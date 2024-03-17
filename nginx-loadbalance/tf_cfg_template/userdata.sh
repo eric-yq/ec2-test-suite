@@ -15,8 +15,8 @@ apt update -y && apt install -y git awscli
 
 ## 获取代码
 cd /root/
-git clone https://github.com/eric-yq/aws-ec2-benchmark-suite.git
+git clone https://github.com/eric-yq/ec2-test-suite.git
 
-cd aws-ec2-benchmark-suite/${SUT_NAME}
+cd ec2-test-suite/${SUT_NAME}
 bash install-sut.sh ${SUT_NAME} ${INSTANCE_IP_WEB1} ${INSTANCE_IP_WEB2}
  
