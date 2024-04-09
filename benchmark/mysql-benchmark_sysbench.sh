@@ -13,7 +13,7 @@ RUN_THREADS=${5}
 cd ~/sysbench-1.0.20/
 
 source /tmp/temp-setting
-RESULT_PATH="/root/ab23-sample-code/benchmark-result-files"
+RESULT_PATH="/root/ec2-test-suite/benchmark-result-files"
 mkdir -p ${RESULT_PATH}
 RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}.txt"
 

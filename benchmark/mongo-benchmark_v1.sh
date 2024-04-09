@@ -66,7 +66,7 @@ EOF
 
 ## 执行 benchmark 测试
 source /tmp/temp-setting
-RESULT_PATH="/root/ab23-sample-code/benchmark-result-files"
+RESULT_PATH="/root/ec2-test-suite/benchmark-result-files"
 mkdir -p ${RESULT_PATH}
 
 submit_task ${1} 

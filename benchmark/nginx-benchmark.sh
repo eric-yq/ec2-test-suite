@@ -6,7 +6,7 @@ SUT_IP_ADDR=${1}
 TEST_TIME=${2}
 
 source /tmp/temp-setting
-RESULT_PATH="/root/ab23-sample-code/benchmark-result-files"
+RESULT_PATH="/root/ec2-test-suite/benchmark-result-files"
 mkdir -p ${RESULT_PATH}
 
 
