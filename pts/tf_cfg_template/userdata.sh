@@ -71,6 +71,7 @@ unzip awscliv2.zip
 ./aws/install
 cp -rf /usr/local/bin/aws /usr/bin/aws
 aws --version
+
 aws_ak_value="xxx"
 aws_sk_value="xxx"
 aws_region_name="us-east-2"

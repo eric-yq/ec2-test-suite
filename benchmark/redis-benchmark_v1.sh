@@ -15,8 +15,8 @@ source /tmp/temp-setting
 RESULT_PATH="/root/ec2-test-suite/benchmark-result-files"
 mkdir -p ${RESULT_PATH}
 
-# THREAD_LIST="1 2 4 6 8 12 16 32 48 64"
-THREAD_LIST="1 4 8 12 16"
+THREAD_LIST="1 2 4 6 8 12 16 32 48 64"
+# THREAD_LIST="1 4 8 12 16"
 
 for i in ${THREAD_LIST}
 do
