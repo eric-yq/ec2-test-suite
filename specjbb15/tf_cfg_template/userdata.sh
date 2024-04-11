@@ -22,7 +22,7 @@ aws configure set default.region ${aws_region_name}
 yum update -y
 
 ## Corretto 11 --default
-yum install java-11-amazon-corretto -y
+yum install -y java-11-amazon-corretto dmidecode
 JDK_VERSION='corretto11'
 
 ## Corretto 17

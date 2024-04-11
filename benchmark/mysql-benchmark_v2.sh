@@ -10,7 +10,6 @@ VUSER_NUM=${3}
 DATA_SIZE=${4}
 FLAG1=${5}
 
-
 let WARES=${DATA_SIZE}*1024/90
 let VUS=${VUSER_NUM}
 echo "Warehouse: ${WARES}, Vusers: ${VUS}"
