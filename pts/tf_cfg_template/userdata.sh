@@ -273,7 +273,7 @@ df -h  >> ${DATA_DIR}/pts-list-installed-tests.txt
 rm -rf ${LOG_DIR}/*
 cp -r /var/log/messages /var/log/cloud-init*.log /var/log/phoronix-test-suite-*.log /var/lib/cloud ${LOG_DIR}
 tar czfP ${DATA_DIR}-all.tar.gz ${DATA_DIR}
-aws s3 cp ${DATA_DIR}-all.tar.gz ${aws_s3_bucket_name}/pts/ && \
+aws s3 cp ${DATA_DIR}-all.tar.gz ${aws_s3_bucket_name}/result_pts/ && \
 echo "[INFO] Step3: Result files have been uploaded to s3 bucket. BYE BYE."
 
 ## 停止实例

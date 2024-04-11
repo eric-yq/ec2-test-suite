@@ -48,9 +48,7 @@ JDK_VERSION='corretto11'
 # JDK_VERSION='dragonwell11'
 
 java -version
-
-yum install -y htop dstat
-java -version
+yum install -y htop dstat dmidecode
 
 ## 系统配置
 PN=$(dmidecode -s system-product-name | tr ' ' '_')
@@ -141,7 +139,7 @@ cd ~
 grep "RUN RESULT: hbIR" ~/specjbb/composite.out >> ~/specjbb/specjbb_results.txt
 cp -r result specjbb/
 tar czf specjbb15-${JDK_VERSION}-${PN}.tar.gz specjbb/
-aws s3 cp specjbb15-${JDK_VERSION}-${PN}.tar.gz ${aws_s3_bucket_name}/specjbb15/
+aws s3 cp specjbb15-${JDK_VERSION}-${PN}.tar.gz ${aws_s3_bucket_name}/result_specjbb15/
 aws s3 ls ${aws_s3_bucket_name}
 echo "Upload specjbb15-${JDK_VERSION}-${PN}.tar.gz to ${aws_s3_bucket_name} ."
 
