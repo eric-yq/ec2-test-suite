@@ -29,8 +29,7 @@ end
 EOF
 
 	~/wrk-4.2.0/wrk --threads $THREADS --connections $i --duration $DURATION \
-		--script ~/wrk-4.2.0/report.lua https://$SUT_IP_ADDR/$RESOURCE_FILE | \
-		grep BENCH >> $RESULT_FILE
+		--script ~/wrk-4.2.0/report.lua https://$SUT_IP_ADDR/$RESOURCE_FILE >> $RESULT_FILE
 		
 # 	~/wrk-4.2.0/wrk --threads ${THREADS} --connections ${CONNECTIONS} --duration ${DURATION} \
 # 		--script ~/wrk-4.2.0/report.lua -H 'Connection: close' \
