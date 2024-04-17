@@ -5,13 +5,7 @@ INSTANCE_IP_WEB1="INSTANCE_IP_WEB1_XXX"
 INSTANCE_IP_WEB2="INSTANCE_IP_WEB2_XXX"
 
 yum install -y git awscli
-dnf install -y git awscli
 apt update -y && apt install -y git awscli
-
-
-yum install -y git awscli git
-apt update -y && apt install -y git awscli
-
 
 ## 获取代码
 cd /root/

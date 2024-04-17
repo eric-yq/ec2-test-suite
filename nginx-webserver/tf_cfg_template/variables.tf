@@ -6,9 +6,7 @@ variable "subnet_id" {
 # for slave
 variable "subnet_id_1" {
 	default = "subnet-025096aa4e2c8c3f3"
-# 	default = "subnet-0f246934a6394ca73"
 }
-
 
 variable "vpc_security_group_ids" {
 	default = ["sg-066af1ddd6d0624d9"]

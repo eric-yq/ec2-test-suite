@@ -6,9 +6,7 @@ echo "$0: Install SUT_NAME: ${SUT_NAME}"
 install_public_tools(){
 	$PKGCMD update -y
 	$PKGCMD1 install -y epel
-	$PKGCMD install -y dmidecode net-tools dstat htop nload
-# 	$PKGCMD install -y stress-ng
-# 	$PKGCMD install -y perf
+	$PKGCMD install -y dmidecode htop
 	$PKGCMD install -y git
 }
 os_configure(){
@@ -88,7 +86,6 @@ EOF
 
 ## 获取OS 、CPU 架构信息。
 OS_NAME=$(egrep ^NAME /etc/os-release | awk -F "\"" '{print $2}')
-# OS_ID=$(egrep "^ID=" /etc/os-release | awk -F "\"" '{print $2}') 
 OS_VERSION=$(egrep ^VERSION_ID /etc/os-release | awk -F "\"" '{print $2}') 
 ARCH=$(lscpu | grep Architecture | awk -F " " '{print $NF}') 
 PN=$(dmidecode -s system-product-name | tr ' ' '_')
@@ -107,7 +104,6 @@ if   [[ "$OS_NAME" == "Amazon Linux" ]]; then
 		exit 1
 	fi
 		
-		
 	# NGINX conf
 	NGINX_SERVICE="nginx"
 	NGINX_CONF="/etc/nginx/nginx.conf"
@@ -119,15 +115,6 @@ elif [[ "$OS_NAME" == "Ubuntu" ]]; then
 	# mysql conf
 	NGINX_SERVICE="nginx"
 	NGINX_CONF="/etc/nginx/nginx.conf"
-
-# elif [[ "$OS_NAME" == "CentOS Linux" ]] && [[ "$OS_VERSION" == "7" ]]; then
-# 	install_centos7_dependencies
-# 
-# elif [[ "$OS_NAME" == "CentOS Stream" ]] && [[ "$OS_VERSION" == "8" ]]; then
-# 	install_centos8_dependencies
-# 
-# elif [[ "$OS_NAME" == "CentOS Stream" ]] && [[ "$OS_VERSION" == "9" ]]; then
-# 	install_centos9_dependencies
 
 else
 	echo "$0: $OS_NAME not supported"
