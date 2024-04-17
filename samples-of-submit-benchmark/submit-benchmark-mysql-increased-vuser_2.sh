@@ -3,7 +3,7 @@
 ## 待测 EC2 规格和 OS
 os_types="al2023"
 instance_types="r5.2xlarge r6a.2xlarge r6g.2xlarge r6i.2xlarge r7a.2xlarge r7g.2xlarge r7i.2xlarge"
-# instance_types="r5.2xlarge"
+# instance_types="r5.2xlarge"	
 
 for os in ${os_types} 
 do

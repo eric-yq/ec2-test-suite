@@ -7,9 +7,14 @@ instance_types="r5.4xlarge r6a.4xlarge r6g.4xlarge r6i.4xlarge r7a.4xlarge r7g.4
 for os in ${os_types} 
 do
 	for ins in ${instance_types} 
-	do
+		do
 		## 创建实例、安装软件
 		echo "$0: OS_TYPE=${os}, INSTANCE_TYPE=${ins}"
-		bash launch-instances-single.sh -s specjbb15 -t ${ins} -o ${os}
+		bash launch-instances-nginx.sh -s nginx -t ${ins} -o ${os}
+
+		## 执行 Benchmark 测试
+		echo "$0: Star to run benchmark"
+		source /tmp/temp-setting
+		bash benchmark/nginx-benchmark.sh ${INSTANCE_IP_LOADBALANCE}
 	done
 done
