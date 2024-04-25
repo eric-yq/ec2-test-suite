@@ -31,7 +31,7 @@ then
     OS_TYPE=al2
 fi
 
-REGION_NAME="us-east-2"
+REGION_NAME="us-west-2"
 echo "" > /tmp/temp-setting
 echo "export REGION_NAME=${REGION_NAME}" >> /tmp/temp-setting
 echo "export INSTANCE_TYPE=${INSTANCE_TYPE}" >> /tmp/temp-setting

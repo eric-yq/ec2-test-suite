@@ -1,17 +1,17 @@
 ## 手工设置下面几个变量
 # for master
 variable "subnet_id" {
-	default = "subnet-025096aa4e2c8c3f3"
+	default = "subnet-046de201cd71d1cde"
 }
 # for slave
 variable "subnet_id_1" {
 # 	default = "subnet-0f246934a6394ca73"
-	default = "subnet-025096aa4e2c8c3f3"
+	default = "subnet-046de201cd71d1cde"
 }
 
 
 variable "vpc_security_group_ids" {
-	default = ["sg-066af1ddd6d0624d9"]
+	default = ["sg-0d75ecd997cb2a4b4"]
 }
 
 variable "ami_key_pair_name" {
@@ -52,7 +52,7 @@ variable "root_block_throughput" {
 ## 
 variable "region_name" {
 	description = "Name of the region"
-	default = "us-east-2"
+	default = "us-west-2"
 }
 
 variable "number_of_instances" {
