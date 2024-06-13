@@ -60,6 +60,18 @@ EOF
 ## 执行 benchmark 测试
 source /tmp/temp-setting
 
+if [[ x"$SUT_NAME" == x ]]; then
+    SUT_NAME="mysql_hammerdb"
+fi
+
+if [[ x"$INSTANCE_TYPE" == x ]]; then
+    INSTANCE_TYPE=$FLAG1
+fi
+
+if [[ x"$INSTANCE_IP_MASTER" == x ]]; then
+    INSTANCE_IP_MASTER=$SUT_IP_ADDR
+fi
+
 RESULT_PATH="/root/ec2-test-suite/benchmark-result-files"
 mkdir -p ${RESULT_PATH}
 RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}.txt"
