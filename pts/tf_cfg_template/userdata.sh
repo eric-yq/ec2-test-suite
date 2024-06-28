@@ -255,7 +255,6 @@ pyperformance cython-bench cpp-perf-bench \
 graphics-magick smallpt c-ray \
 renaissance dacapobench java-scimark2 \
 scimark2 arrayfire quantlib stockfish lczero \
-ncnn opencv llama-cpp llamafile \
 "
 for testname in ${tests} 
 do
@@ -272,7 +271,8 @@ tests="\
 blogbench nginx \
 memtier-benchmark cassandra \
 spark rocksdb clickhouse influxdb \
-tjbench vvenc libxsmm ncnn \
+tjbench vvenc libxsmm \
+ncnn opencv llama-cpp llamafile \
 "
 # 下面这些需要再研究下如何运行
 # cpuminer-opt 
