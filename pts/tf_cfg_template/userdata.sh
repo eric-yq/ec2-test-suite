@@ -27,14 +27,18 @@ install_al2_dependencies () {
   python3 -m pip install pandas numpy scipy matplotlib sh seaborn plotext
   git clone https://github.com/brendangregg/FlameGraph.git FlameGraph
   
-  echo "------ REPLACE GCC 7.3 WITH GCC 10.X------"
-  ## 设置使用 GCC 10.4 版本
-  mv /usr/bin/gcc /usr/bin/gcc7.3
-  mv /usr/bin/g++ /usr/bin/g++7.3
-  alternatives --install /usr/bin/gcc gcc /usr/bin/gcc10-cc  100
-  alternatives --install /usr/bin/g++ g++ /usr/bin/gcc10-c++ 100
+#   echo "------ REPLACE GCC 7.3 WITH GCC 10.X------"
+#   ## 设置使用 GCC 10.4 版本
+#   mv /usr/bin/gcc /usr/bin/gcc7.3
+#   mv /usr/bin/g++ /usr/bin/g++7.3
+#   alternatives --install /usr/bin/gcc gcc /usr/bin/gcc10-cc  100
+#   alternatives --install /usr/bin/g++ g++ /usr/bin/gcc10-c++ 100
   gcc --version
   g++ --version
+  
+  ## 20240619
+  yum install -y blas blas-devel lapack lapack-devel lz4 lz4-devel lzo lzo-devel  
+  
 
   echo "------ DONE ------"
 }
@@ -121,15 +125,15 @@ PTS_RESULT_DIR=${DATA_DIR}/pts-result
 LOG_DIR=${DATA_DIR}/logs
 mkdir -p ${DATA_DIR}  ${CFG_DIR} ${PTS_RESULT_DIR} ${LOG_DIR} 
 
-echo "DATA_DIR=${DATA_DIR}" >> /root/.bash_profile
-echo "CFG_DIR=${CFG_DIR}" >> /root/.bash_profile
-echo "PTS_RESULT_DIR=${PTS_RESULT_DIR}" >> /root/.bash_profile
-echo "LOG_DIR=${LOG_DIR}" >> /root/.bash_profile
-echo "PN=${PN}" >> /root/.bash_profile
-echo "TEST_RESULTS_IDENTIFIER=${PN}" >> /root/.bash_profile
-echo "TEST_RESULTS_DESCRIPTION=${PN}" >> /root/.bash_profile
-echo "TEST_RESULTS_NAME=${PN}" >> /root/.bash_profile
-source /root/.bash_profile
+echo "export DATA_DIR=${DATA_DIR}" >> /root/.bashrc
+echo "export CFG_DIR=${CFG_DIR}" >> /root/.bashrc
+echo "export PTS_RESULT_DIR=${PTS_RESULT_DIR}" >> /root/.bashrc
+echo "export LOG_DIR=${LOG_DIR}" >> /root/.bashrc
+echo "export PN=${PN}" >> /root/.bashrc
+echo "export TEST_RESULTS_IDENTIFIER=${PN}" >> /root/.bashrc
+echo "export TEST_RESULTS_DESCRIPTION=${PN}" >> /root/.bashrc
+echo "export TEST_RESULTS_NAME=${PN}" >> /root/.bashrc
+source /root/.bashrc
 
 ## 收集系统信息
 dmidecode > ${CFG_DIR}/cfg_dmidecode.txt
@@ -237,14 +241,22 @@ cd ~/phoronix-test-suite/
 ## PTS：setup default user-configuration in /etc/phoronix-test-suite.xml
 ### following command use /usr/share/phoronix-test-suite/pts-core/commands/batch_setup.php
 phoronix-test-suite batch-setup
-export TEST_RESULTS_IDENTIFIER=${PN}
-export TEST_RESULTS_DESCRIPTION=${PN}
-export TEST_RESULTS_NAME=${PN}
+
 
 ## 执行基准测试(标准)
 echo "[INFO] Step1: Start to perform standard PTS tests related to CPU/Memory/Cache and some simple workloads..."
-tests="stream intel-mlc cachebench gmpbench compress-zstd compress-lz4 openssl botan x264 x265   \
-      pyperformance cpp-perf-bench graphics-magick smallpt stockfish c-ray scimark2 renaissance dacapobench"
+tests="\
+byte sysbench gmpbench primesieve \
+stream intel-mlc cachebench ramspeed \
+compress-zstd compress-lz4 blosc \
+openssl botan john-the-ripper \
+x264 x265 \
+pyperformance cython-bench cpp-perf-bench \
+graphics-magick smallpt c-ray \
+renaissance dacapobench java-scimark2 \
+scimark2 arrayfire quantlib stockfish lczero \
+ncnn opencv llama-cpp llamafile \
+"
 for testname in ${tests} 
 do
     phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
@@ -256,7 +268,17 @@ echo "[INFO] Step1: Complete STANDARD PTS TESTS."
 
 ## 执行基准测试(更多)
 echo "[INFO] Step2: Start to perform more PTS tests related to complex workload..."
-tests="blogbench nginx memtier-benchmark cassandra tjbench vvenc ncnn libxsmm spark rocksdb clickhouse influxdb"
+tests="\
+blogbench nginx \
+memtier-benchmark cassandra \
+spark rocksdb clickhouse influxdb \
+tjbench vvenc libxsmm ncnn \
+"
+# 下面这些需要再研究下如何运行
+# cpuminer-opt 
+# ai-benchmark mlpack scikit-learn onednn deepsparse llama-cpp llamafile whisper-cpp
+
+
 for testname in ${tests} 
 do
     phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
