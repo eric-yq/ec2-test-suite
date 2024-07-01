@@ -241,7 +241,9 @@ cd ~/phoronix-test-suite/
 ## PTS：setup default user-configuration in /etc/phoronix-test-suite.xml
 ### following command use /usr/share/phoronix-test-suite/pts-core/commands/batch_setup.php
 phoronix-test-suite batch-setup
-
+export TEST_RESULTS_IDENTIFIER=${PN}
+export TEST_RESULTS_DESCRIPTION=${PN}
+export TEST_RESULTS_NAME=${PN}
 
 ## 执行基准测试(标准)
 echo "[INFO] Step1: Start to perform standard PTS tests related to CPU/Memory/Cache and some simple workloads..."
@@ -252,7 +254,7 @@ compress-zstd compress-lz4 blosc \
 openssl botan john-the-ripper \
 x264 x265 \
 pyperformance cython-bench cpp-perf-bench \
-graphics-magick smallpt c-ray \
+graphics-magick smallpt c-ray draco \
 renaissance dacapobench java-scimark2 \
 scimark2 arrayfire quantlib stockfish lczero \
 "
@@ -269,15 +271,14 @@ echo "[INFO] Step1: Complete STANDARD PTS TESTS."
 echo "[INFO] Step2: Start to perform more PTS tests related to complex workload..."
 tests="\
 blogbench nginx \
-memtier-benchmark cassandra \
+memtier-benchmark cassandra scylladb \
 spark rocksdb clickhouse influxdb \
 tjbench vvenc libxsmm \
 ncnn opencv llama-cpp llamafile \
 "
 # 下面这些需要再研究下如何运行
-# cpuminer-opt 
-# ai-benchmark mlpack scikit-learn onednn deepsparse llama-cpp llamafile whisper-cpp
-
+# cpuminer-opt scikit-learn  
+# 有价值但是目前只在 x86 支持的 test：  embree
 
 for testname in ${tests} 
 do
