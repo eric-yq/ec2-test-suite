@@ -1,9 +1,12 @@
 #!/bin/bash 
 
-
-# Ubuntu 22.04 安装 PTS
-
 cd /root/
+
+###################################################################################################
+# 安装 nvidia driver, cuda, cudnn 等
+wget https://raw.githubusercontent.com/eric-yq/ec2-test-suite/main/misc/setup_gpu.sh 
+bash setup_gpu.sh 
+
 
 ###################################################################################################
 # 安装需求包
@@ -91,11 +94,10 @@ pip install -U "huggingface_hub[cli]"
 ###################################################################################################
 # 构建 llama.cpp
 cd /root/
-apt install -y libopenblas-dev
 
 git clone https://github.com/ggerganov/llama.cpp.git
 cd /root/llama.cpp
-make -j $(nproc) LLAMA_CURL=ON GGML_OPENBLAS=1
+make -j $(nproc) LLAMA_CURL=ON LLAMA_CUBLAS=1
 ln -s /root/llama.cpp/llama-cli /usr/local/bin/llama-cli
 chmod +x /usr/local/bin/llama-cli
 
@@ -117,8 +119,7 @@ echo "[Info] \$(date +%Y%m%d.%H%M%S) The output of prompt file \$3 and llama_pri
   >> \$LOG_FILE 
   
 llama-cli --hf-repo \$id --hf-file \$name -f \$PROMPTS_REPO/\$3.txt \
-  --color --ctx_size 4096 
-# >> \$LOG_FILE 2>&1
+  --color --gpu-layers 64 --ctx_size 9999 >> \$LOG_FILE 2>&1
 
 echo "[Info] \$(date +%Y%m%d.%H%M%S) Complete Successfully. " 
 EOF
@@ -221,12 +222,12 @@ run-llama-cpp $repo_id $filenames 02
 run-llama-cpp $repo_id $filenames 03
 
 #################################################
-# ## Model: Grok-1-GGUF
-# repo_id="Arki05/Grok-1-GGUF"
-# filenames="gemma-2-27b-it-Q5_K_M.gguf"
-# run-llama-cpp $repo_id $filenames 01
-# run-llama-cpp $repo_id $filenames 02
-# run-llama-cpp $repo_id $filenames 03
+## Model: Grok-1-GGUF
+repo_id="Arki05/Grok-1-GGUF"
+filenames="gemma-2-27b-it-Q5_K_M.gguf"
+run-llama-cpp $repo_id $filenames 01
+run-llama-cpp $repo_id $filenames 02
+run-llama-cpp $repo_id $filenames 03
 
 #################################################
 ## Model: Starling-LM-7B-alpha-GGUF
@@ -259,6 +260,7 @@ filenames="solar-10.7b-instruct-v1.0-uncensored.Q5_K_M.gguf"
 run-llama-cpp $repo_id $filenames 01
 run-llama-cpp $repo_id $filenames 02
 run-llama-cpp $repo_id $filenames 03
+
 
 #################################################
 ## Model: llama-Chinese-Alpaca-2-7B-q4_0.gguf
