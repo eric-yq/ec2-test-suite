@@ -108,19 +108,20 @@ name=\$(echo \$2 | sed 's/\//__/g')
 
 LOG_REPO="/root/logs_of_llama.cpp/\$id/"
 LOG_FILE="\$LOG_REPO/\$name.log"
+PROMPTS_REPO="/root/prompts_repo"
 mkdir -p \$LOG_REPO
 
 
 echo "[Info] \$(date +%Y%m%d.%H%M%S) Start to generate contents using Model \$name ...... " 
 echo "[Info] \$(date +%Y%m%d.%H%M%S) Progress and log file:  \$LOG_FILE " 
-echo "[Info] \$(date +%Y%m%d.%H%M%S) The output of prompt file \$3 and llama_print_timings: " \
-  >> \$LOG_FILE 
+echo "[Info] \$(date +%Y%m%d.%H%M%S) The output of prompt file \$3 and llama_print_timings: " >> \$LOG_FILE 
   
 llama-cli --hf-repo \$id --hf-file \$name -f \$PROMPTS_REPO/\$3.txt \
-  --color --ctx_size 4096 
-# >> \$LOG_FILE 2>&1
+  --color --ctx_size 4096 >> \$LOG_FILE 2>&1
 
+grep "llama_print_timings:" \$LOG_FILE 
 echo "[Info] \$(date +%Y%m%d.%H%M%S) Complete Successfully. " 
+
 EOF
 chmod +x /usr/local/bin/run-llama-cpp
 
@@ -162,7 +163,6 @@ filenames="tinyllama-1.1b-chat-v1.0.Q8_0.gguf"
 run-llama-cpp $repo_id $filenames 01
 run-llama-cpp $repo_id $filenames 02
 run-llama-cpp $repo_id $filenames 03
-
 
 #################################################
 ## Model: Llama-2-7B-Chat-GGUF

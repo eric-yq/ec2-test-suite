@@ -1,7 +1,7 @@
 #!/bin/bash
 # OS: Ubuntu 22.04 
 
-# Reference: 
+# Reference:  这里使用 TorchBench framework.
 # https://aws.amazon.com/blogs/machine-learning/accelerated-pytorch-inference-with-torch-compile-on-aws-graviton-processors/
 
 sudo su - root
@@ -64,11 +64,15 @@ testname="torch.compile.bench"
 conda create -y -q -n ${testname} python=3.11
 conda activate $testname
 
+cd ~
+
+echo "[Info] DNNL_DEFAULT_FPMATH_MODE=$DNNL_DEFAULT_FPMATH_MODE, THP_MEM_ALLOC_ENABLE=$THP_MEM_ALLOC_ENABLE,  LRU_CACHE_CAPACITY=$LRU_CACHE_CAPACITY"
+
 # Install PyTorch and extensions
 pip install torch==2.3.1 torchvision==0.18.1 torchaudio==2.3.1
 
-# Set OMP_NUM_THREADS to number of vcpus, 16 for c7g.4xl instance
-export OMP_NUM_THREADS=16
+# Set OMP_NUM_THREADS to number of vcpus
+export OMP_NUM_THREADS=$(nproc)
 
 # Install the dependencies
 apt install -y libgl1-mesa-glx libpangocairo-1.0-0 libgeos-dev
@@ -81,6 +85,12 @@ cd benchmark
 # listing the commit we used for collecting the performance numbers
 git checkout 9a5e4137299741e1b6fb7aa7f5a6a853e5dd2295
 
+
+export DNNL_DEFAULT_FPMATH_MODE=BF16
+export THP_MEM_ALLOC_ENABLE=1
+export LRU_CACHE_CAPACITY=1024
+echo "[Info] DNNL_DEFAULT_FPMATH_MODE=$DNNL_DEFAULT_FPMATH_MODE, THP_MEM_ALLOC_ENABLE=$THP_MEM_ALLOC_ENABLE,  LRU_CACHE_CAPACITY=$LRU_CACHE_CAPACITY"
+
 # Setup the models
 python3 install.py
 
@@ -92,6 +102,7 @@ python3 run_benchmark.py cpu --model $models \
 
 # 222222...... Collect torch.compile mode performance with inductor backend and weights pre-packing enabled. 
 # The results will be stored at .userbenchmark/cpu/metric-<timestamp>.json
+models="BERT_pytorch,hf_Bert,hf_Bert_large,hf_GPT2,hf_Albert,hf_Bart,hf_BigBird,hf_DistilBert,hf_GPT2_large,dlrm,hf_T5,mnasnet1_0,mobilenet_v2,mobilenet_v3_large,squeezenet1_1,timm_efficientnet,shufflenet_v2_x1_0,timm_regnet,resnet50,soft_actor_critic,phlippe_densenet,resnet152,resnet18,resnext50_32x4d,densenet121,phlippe_resnet,doctr_det_predictor,timm_vovnet,alexnet,doctr_reco_predictor,vgg16,dcgan,yolov3,pytorch_stargan,hf_Longformer,timm_nfnet,timm_vision_transformer,timm_vision_transformer_large,nvidia_deeprecommender,demucs,tts_angular,hf_Reformer,pytorch_CycleGAN_and_pix2pix,functorch_dp_cifar10,pytorch_unet"
 python3 run_benchmark.py cpu --model $models \
   --test eval --metrics="latencies,cpu_peak_mem" --torchdynamo inductor --freeze_prepack_weights 
 

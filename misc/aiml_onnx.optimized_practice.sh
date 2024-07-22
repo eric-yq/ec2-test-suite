@@ -1,8 +1,8 @@
 #!/bin/bash
 # OS: Ubuntu 22.04 
 
-# Reference: 
-# https://aws.amazon.com/blogs/machine-learning/accelerated-pytorch-inference-with-torch-compile-on-aws-graviton-processors/
+# Reference: 目的是和 onnxruntime==1.16 比较。
+# https://aws.amazon.com/cn/blogs/machine-learning/accelerate-nlp-inference-with-onnx-runtime-on-aws-graviton-processors/
 
 sudo su - root
 
