@@ -14,12 +14,10 @@ https://aws-ciw-readonly.amazon.com/cost-management/home?spoofAccountId=02940793
 ## 所有字段
 bash -x ./InstallAndRunGSR.sh --batch-mode --batch-file /Users/ericyq/Customers-List.csv --gsr-install-location /Users/ericyq
 
-## 只有 3 个字段
-bash -x ./InstallAndRunGSR.sh --batch-mode --batch-file /Users/ericyq/Customers-List-1.csv --gsr-install-location /Users/ericyq
-
 
 Solutions Architect,Technical Account Manager,Customer Solutions Manager
 
-# Windows
+
+# Windows执行
 ./InstallAndRunGSR.ps1 -BatchMode -BatchFile 'D:\Customers-List.csv' -GsrInstallationLocation 'D:\'
 
