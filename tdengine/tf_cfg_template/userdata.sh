@@ -1,6 +1,8 @@
 #!/bin/bash
 
 # al2023
+yum update 
+yum clean all
 yum groupinstall -y "Development Tools"
 yum install -y cmake maven
 yum install -y java-1.8.0-amazon-corretto java-1.8.0-amazon-corretto-devel
