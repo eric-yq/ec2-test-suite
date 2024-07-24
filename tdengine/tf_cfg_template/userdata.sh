@@ -1,12 +1,11 @@
 #!/bin/bash
 
 # al2023
-yum update 
-yum clean all
-yum groupinstall -y "Development Tools"
-yum install -y cmake maven
-yum install -y java-1.8.0-amazon-corretto java-1.8.0-amazon-corretto-devel
-yum install -y zlib-devel zlib-static xz-devel snappy-devel jansson jansson-devel pkgconfig libatomic libatomic-static libstdc++-static
+dnf update 
+dnf groupinstall -y "Development Tools"
+dnf install -y cmake maven
+dnf install -y java-1.8.0-amazon-corretto java-1.8.0-amazon-corretto-devel
+dnf install -y zlib-devel zlib-static xz-devel snappy-devel jansson jansson-devel pkgconfig libatomic libatomic-static libstdc++-static
 
 # 编译构建和安装
 cd /root/
