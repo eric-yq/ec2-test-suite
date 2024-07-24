@@ -20,4 +20,13 @@ Solutions Architect,Technical Account Manager,Customer Solutions Manager
 
 # Windows执行
 ./InstallAndRunGSR.ps1 -BatchMode -BatchFile 'D:\Customers-List.csv' -GsrInstallationLocation 'D:\'
+ 
+python.exe D:\GSR-sendmail\SendEmail.py -hfile 'D:\GSR-sendmail\Dear Account Team.html' -rdir 'D:\GSR' -clst 'D:\Customers-List.csv'
+
+
+
+
+
+
+
 

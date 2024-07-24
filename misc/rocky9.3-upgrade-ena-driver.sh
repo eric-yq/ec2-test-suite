@@ -1,4 +1,3 @@
-
 sudo su - root
 
 ## 首次启动实例查看：
@@ -20,7 +19,7 @@ find / -name "ena.ko*"
 # /usr/lib/modules/5.14.0-362.8.1.el9_3.x86_64/kernel/drivers/net/ethernet/amazon/ena/ena.ko.xz
 
 
-## 升级系统, kernel 会被一同升级
+## 升级系统, kernel 会被一同升级；应该也可以不执行这个。
 dnf update -y
 reboot
 
@@ -64,6 +63,11 @@ modinfo ena
 ethtool -i eth0
 # driver: ena
 # version: 2.12.3g
+
+
+
+
+
 
 
 ##### 安装 dkms ????
