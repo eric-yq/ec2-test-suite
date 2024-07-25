@@ -105,13 +105,10 @@ else
 fi
 
 ## 更新 cmake
-ARCH=$(lscpu | grep Architecture | awk -F " " '{print $NF}')   ## aarch64, x86_64
-mkdir /root/cmake-3.25.2-linux-${ARCH}
-cd    /root/cmake-3.25.2-linux-${ARCH}
-wget https://github.com/Kitware/CMake/releases/download/v3.25.2/cmake-3.25.2-linux-${ARCH}.sh
-sh cmake-3.25.2-linux-${ARCH}.sh --skip-license 
-mv /usr/bin/cmake /usr/bin/cmake.bak
-ln -s /root/cmake-3.25.2-linux-${ARCH}/bin/cmake /usr/bin/cmake
+ARCH=$(arch) 
+VER=3.29.6
+wget https://github.com/Kitware/CMake/releases/download/v${VER}/cmake-${VER}-linux-${ARCH}.sh
+sh cmake-${VER}-linux-${ARCH}.sh --skip-license --prefix=/usr
 cmake -version
 
 
