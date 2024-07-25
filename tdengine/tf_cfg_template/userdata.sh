@@ -1,11 +1,32 @@
 #!/bin/bash
 
-# al2023
-dnf update 
-dnf groupinstall -y "Development Tools"
-dnf install -y cmake maven
-dnf install -y java-1.8.0-amazon-corretto java-1.8.0-amazon-corretto-devel
-dnf install -y zlib-devel zlib-static xz-devel snappy-devel jansson jansson-devel pkgconfig libatomic libatomic-static libstdc++-static
+# al2023 ####################################################################
+# dnf update 
+# dnf groupinstall -y "Development Tools"
+# dnf install -y cmake maven
+# dnf install -y java-1.8.0-amazon-corretto java-1.8.0-amazon-corretto-devel
+# dnf install -y zlib-devel zlib-static xz-devel snappy-devel jansson jansson-devel pkgconfig libatomic libatomic-static libstdc++-static
+
+
+# al2 ######################################################################
+amazon-linux-extras install -y epel
+yum groupinstall -y "Development Tools"
+yum install -y gcc gcc-c++ make git java-1.8.0-openjdk java-1.8.0-openjdk-devel
+yum install -y zlib-devel zlib-static xz-devel snappy-devel jansson jansson-devel pkgconfig libatomic libatomic-static libstdc++-static
+## 更新 cmake
+cd /root/
+ARCH=$(arch) 
+VER=3.29.6
+wget https://github.com/Kitware/CMake/releases/download/v${VER}/cmake-${VER}-linux-${ARCH}.sh
+sh cmake-${VER}-linux-${ARCH}.sh --skip-license --prefix=/usr
+cmake -version
+# 更新 maven
+cd /root/
+VER=3.9.8
+wget https://dlcdn.apache.org/maven/maven-3/${VER}/binaries/apache-maven-${VER}-bin.tar.gz
+tar zxf apache-maven-${VER}-bin.tar.gz -C /usr/ --strip-components 1
+mvn -v
+#############################################################################
 
 # 编译构建和安装
 cd /root/
@@ -21,6 +42,7 @@ systemctl start  taosd
 systemctl status taosd
 
 sleep 10
+
 
 ## 获取机型规格、kernel 版本，创建保存输出文件的目录。
 cd /root/
