@@ -15,6 +15,10 @@ make && make install
 phoronix-test-suite install rocksdb
 phoronix-test-suite batch-benchmark rocksdb
 
+## 安装运行 influxdb benchmark
+phoronix-test-suite install rocksdb
+phoronix-test-suite batch-benchmark rocksdb
+
 
 ############ 公共部分：安装 PTS ############ 
 INSTALL_PTS_ON_AMAZONLINUX () {

@@ -29,10 +29,10 @@ install_al2_dependencies () {
   
 #   echo "------ REPLACE GCC 7.3 WITH GCC 10.X------"
 #   ## 设置使用 GCC 10.4 版本
-#   mv /usr/bin/gcc /usr/bin/gcc7.3
-#   mv /usr/bin/g++ /usr/bin/g++7.3
-#   alternatives --install /usr/bin/gcc gcc /usr/bin/gcc10-cc  100
-#   alternatives --install /usr/bin/g++ g++ /usr/bin/gcc10-c++ 100
+  mv /usr/bin/gcc /usr/bin/gcc7.3
+  mv /usr/bin/g++ /usr/bin/g++7.3
+  alternatives --install /usr/bin/gcc gcc /usr/bin/gcc10-cc  100
+  alternatives --install /usr/bin/g++ g++ /usr/bin/gcc10-c++ 100
   gcc --version
   g++ --version
   
