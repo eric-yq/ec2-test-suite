@@ -1,22 +1,3 @@
-sudo su - root
-
-## 首次启动实例查看：
-uname -a
-# Linux ip-172-31-18-59.us-east-2.compute.internal 5.14.0-362.8.1.el9_3.x86_64 #1 SMP PREEMPT_DYNAMIC Wed Nov 8 17:36:32 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux
-
-modinfo ena
-# name:           ena
-# vermagic:       5.14.0-362.8.1.el9_3.x86_64 SMP preempt mod_unload modversions 
-
-ethtool -i eth0
-# driver: ena
-# version: 5.14.0-362.8.1.el9_3.x86_64
-
-depmod -n | grep ena.ko
-# kernel/drivers/net/ethernet/amazon/ena/ena.ko.xz:
-
-find / -name "ena.ko*"
-# /usr/lib/modules/5.14.0-362.8.1.el9_3.x86_64/kernel/drivers/net/ethernet/amazon/ena/ena.ko.xz
 
 
 ## 升级系统, kernel 会被一同升级；应该也可以不执行这个。

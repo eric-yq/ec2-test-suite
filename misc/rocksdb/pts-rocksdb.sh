@@ -16,8 +16,8 @@ phoronix-test-suite install rocksdb
 phoronix-test-suite batch-benchmark rocksdb
 
 ## 安装运行 influxdb benchmark
-phoronix-test-suite install rocksdb
-phoronix-test-suite batch-benchmark rocksdb
+phoronix-test-suite install influxdb
+phoronix-test-suite batch-benchmark influxdb
 
 
 ############ 公共部分：安装 PTS ############ 
