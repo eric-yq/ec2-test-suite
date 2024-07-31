@@ -15,6 +15,7 @@ mkdir -p $LOG_PATH
 ##################################################################################
 ## 磁盘工作负载
 PRINT_INFO "Start to peform RocksDB In Storage Workload Performance Benchmarks"
+cd /root/rocksdb-9.0.0/build
 wget https://raw.githubusercontent.com/facebook/rocksdb/main/tools/benchmark.sh
 
 export DB_DIR="/mnt/db/"
@@ -50,3 +51,6 @@ NUM_KEYS=900000000 CACHE_SIZE=6442450944 DURATION=5400 MB_WRITE_PER_SEC=2 bash b
 
 PRINT_INFO "Complete to peform RocksDB In Storage Workload Performance Benchmarks"
 
+
+cp nohup.out /tmp/benchmark_* /tmp/schedule.txt /tmp/report.tsv ${LOG_PATH}/
+tar czfP ${LOG_PATH}.tar.gz ${LOG_PATH}
