@@ -141,5 +141,5 @@ PRINT_INFO "  $ACTION....."
 PRINT_INFO "Complete to peform $TEST Benchmark."
 PRINT_INFO "Complete to peform RocksDB In Memory Workload Performance Benchmarks"
 
-cp nohup.out ${LOG_PATH}/
+cp /root/nohup.out ${LOG_PATH}/
 tar czfP ${LOG_PATH}.tar.gz ${LOG_PATH}
