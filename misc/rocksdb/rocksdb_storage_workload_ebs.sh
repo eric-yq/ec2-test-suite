@@ -9,7 +9,7 @@ PRINT_INFO(){
 
 ## Benchmark 流程
 PN=$(dmidecode -s system-product-name | tr ' ' '_')
-LOG_PATH="$HOME/RocksDB_Benchmark_storage_workload_$PN"
+LOG_PATH="$HOME/RocksDB_Benchmark_storage_workload_ebs_$PN"
 mkdir -p $LOG_PATH
 
 ##################################################################################
@@ -50,7 +50,6 @@ ACTION="revrangewhilewriting" && PRINT_INFO "  $ACTION....." && LOG_FILE="$LOG_P
 NUM_KEYS=900000000 CACHE_SIZE=6442450944 DURATION=5400 MB_WRITE_PER_SEC=2 bash benchmark.sh revrangewhilewriting > $LOG_FILE 2>&1
 
 PRINT_INFO "Complete to peform RocksDB In Storage Workload Performance Benchmarks"
-
 
 cp /root/nohup.out /tmp/benchmark_* /tmp/schedule.txt /tmp/report.tsv ${LOG_PATH}/
 tar czfP ${LOG_PATH}.tar.gz ${LOG_PATH}

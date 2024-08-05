@@ -86,6 +86,9 @@ wget https://raw.githubusercontent.com/facebook/rocksdb/main/tools/benchmark.sh
 
 export DB_DIR="/data/nvme1n1p1"
 export WAL_DIR="/data/nvme1n1p1"
+
+# 对于 r5d.4xlarge，带有 2*300G 的盘，这里将 WAL_DIR 放在另一块盘分担下容量压力。
+# export WAL_DIR="/data/nvme2n1p1"
 export COMPRESSION_TYPE=snappy 
 
 ACTION="bulkload" && PRINT_INFO "  $ACTION....." && LOG_FILE="$LOG_PATH/$ACTION.log"
