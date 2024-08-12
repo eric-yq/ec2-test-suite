@@ -12,6 +12,8 @@ install_public_tools(){
 	$PKGCMD install -y git
 }
 install_mongo(){
+    $PKGCMD list mongodb-org*
+    sleep 5
     $PKGCMD install -y mongodb-org
     MONGO_USER_GROUP=$(grep mongo /etc/passwd | awk -F ":" '{print $1}')
     
@@ -141,15 +143,6 @@ elif [[ "$OS_NAME" == "Ubuntu" ]]; then
 	# mongo conf
 	MONGO_SERVICE="mongod"
 	MONGO_CONF="/etc/mongod.conf"
-	
-# elif [[ "$OS_NAME" == "CentOS Linux" ]] && [[ "$OS_VERSION" == "7" ]]; then
-# 	install_centos7_dependencies
-# 
-# elif [[ "$OS_NAME" == "CentOS Stream" ]] && [[ "$OS_VERSION" == "8" ]]; then
-# 	install_centos8_dependencies
-# 
-# elif [[ "$OS_NAME" == "CentOS Stream" ]] && [[ "$OS_VERSION" == "9" ]]; then
-# 	install_centos9_dependencies
 
 else
 	echo "$OS_NAME not supported"
