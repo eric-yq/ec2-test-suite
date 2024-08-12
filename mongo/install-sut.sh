@@ -4,7 +4,7 @@ SUT_NAME=${1}
 echo "$0: Install SUT_NAME: ${SUT_NAME}"
 
 install_public_tools(){
-	$PKGCMD update -y
+# 	$PKGCMD update -y
 	$PKGCMD1 install -y epel
 	$PKGCMD install -y dmidecode net-tools dstat htop nload
 # 	$PKGCMD install -y stress-ng
