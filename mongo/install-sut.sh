@@ -7,13 +7,8 @@ install_public_tools(){
 # 	$PKGCMD update -y
 	$PKGCMD1 install -y epel
 	$PKGCMD install -y dmidecode net-tools dstat htop nload
-# 	$PKGCMD install -y stress-ng
-# 	$PKGCMD install -y perf
-	$PKGCMD install -y git
 }
 install_mongo(){
-    $PKGCMD list mongodb-org*
-    sleep 5
     $PKGCMD install -y mongodb-org
     MONGO_USER_GROUP=$(grep mongo /etc/passwd | awk -F ":" '{print $1}')
     
@@ -151,5 +146,6 @@ fi
 
 # mongo installation
 install_public_tools
+sleep 30
 install_mongo
 init_start_mongo
