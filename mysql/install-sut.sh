@@ -97,6 +97,8 @@ innodb_read_io_threads=16
 innodb_write_io_threads=16
 innodb_purge_threads=4
 innodb_adaptive_hash_index=0
+# 20240815-new-added
+innodb_use_fdatasync=ON
 EOF
 
     systemctl restart ${MYSQL_SERVICE}
