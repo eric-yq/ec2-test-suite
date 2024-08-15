@@ -31,6 +31,14 @@ python.exe D:\GSR-sendmail\SendEmail.py -hfile 'D:\GSR-sendmail\Dear Account Tea
 
 
 
+## 
+0013800001ORDnJAAX	Crypto.com (Foris Limited)	372042772205 
+
+00138000018EGKcAAO	Bybit-real	541347453293 
+https://aws-ciw-readonly.amazon.com/cost-management/home?spoofAccountId=541347453293
+0013800001LQXjlAAH	gate.io	?
+00138000018r5DrAAI	f2pool.com	701613234364 
+0013800001Kju71AAB	kucoin	573902261232 
 
 
 
