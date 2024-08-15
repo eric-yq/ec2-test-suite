@@ -10,5 +10,5 @@ which sysbench
 
 
 # Perform benchmark with ACCP
-
-
+git clone https://github.com/corretto/amazon-corretto-crypto-provider.git
+wget https://github.com/corretto/amazon-corretto-crypto-provider/releases/download/2.4.1/AmazonCorrettoCryptoProvider-2.4.1-linux-aarch_64.jar
