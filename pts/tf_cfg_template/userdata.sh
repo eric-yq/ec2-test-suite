@@ -76,8 +76,8 @@ unzip awscliv2.zip
 cp -rf /usr/local/bin/aws /usr/bin/aws
 aws --version
 
-aws_ak_value="xxx"
-aws_sk_value="xxx"
+aws_ak_value="akxxx"
+aws_sk_value="skxxx"
 aws_region_name="us-west-2"
 aws_s3_bucket_name="s3://ec2-core-benchmark-ericyq"
 aws configure set aws_access_key_id ${aws_ak_value}
