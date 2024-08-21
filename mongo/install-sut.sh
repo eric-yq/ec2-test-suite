@@ -25,6 +25,10 @@ install_mongo(){
 # 	sed -i 's/\/var\/lib\/mongodb/\/var\/lib\/mongo/g' ${MONGO_CONF}
 # 	sed -i 's/\/var\/lib\/mongo/\/data\/mongodb/g' ${MONGO_CONF}
 	
+	## 设置 cacheSizeGB
+	MEM_TOTAL_GB=$(free -g |grep Mem | awk -F " " '{print $2}')
+	let XXX=${MEM_TOTAL_GB}*80/100
+	
     cat << EOF > ${MONGO_CONF}
 systemLog:
   destination: file
@@ -50,7 +54,7 @@ storage:
   engine: wiredTiger
   wiredTiger:
     engineConfig:
-      cacheSizeGB: 31
+      cacheSizeGB: ${XXX}
       directoryForIndexes: true
       journalCompressor: snappy
     collectionConfig:
