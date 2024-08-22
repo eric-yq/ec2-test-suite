@@ -51,7 +51,7 @@ inputs = tokenizer(["Machine learning is"], return_tensors="pt")
 
 # 设置生成参数
 gen_kwargs = {
-    "max_new_tokens": 512,
+    "max_new_tokens": 50,
     "top_p": 0.8,
     "temperature": 0.8,
     "do_sample": True,
@@ -79,5 +79,5 @@ print(f"每秒生成的 token 数量: {tokens_per_second:.2f} tokens/秒")
 EOF
 
 
-
-python test.py
+python test-dclm.py apple/DCLM-7B
+python test-dclm.py TRI-ML/DCLM-1B

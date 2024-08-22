@@ -157,6 +157,6 @@ fi
 
 # mongo installation
 install_public_tools
-sleep 30
+sleep 60
 install_mongo
 init_start_mongo
