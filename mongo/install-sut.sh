@@ -9,9 +9,9 @@ install_public_tools(){
 	$PKGCMD install -y dmidecode net-tools dstat htop nload
 	
 	## OS CONFIG
-	sysctl -w vm.max_map_count = 98000
-	sysctl -w kernel.pid_max = 64000
-	sysctl -w kernel.threads-max = 64000
+	sysctl -w vm.max_map_count=98000
+	sysctl -w kernel.pid_max=64000
+	sysctl -w kernel.threads-max=64000
 	sysctl -w vm.max_map_count=128000
 	sysctl -w net.core.somaxconn=65535
 }
