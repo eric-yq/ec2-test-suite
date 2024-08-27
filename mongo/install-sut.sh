@@ -81,7 +81,6 @@ EOF
 	echo "security:" >> ${MONGO_CONF}
 	echo "  authorization: enabled" >> ${MONGO_CONF}
 
-
 	systemctl restart ${MONGO_SERVICE}
 	systemctl status ${MONGO_SERVICE}
 	
