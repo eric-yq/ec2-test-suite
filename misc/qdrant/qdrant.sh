@@ -68,28 +68,107 @@ python3 -m run --engines qdrant-sq-rps-m-64-ef-512 --datasets gist-960-euclidean
 python3 -m run --engines qdrant-sq-rps-m-64-ef-512 --datasets glove-100-angular
 EOF
 
+## 修改 upload 操作超时时间
+sed -i.bak "66a\            timeout=600" /root/vector-db-benchmark/engine/clients/qdrant/upload.py
+
+rm -rf results/* nohup.out
 nohup bash test123.sh &
 
+##########################################################################################
+# 合并数据
+cd /root/vector-db-benchmark/results
+INS_TYPE=$(cloud-init query ds.meta_data.instance_type)
+jq -s '.' *upload*.json > qdrant_benchmark_upload_$INS_TYPE.json
+jq -s '.' *search*.json > qdrant_benchmark_search_$INS_TYPE.json
+# -rw-r--r--. 1 root root 87834 Aug 27 08:42 qdrant_benchmark_search_m6i.2xlarge.json
+# -rw-r--r--. 1 root root  2813 Aug 27 08:41 qdrant_benchmark_upload_m6i.2xlarge.json
+## 结果文件生成 csv 文件：upload 文件
+INS_TYPE=$(cloud-init query ds.meta_data.instance_type)
+echo "experiment,engine,dataset,parallel,batch_size,hnsw_config.m,hnsw_config.ef_construct,upload_time,total_time" > qdrant_benchmark_upload_$INS_TYPE.csv
+jq -r '.[] | "\(.params.experiment),\(.params.engine),\(.params.dataset),\(.params.parallel),\(.params.batch_size),\(.params.hnsw_config.m),\(.params.hnsw_config.ef_construct),\(.results.upload_time),\(.results.total_time)"' qdrant_benchmark_upload_$INS_TYPE.json >> qdrant_benchmark_upload_$INS_TYPE.csv
+## upload 文件
+#   {
+#     "params": {
+#       "experiment": "qdrant-sq-rps-m-64-ef-512",
+#       "engine": "qdrant",
+#       "dataset": "dbpedia-openai-1M-1536-angular",
+#       "parallel": 16,
+#       "batch_size": 1024,
+#       "optimizers_config": {
+#         "max_segment_size": 1000000,
+#         "memmap_threshold": 10000000,
+#         "default_segment_number": 2
+#       },
+#       "hnsw_config": {
+#         "m": 64,
+#         "ef_construct": 512
+#       },
+#       "quantization_config": {
+#         "scalar": {
+#           "type": "int8",
+#           "quantile": 0.99,
+#           "always_ram": true
+#         }
+#       }
+#     },
+#     "results": {
+#       "post_upload": {},
+#       "upload_time": 320.67010107799433,
+#       "total_time": 1343.5359594210022
+#     }
+#   }
 
+## 结果文件生成 csv 文件：search 文件
+INS_TYPE=$(cloud-init query ds.meta_data.instance_type)
+echo "experiment,engine,dataset,parallel,hnsw_ef,oversampling,mean_precisions,rps,total_time,mean_time,p95_time,p99_time" > qdrant_benchmark_search_$INS_TYPE.csv
+jq -r '.[] | "\(.params.experiment),\(.params.engine),\(.params.dataset),\(.params.parallel),\(.params.config.hnsw_ef),\(.params.config.quantization.oversampling),\(.results.mean_precisions),\(.results.rps),\(.results.total_time),\(.results.mean_time),\(.results.p95_time),\(.results.p99_time)"' qdrant_benchmark_search_$INS_TYPE.json >> qdrant_benchmark_search_$INS_TYPE.csv
+## search 文件
+#   {
+#     "params": {
+#       "dataset": "dbpedia-openai-1M-1536-angular",
+#       "experiment": "qdrant-sq-rps-m-64-ef-512",
+#       "engine": "qdrant",
+#       "parallel": 1,
+#       "config": {
+#         "hnsw_ef": 64,
+#         "quantization": {
+#           "rescore": true,
+#           "oversampling": 1.0
+#         }
+#       }
+#     },
+#     "results": {
+#       "total_time": 14.071015573994373,
+#       "mean_time": 0.002298591131120338,
+#       "mean_precisions": 0.9929,
+#       "std_time": 0.0002850996156008218,
+#       "min_time": 0.0015700549993198365,
+#       "max_time": 0.008849541991367005,
+#       "rps": 355.3403785040825,
+#       "p95_time": 0.0027295801570289767,
+#       "p99_time": 0.0028827918137540112
+#     }
+#   }
+
+cd ../
+tar czf qdrant_benchmark_result_$INS_TYPE.tar.gz results
 
 install_h5py_aarch64 {
 # build hdf5
     yum groupinstall -y -q "Development Tools"
-    cd ~
+    cd /root/
 	wget https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-1_10_7.tar.gz
 	tar zxf hdf5-1_10_7.tar.gz
 	cd hdf5-hdf5-1_10_7/
 	./configure --enable-cxx --prefix=/usr/local/hdf5
-	make -j$(nproc)
-	make install 
+	make -j$(nproc) && make install 
 # install h5py
-	cd ~
+	cd /root/
 	HDF5_DIR=/usr/local/hdf5 pip install --no-binary=h5py h5py
 }
 
 
-
-### 将 https://qdrant.tech/benchmarks/results-1-100-thread-2024-06-15.json 对应的 json文件中的格式：
+### 附录：https://qdrant.tech/benchmarks/results-1-100-thread-2024-06-15.json 中的格式
 #   {
 #     "engine_name": "qdrant",
 #     "setup_name": "qdrant-sq-rps-m-64-ef-512",
@@ -110,6 +189,7 @@ install_h5py_aarch64 {
 #       }
 #     }
 #   }
+#
 ### 通过 jq 命令将这个文件转换为 csv 文件：
 # jq -r '.[] | "\(.engine_name), \(.setup_name), \(.dataset_name), \(.upload_time), \(.total_upload_time), \(.parallel), \(.engine_params.hnsw_ef), \(.engine_params.quantization.oversampling), \(.rps), \(.mean_precisions), \(.mean_time), \(.p95_time), \(.p99_time)"' results-1-100-thread-2024-06-15.json > results-1-100-thread-2024-06-15-new.csv
 
