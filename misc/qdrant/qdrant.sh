@@ -39,15 +39,30 @@ conda create -y -q -n ${testname} python=3.11
 ## 安装客户端
 conda activate $testname
 pip install poetry
-cd /root/vector-db-benchmark/
-poetry install
 
+install_h5py_aarch64 {
+# build hdf5
+    yum groupinstall -y "Development Tools"
+    cd /root/
+	wget https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-1_10_7.tar.gz
+	tar zxf hdf5-1_10_7.tar.gz
+	cd hdf5-hdf5-1_10_7/
+	./configure --enable-cxx --prefix=/usr/local/hdf5
+	make -j $(nproc)
+	make install 
+# install h5py
+	HDF5_DIR=/usr/local/hdf5 pip install --no-binary=h5py h5py
+}
 if [[ $(arch) == "aarch64" ]]; then
 	echo "Arch is $(arch), build hdf5 and install h5py..."
     install_h5py_aarch64
 else
     echo "Arch is $(arch), h5py will install automatically."
 fi
+
+cd /root/vector-db-benchmark/
+poetry install
+
 
 ##########################################################################################
 # 启动测试
@@ -60,7 +75,7 @@ fi
 #  deep-image-96-angular
 #  gist-960-euclidean
 #  glove-100-angular
-
+cd /root/vector-db-benchmark/
 cat << EOF > test123.sh
 python3 -m run --engines qdrant-sq-rps-m-64-ef-512 --datasets dbpedia-openai-1M-1536-angular
 python3 -m run --engines qdrant-sq-rps-m-64-ef-512 --datasets deep-image-96-angular
@@ -69,7 +84,7 @@ python3 -m run --engines qdrant-sq-rps-m-64-ef-512 --datasets glove-100-angular
 EOF
 
 ## 修改 upload 操作超时时间
-sed -i.bak "66a\            timeout=600" /root/vector-db-benchmark/engine/clients/qdrant/upload.py
+sed -i.bak "66a\            timeout=1800" /root/vector-db-benchmark/engine/clients/qdrant/upload.py
 
 rm -rf results/* nohup.out
 nohup bash test123.sh &
@@ -86,6 +101,14 @@ jq -s '.' *search*.json > qdrant_benchmark_search_$INS_TYPE.json
 INS_TYPE=$(cloud-init query ds.meta_data.instance_type)
 echo "experiment,engine,dataset,parallel,batch_size,hnsw_config.m,hnsw_config.ef_construct,upload_time,total_time" > qdrant_benchmark_upload_$INS_TYPE.csv
 jq -r '.[] | "\(.params.experiment),\(.params.engine),\(.params.dataset),\(.params.parallel),\(.params.batch_size),\(.params.hnsw_config.m),\(.params.hnsw_config.ef_construct),\(.results.upload_time),\(.results.total_time)"' qdrant_benchmark_upload_$INS_TYPE.json >> qdrant_benchmark_upload_$INS_TYPE.csv
+## 结果文件生成 csv 文件：search 文件
+INS_TYPE=$(cloud-init query ds.meta_data.instance_type)
+echo "experiment,engine,dataset,parallel,hnsw_ef,oversampling,mean_precisions,rps,total_time,mean_time,p95_time,p99_time" > qdrant_benchmark_search_$INS_TYPE.csv
+jq -r '.[] | "\(.params.experiment),\(.params.engine),\(.params.dataset),\(.params.parallel),\(.params.config.hnsw_ef),\(.params.config.quantization.oversampling),\(.results.mean_precisions),\(.results.rps),\(.results.total_time),\(.results.mean_time),\(.results.p95_time),\(.results.p99_time)"' qdrant_benchmark_search_$INS_TYPE.json >> qdrant_benchmark_search_$INS_TYPE.csv
+cd ../
+tar czf qdrant_benchmark_result_$INS_TYPE.tar.gz results
+cp qdrant_benchmark_result_$INS_TYPE.tar.gz /home/ec2-user/
+
 ## upload 文件
 #   {
 #     "params": {
@@ -117,11 +140,7 @@ jq -r '.[] | "\(.params.experiment),\(.params.engine),\(.params.dataset),\(.para
 #       "total_time": 1343.5359594210022
 #     }
 #   }
-
-## 结果文件生成 csv 文件：search 文件
-INS_TYPE=$(cloud-init query ds.meta_data.instance_type)
-echo "experiment,engine,dataset,parallel,hnsw_ef,oversampling,mean_precisions,rps,total_time,mean_time,p95_time,p99_time" > qdrant_benchmark_search_$INS_TYPE.csv
-jq -r '.[] | "\(.params.experiment),\(.params.engine),\(.params.dataset),\(.params.parallel),\(.params.config.hnsw_ef),\(.params.config.quantization.oversampling),\(.results.mean_precisions),\(.results.rps),\(.results.total_time),\(.results.mean_time),\(.results.p95_time),\(.results.p99_time)"' qdrant_benchmark_search_$INS_TYPE.json >> qdrant_benchmark_search_$INS_TYPE.csv
+#
 ## search 文件
 #   {
 #     "params": {
@@ -150,22 +169,7 @@ jq -r '.[] | "\(.params.experiment),\(.params.engine),\(.params.dataset),\(.para
 #     }
 #   }
 
-cd ../
-tar czf qdrant_benchmark_result_$INS_TYPE.tar.gz results
 
-install_h5py_aarch64 {
-# build hdf5
-    yum groupinstall -y -q "Development Tools"
-    cd /root/
-	wget https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-1_10_7.tar.gz
-	tar zxf hdf5-1_10_7.tar.gz
-	cd hdf5-hdf5-1_10_7/
-	./configure --enable-cxx --prefix=/usr/local/hdf5
-	make -j$(nproc) && make install 
-# install h5py
-	cd /root/
-	HDF5_DIR=/usr/local/hdf5 pip install --no-binary=h5py h5py
-}
 
 
 ### 附录：https://qdrant.tech/benchmarks/results-1-100-thread-2024-06-15.json 中的格式

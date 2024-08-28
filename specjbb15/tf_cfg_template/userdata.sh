@@ -51,7 +51,7 @@ java -version
 yum install -y htop dstat dmidecode
 
 ## 系统配置
-PN=$(dmidecode -s system-product-name | tr ' ' '_')
+PN=$(cloud-init query ds.meta_data.instance_type)
 cat << EOF >> /etc/sysctl.conf
 dev.raid.speed_limit_min = 4000
 kernel.sched_rt_runtime_us = 990000
@@ -92,12 +92,13 @@ CPU_CORES=$(cat /proc/cpuinfo | grep processor | wc -l)
 MEM_TOTAL_MB=$(free -m |grep Mem | awk -F " " '{print $2}')
 
 ## 变量计算
-let XMS=${MEM_TOTAL_MB}*9/10
-let XMX=${MEM_TOTAL_MB}*9/10
-let XMN=${MEM_TOTAL_MB}*8/10
+let XMS=${MEM_TOTAL_MB}*90/100
+let XMX=${MEM_TOTAL_MB}*90/100
+let XMN=${MEM_TOTAL_MB}*80/100
 let GC_THREADS=${CPU_CORES}
 let WORKERS_TIER1=${CPU_CORES}
 let WORKERS_TIER3=${CPU_CORES}/4
+let THREADS_PROBE=${1}
 
 ## 执行 Benchmark
 mkdir -p /root/specjbb
@@ -105,6 +106,12 @@ echo "Star to run specjbb15 benchmark on ${PN}." >> ~/specjbb/specjbb_results.tx
 echo "JAVA VERSION is: ${JDK_VERSION}." >> ~/specjbb/specjbb_results.txt
 echo "Instance Type: ${PN}, ${CPU_CORES} vCPU, Memory ${MEM_TOTAL_MB} MB." >> ~/specjbb/specjbb_results.txt
 echo "XMS=${XMS}, XMX=${XMX}, XMN=${XMN}, ParallelGCThreads=${GC_THREADS}, workers.Tier1=${WORKERS_TIER1}, workers.Tier3=${WORKERS_TIER3}" >> ~/specjbb/specjbb_results.txt
+echo "THREADS_PROBE=${THREADS_PROBE}" >> ~/specjbb/specjbb_results.txt
+
+## 启动 dstat 监控
+DSTAT_LOGFILE="/root/specjbb/dstat.log"
+echo "Testcase: THREADS_PROBE=${THREADS_PROBE}......"
+nohup dstat -cmndryt 60 > $DSTAT_LOGFILE 2>&1 & echo $! > pid_file.txt
 
 java -showversion -server \
 -Xms${XMS}m \
@@ -125,7 +132,7 @@ java -showversion -server \
 -Dspecjbb.comm.connect.timeouts.connect=700000 \
 -Dspecjbb.comm.connect.timeouts.read=700000 \
 -Dspecjbb.comm.connect.timeouts.write=700000 \
--Dspecjbb.customerDriver.threads.probe=64 \
+-Dspecjbb.customerDriver.threads.probe=${THREADS_PROBE} \
 -Dspecjbb.forkjoin.workers.Tier1=${WORKERS_TIER1} \
 -Dspecjbb.forkjoin.workers.Tier2=1 \
 -Dspecjbb.forkjoin.workers.Tier3=${WORKERS_TIER3} \
@@ -133,6 +140,9 @@ java -showversion -server \
 -Dspecjbb.heartbeat.threshold=1000000 \
 -jar ./specjbb2015.jar -m COMPOSITE \
 2> ./specjbb/composite.log > ./specjbb/composite.out
+
+# 停止 dstat
+kill -9 $(cat pid_file.txt)
 
 ## 保存结果并上传到 S3 bucket
 cd ~
