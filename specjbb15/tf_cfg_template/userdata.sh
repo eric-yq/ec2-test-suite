@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [[ X"$1" == X"" ]]; then
+	let THREADS_PROBE=64
+else
+	let THREADS_PROBE=${1}
+fi
+
 ## 配置 AWSCLI
 cd /root/
 yum remove -y awscli
@@ -98,20 +104,22 @@ let XMN=${MEM_TOTAL_MB}*80/100
 let GC_THREADS=${CPU_CORES}
 let WORKERS_TIER1=${CPU_CORES}
 let WORKERS_TIER3=${CPU_CORES}/4
-let THREADS_PROBE=${1}
+
 
 ## 执行 Benchmark
+RESULT_SUMMARY_FILE="/root/specjbb/specjbb_results.txt"
 mkdir -p /root/specjbb
-echo "Star to run specjbb15 benchmark on ${PN}." >> ~/specjbb/specjbb_results.txt
-echo "JAVA VERSION is: ${JDK_VERSION}." >> ~/specjbb/specjbb_results.txt
-echo "Instance Type: ${PN}, ${CPU_CORES} vCPU, Memory ${MEM_TOTAL_MB} MB." >> ~/specjbb/specjbb_results.txt
-echo "XMS=${XMS}, XMX=${XMX}, XMN=${XMN}, ParallelGCThreads=${GC_THREADS}, workers.Tier1=${WORKERS_TIER1}, workers.Tier3=${WORKERS_TIER3}" >> ~/specjbb/specjbb_results.txt
-echo "THREADS_PROBE=${THREADS_PROBE}" >> ~/specjbb/specjbb_results.txt
+echo "Star to run specjbb15 benchmark on ${PN}." >> ${RESULT_SUMMARY_FILE}
+echo "JAVA VERSION is: ${JDK_VERSION}." >> ${RESULT_SUMMARY_FILE}
+echo "Instance Type: ${PN}, ${CPU_CORES} vCPU, Memory ${MEM_TOTAL_MB} MB." >> ${RESULT_SUMMARY_FILE}
+echo "XMS=${XMS}, XMX=${XMX}, XMN=${XMN}, ParallelGCThreads=${GC_THREADS}, workers.Tier1=${WORKERS_TIER1}, workers.Tier3=${WORKERS_TIER3}" >> ${RESULT_SUMMARY_FILE}
+echo "THREADS_PROBE=${THREADS_PROBE}" >> ${RESULT_SUMMARY_FILE}
 
 ## 启动 dstat 监控
-DSTAT_LOGFILE="/root/specjbb/dstat.log"
-echo "Testcase: THREADS_PROBE=${THREADS_PROBE}......"
-nohup dstat -cmndryt 60 > $DSTAT_LOGFILE 2>&1 & echo $! > pid_file.txt
+# DSTAT_LOGFILE="/root/specjbb/dstat.log"
+# echo "Testcase: THREADS_PROBE=${THREADS_PROBE}......"
+# nohup dstat -cmndryt 60 > $DSTAT_LOGFILE 2>&1 & echo $! > pid_file.txt
+# # kill -9 $(cat pid_file.txt)
 
 java -showversion -server \
 -Xms${XMS}m \
@@ -142,11 +150,11 @@ java -showversion -server \
 2> ./specjbb/composite.log > ./specjbb/composite.out
 
 # 停止 dstat
-kill -9 $(cat pid_file.txt)
+# kill -9 $(cat pid_file.txt)
 
 ## 保存结果并上传到 S3 bucket
-cd ~
-grep "RUN RESULT: hbIR" ~/specjbb/composite.out >> ~/specjbb/specjbb_results.txt
+cd /root/
+grep "RUN RESULT: hbIR" ~/specjbb/composite.out >> ${RESULT_SUMMARY_FILE}
 cp -r result specjbb/
 tar czf specjbb15-${JDK_VERSION}-${PN}.tar.gz specjbb/
 aws s3 cp specjbb15-${JDK_VERSION}-${PN}.tar.gz ${aws_s3_bucket_name}/result_specjbb15/

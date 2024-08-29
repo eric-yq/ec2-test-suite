@@ -1,70 +1,5 @@
 #!/bin/bash
 
-# On Amazon Linux 2023
-sudo su - root
-
-##########################################################################################
-# 安装服务端
-## 安装 docker 和 docker-compose
-cd /root/
-yum install -y docker git htop python3.11
-systemctl start docker
-VER="v2.29.2"
-ARCH=$(arch)
-curl -SL https://github.com/docker/compose/releases/download/$VER/docker-compose-linux-${ARCH} -o /usr/bin/docker-compose
-chmod +x /usr/bin/docker-compose
-
-## 启动 qdrant 服务
-git clone https://github.com/qdrant/vector-db-benchmark.git
-ENGINE_CONFIG_NAME="qdrant-single-node"
-cd /root/vector-db-benchmark/engine/servers/$ENGINE_CONFIG_NAME
-docker-compose up -d
-## 查看状态
-docker-compose ps
-
-
-##########################################################################################
-# 客户端操作：
-## 安装 conda
-cd /root/
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-$(arch).sh
-bash Miniconda3-latest-Linux-$(arch).sh -b -p /root/miniconda3/
-eval "$(/root/miniconda3/bin/conda shell.bash hook)"
-conda init
-source /root/.bashrc
-
-## 创建 python 环境
-testname="qdrant"
-conda create -y -q -n ${testname} python=3.11
-
-## 安装客户端软件
-conda activate $testname
-pip install poetry
-
-## 在 aarch64 实例构建 h5p5
-install_h5py_aarch64 {
-# build hdf5
-    yum groupinstall -y "Development Tools"
-    cd /root/
-	wget https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-1_10_7.tar.gz
-	tar zxf hdf5-1_10_7.tar.gz
-	cd hdf5-hdf5-1_10_7/
-	./configure --enable-cxx --prefix=/usr/local/hdf5
-	make -j $(nproc)
-	make install 
-# install h5py
-	HDF5_DIR=/usr/local/hdf5 pip install --no-binary=h5py h5py
-}
-if [[ $(arch) == "aarch64" ]]; then
-	echo "Arch is $(arch), build hdf5 and install h5py..."
-    install_h5py_aarch64
-else
-    echo "Arch is $(arch), h5py will install automatically."
-fi
-
-cd /root/vector-db-benchmark/
-poetry install
-
 ## 需要进行 benchmark 的 SUT 主机
 if [[ X${1} == X"" ]]; then
 	HOST=""
@@ -104,7 +39,7 @@ done
 EOF
 
 ## 修改 upload 操作超时时间
-sed -i.bak "66a\            timeout=1800" /root/vector-db-benchmark/engine/clients/qdrant/upload.py
+# sed -i.bak "66a\            timeout=1800" /root/vector-db-benchmark/engine/clients/qdrant/upload.py
 
 ## 执行 benchmark
 rm -rf results/* nohup.out
