@@ -51,6 +51,7 @@ EOF
 
 ## 执行 benchmark
 rm -rf results/* nohup.out
+eval "$(/root/miniconda3/bin/conda shell.bash hook)"
 conda init
 conda activate qdrant
 bash test-search.sh
