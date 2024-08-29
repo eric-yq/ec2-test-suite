@@ -14,7 +14,7 @@ do
 		bash launch-instances-single.sh -s qdrant -t ${ins} -o ${os}
 		
 		echo "$0: Sleep 120 seconds..."
-		sleep 300
+		sleep 120
 		
 		## 执行 Benchmark 测试
 		echo "$0: Star to run benchmark"
@@ -22,9 +22,6 @@ do
 		bash benchmark/qdrant-benchmark.sh ${INSTANCE_IP_MASTER}
 		
 		## 停止实例
-		aws ec2 stop-instances --instance-ids ${INSTANCE_ID}
+		# aws ec2 stop-instances --instance-ids ${INSTANCE_ID}
 	done
 done
-
-bash benchmark/qdrant-benchmark.sh  r8g.2xlarge
-
