@@ -25,6 +25,7 @@ DATASET_SEARCH="glove-100-angular"
 cat << EOF > test-search.sh
 for i in $DATASET_SEARCH
 do
+    echo "i=$i, HOST=$HOST"
     python3 -m run --engines qdrant-sq-rps-m-64-ef-512 --datasets $i $HOST
 done
 EOF
@@ -42,6 +43,7 @@ DATASET_FILTER="100-kw-small-vocab-filters"
 cat << EOF > test-filter.sh
 for i in $DATASET_FILTER
 do
+    echo "i=$i, HOST=$HOST"
     python3 -m run --engines  qdrant-m-16-ef-128 --datasets $i $HOST
 done
 EOF
