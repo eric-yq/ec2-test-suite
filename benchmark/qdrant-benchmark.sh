@@ -23,7 +23,7 @@ cd /root/vector-db-benchmark/
 DATASET_SEARCH="glove-100-angular"
 
 cat << EOF > test-search.sh
-for i in $DATASET_SEARCH
+for i in ${DATASET_SEARCH}
 do
     echo "i=$i, HOST=$HOST"
     python3 -m run --engines qdrant-sq-rps-m-64-ef-512 --datasets $i $HOST
@@ -41,7 +41,7 @@ cd /root/vector-db-benchmark/
 # DATASET_FILTER="100-kw-small-vocab-filters  100-kw-small-vocab-no-filters  arxiv-titles-384-filters  arxiv-titles-384-no-filters  geo-radius-100-filters  geo-radius-100-no-filters  geo-radius-2048-filters  geo-radius-2048-no-filters  h-and-m-2048-filters  h-and-m-2048-no-filters  int-100-filters  int-100-no-filters  int-2048-filters  int-2048-no-filters  keyword-100-filters  keyword-100-no-filters  keyword-2048-filters  keyword-2048-no-filters  range-100-filters  range-100-no-filters  range-2048-filters  range-2048-no-filters"
 DATASET_FILTER="100-kw-small-vocab-filters"
 cat << EOF > test-filter.sh
-for i in $DATASET_FILTER
+for i in ${DATASET_FILTER}
 do
     echo "i=$i, HOST=$HOST"
     python3 -m run --engines  qdrant-m-16-ef-128 --datasets $i $HOST
