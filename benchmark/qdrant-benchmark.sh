@@ -51,6 +51,7 @@ EOF
 
 ## 执行 benchmark
 rm -rf results/* nohup.out
+conda init
 conda activate qdrant
 bash test-search.sh
 bash test-filter.sh
