@@ -25,9 +25,7 @@ conda activate qdrant
 #  qdrant-single-node-sq-rps.json:    "name": "qdrant-sq-rps-m-64-ef-512",
 ## --datasets： 在 datasets/datasets.json 文件中搜索 "name"
 ## 参考官方结果的数据集： https://qdrant.tech/benchmarks/#tested-datasets 
-
-# DATASET_SEARCH="dbpedia-openai-1M-1536-angular deep-image-96-angular gist-960-euclidean glove-100-angular"
-DATASET_SEARCH="glove-100-angular"
+DATASET_SEARCH="dbpedia-openai-1M-1536-angular deep-image-96-angular gist-960-euclidean glove-100-angular"
 for i in ${DATASET_SEARCH}
 do
     echo "i=$i, HOST=$HOST"
@@ -41,22 +39,19 @@ done
 #  qdrant-single-node-sq-rps.json:    "name": "qdrant-m-16-ef-128",
 ## --datasets： 在 datasets/datasets.json 文件中搜索 "name"
 ## 参考官方结果的数据集： https://qdrant.tech/benchmarks/filter-result-2023-02-03.json
-
-# DATASET_FILTER="100-kw-small-vocab-filters  100-kw-small-vocab-no-filters  arxiv-titles-384-filters  arxiv-titles-384-no-filters  geo-radius-100-filters  geo-radius-100-no-filters  geo-radius-2048-filters  geo-radius-2048-no-filters  h-and-m-2048-filters  h-and-m-2048-no-filters  int-100-filters  int-100-no-filters  int-2048-filters  int-2048-no-filters  keyword-100-filters  keyword-100-no-filters  keyword-2048-filters  keyword-2048-no-filters  range-100-filters  range-100-no-filters  range-2048-filters  range-2048-no-filters"
-DATASET_FILTER="100-kw-small-vocab-filters"
+DATASET_FILTER="random-100-match-kw-small-vocab-filters random-100-match-kw-small-vocab-no-filters arxiv-titles-384-angular-filters arxiv-titles-384-angular-no-filters random-geo-radius-100-angular-filters  random-geo-radius-100-angular-no-filters random-geo-radius-2048-angular-filters random-geo-radius-2048-angular-no-filters h-and-m-2048-angular-filters h-and-m-2048-angular-no-filters random-match-int-100-angular-filters  random-match-int-100-angular-no-filters random-match-int-2048-angular-filters random-match-int-2048-angular-no-filters random-match-keyword-100-angular-filters random-match-keyword-100-angular-no-filters random-match-keyword-2048-angular-filters random-match-keyword-2048-angular-no-filters random-range-100-angular-filters random-range-100-angular-no-filters random-range-2048-angular-filters random-range-2048-angular-no-filters"
 for i in ${DATASET_FILTER}
 do
     echo "i=$i, HOST=$HOST"
-    python3 -m run --engines  qdrant-m-16-ef-128 --datasets $i $HOST
+    python3 -m run --engines qdrant-m-16-ef-128 --datasets $i $HOST
 done
 
 ##########################################################################################
 ## 结果文件处理
 RESULT_FILE_PATH="/root/vector-db-benchmark/results_$INSTANCE_TYPE"
-mkdir -p $RESULT_FILE_PATH
-mv /root/vector-db-benchmark/*.json $RESULT_FILE_PATH/
+mv /root/vector-db-benchmark/results $RESULT_FILE_PATH
 # 合并数据
-cd $RESULT_FILE_PATH/
+cd $RESULT_FILE_PATH
 jq -s '.' *upload*.json > qdrant_benchmark_upload_$INSTANCE_TYPE.json
 jq -s '.' *search*.json > qdrant_benchmark_search_$INSTANCE_TYPE.json
 # qdrant_benchmark_search_m6i.2xlarge.json 
