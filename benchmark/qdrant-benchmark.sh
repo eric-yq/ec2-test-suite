@@ -28,7 +28,7 @@ conda activate qdrant
 DATASET_SEARCH="dbpedia-openai-1M-1536-angular deep-image-96-angular gist-960-euclidean glove-100-angular"
 for i in ${DATASET_SEARCH}
 do
-    echo "i=$i, HOST=$HOST"
+    echo "Test=Search, Dataset=$i, HOST=$HOST"
     python3 -m run --engines qdrant-sq-rps-m-64-ef-512 --datasets $i $HOST
 done
 
@@ -42,7 +42,7 @@ done
 DATASET_FILTER="random-100-match-kw-small-vocab-filters random-100-match-kw-small-vocab-no-filters arxiv-titles-384-angular-filters arxiv-titles-384-angular-no-filters random-geo-radius-100-angular-filters  random-geo-radius-100-angular-no-filters random-geo-radius-2048-angular-filters random-geo-radius-2048-angular-no-filters h-and-m-2048-angular-filters h-and-m-2048-angular-no-filters random-match-int-100-angular-filters  random-match-int-100-angular-no-filters random-match-int-2048-angular-filters random-match-int-2048-angular-no-filters random-match-keyword-100-angular-filters random-match-keyword-100-angular-no-filters random-match-keyword-2048-angular-filters random-match-keyword-2048-angular-no-filters random-range-100-angular-filters random-range-100-angular-no-filters random-range-2048-angular-filters random-range-2048-angular-no-filters"
 for i in ${DATASET_FILTER}
 do
-    echo "i=$i, HOST=$HOST"
+    echo "Test=Filter, Dataset=$i, HOST=$HOST"
     python3 -m run --engines qdrant-m-16-ef-128 --datasets $i $HOST
 done
 
