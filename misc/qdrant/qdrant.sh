@@ -71,6 +71,10 @@ if [[ X${1} == X"" ]]; then
 else
     HOST="--host $1"
 fi
+
+sed -i '/qdrant-sq-rps-m-64-ef-512/{n;n;s/30/60/}' a.json
+
+
 ##########################################################################################
 # 启动测试: Search benchmark
 # python3 -m run --engines XXX --datasets XXX
@@ -79,11 +83,15 @@ fi
 ## --datasets： 在 datasets/datasets.json 文件中搜索 "name"
 ## 参考官方结果的数据集： https://qdrant.tech/benchmarks/#tested-datasets 
 cd /root/vector-db-benchmark/
+SETUP="qdrant-sq-rps-m-64-ef-512"
+CONFIG_FILE=$(grep -l $SETUP /root/vector-db-benchmark/experiments/configurations/*.json)
+sed -i.bak "/$SETUP/{n;n;s/30/600/}" $CONFIG_FILE
+diff $CONFIG_FILE*
 DATASET_SEARCH="dbpedia-openai-1M-1536-angular deep-image-96-angular gist-960-euclidean glove-100-angular"
 cat << EOF > test-search.sh
 for i in $DATASET_SEARCH
 do
-    python3 -m run --engines qdrant-sq-rps-m-64-ef-512 --datasets $i $HOST
+    python3 -m run --engines $SETUP --datasets $i $HOST
 done
 EOF
 
@@ -95,17 +103,20 @@ EOF
 ## --datasets： 在 datasets/datasets.json 文件中搜索 "name"
 ## 参考官方结果的数据集： https://qdrant.tech/benchmarks/filter-result-2023-02-03.json
 cd /root/vector-db-benchmark/
+SETUP="qdrant-m-16-ef-128"
+CONFIG_FILE=$(grep -l $SETUP /root/vector-db-benchmark/experiments/configurations/*.json)
+sed -i.bak "/$SETUP/{n;n;s/30/600/}" $CONFIG_FILE
+diff $CONFIG_FILE*
 DATASET_FILTER="100-kw-small-vocab-filters  100-kw-small-vocab-no-filters  arxiv-titles-384-filters  arxiv-titles-384-no-filters  geo-radius-100-filters  geo-radius-100-no-filters  geo-radius-2048-filters  geo-radius-2048-no-filters  h-and-m-2048-filters  h-and-m-2048-no-filters  int-100-filters  int-100-no-filters  int-2048-filters  int-2048-no-filters  keyword-100-filters  keyword-100-no-filters  keyword-2048-filters  keyword-2048-no-filters  range-100-filters  range-100-no-filters  range-2048-filters  range-2048-no-filters"
 cat << EOF > test-filter.sh
 for i in $DATASET_FILTER
 do
-    python3 -m run --engines  qdrant-m-16-ef-128 --datasets $i $HOST
+    python3 -m run --engines $SETUP --datasets $i $HOST
 done
 EOF
 
 ## 修改 upload 操作超时时间
-sed -i.bak "66a\            timeout=3600" /root/vector-db-benchmark/engine/clients/qdrant/upload.py
-
+# sed -i.bak "66a\            timeout=7200" /root/vector-db-benchmark/engine/clients/qdrant/upload.py
 ## 执行 benchmark
 rm -rf results/* nohup.out
 bash test-search.sh

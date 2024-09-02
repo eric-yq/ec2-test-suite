@@ -25,11 +25,15 @@ conda activate qdrant
 #  qdrant-single-node-sq-rps.json:    "name": "qdrant-sq-rps-m-64-ef-512",
 ## --datasets： 在 datasets/datasets.json 文件中搜索 "name"
 ## 参考官方结果的数据集： https://qdrant.tech/benchmarks/#tested-datasets 
+SETUP="qdrant-sq-rps-m-64-ef-512"
+CONFIG_FILE=$(grep -l $SETUP /root/vector-db-benchmark/experiments/configurations/*.json)
+sed -i.bak "/$SETUP/{n;n;s/30/600/}" $CONFIG_FILE
+diff $CONFIG_FILE*
 DATASET_SEARCH="dbpedia-openai-1M-1536-angular deep-image-96-angular gist-960-euclidean glove-100-angular"
 for i in ${DATASET_SEARCH}
 do
-    echo "Test=Search, Dataset=$i, HOST=$HOST"
-    python3 -m run --engines qdrant-sq-rps-m-64-ef-512 --datasets $i $HOST
+    echo "HOST=$HOST, TestPhase=Search, Setup=$SETUP, Dataset=$i"
+    python3 -m run --engines $SETUP --datasets $i $HOST
 done
 
 ##########################################################################################
@@ -39,11 +43,16 @@ done
 #  qdrant-single-node-sq-rps.json:    "name": "qdrant-m-16-ef-128",
 ## --datasets： 在 datasets/datasets.json 文件中搜索 "name"
 ## 参考官方结果的数据集： https://qdrant.tech/benchmarks/filter-result-2023-02-03.json
+cd /root/vector-db-benchmark/
+SETUP="qdrant-m-16-ef-128"
+CONFIG_FILE=$(grep -l $SETUP /root/vector-db-benchmark/experiments/configurations/*.json)
+sed -i.bak "/$SETUP/{n;n;s/30/600/}" $CONFIG_FILE
+diff $CONFIG_FILE*
 DATASET_FILTER="random-100-match-kw-small-vocab-filters random-100-match-kw-small-vocab-no-filters arxiv-titles-384-angular-filters arxiv-titles-384-angular-no-filters random-geo-radius-100-angular-filters  random-geo-radius-100-angular-no-filters random-geo-radius-2048-angular-filters random-geo-radius-2048-angular-no-filters h-and-m-2048-angular-filters h-and-m-2048-angular-no-filters random-match-int-100-angular-filters  random-match-int-100-angular-no-filters random-match-int-2048-angular-filters random-match-int-2048-angular-no-filters random-match-keyword-100-angular-filters random-match-keyword-100-angular-no-filters random-match-keyword-2048-angular-filters random-match-keyword-2048-angular-no-filters random-range-100-angular-filters random-range-100-angular-no-filters random-range-2048-angular-filters random-range-2048-angular-no-filters"
 for i in ${DATASET_FILTER}
 do
-    echo "Test=Filter, Dataset=$i, HOST=$HOST"
-    python3 -m run --engines qdrant-m-16-ef-128 --datasets $i $HOST
+    echo "HOST=$HOST, TestPhase=Search-and-Filter, Setup=$SETUP, Dataset=$i"
+    python3 -m run --engines $SETUP --datasets $i $HOST
 done
 
 ##########################################################################################
