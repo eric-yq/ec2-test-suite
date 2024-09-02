@@ -104,7 +104,7 @@ done
 EOF
 
 ## 修改 upload 操作超时时间
-sed -i.bak "66a\            timeout=1800" /root/vector-db-benchmark/engine/clients/qdrant/upload.py
+sed -i.bak "66a\            timeout=3600" /root/vector-db-benchmark/engine/clients/qdrant/upload.py
 
 ## 执行 benchmark
 rm -rf results/* nohup.out
