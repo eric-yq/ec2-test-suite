@@ -82,7 +82,7 @@ install_utils() {
     elif [ "$package_manager" = "apt" ]; then
         export DEBIAN_FRONTEND=noninteractive;
         export NEEDRESTART_MODE=a;
-        $package_manager install -y build-essential git autoconf libtool libssl-dev cmake htop iotop yasm nasm jq libfreetype6-dev libfribidi-dev libharfbuzz-dev libfontconfig1-dev libbz2-dev
+        $package_manager install -y build-essential git autoconf libtool libssl-dev cmake htop iotop yasm nasm jq libfreetype6-dev libfribidi-dev libharfbuzz-dev libfontconfig1-dev libbz2-dev kernel-modules-extra
     fi
 
     echo "Success: Updates and packages installed."
