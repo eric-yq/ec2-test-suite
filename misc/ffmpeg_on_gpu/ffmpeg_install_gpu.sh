@@ -78,7 +78,7 @@ install_utils() {
     echo "Installing packages..."
     if [ "$package_manager" = "dnf" ]; then
         $package_manager -y groupinstall "Development Tools"
-        $package_manager install -y git autoconf openssl-devel cmake3 htop iotop yasm nasm jq freetype-devel fribidi-devel harfbuzz-devel fontconfig-devel bzip2-devel
+        $package_manager install -y git autoconf openssl-devel cmake3 htop iotop yasm nasm jq freetype-devel fribidi-devel harfbuzz-devel fontconfig-devel bzip2-devel kernel-modules-extra
     elif [ "$package_manager" = "apt" ]; then
         export DEBIAN_FRONTEND=noninteractive;
         export NEEDRESTART_MODE=a;
@@ -98,15 +98,23 @@ setup_gpu() {
         echo "Skipping GPU installation"
         return 0
     fi
+    #### added by yuanquan
+#   DRIVER_VERSION="560.35.03"
+#   CUDA_VERSION="12.6.1"
+#   CUDNN_VERSION="9.3.0.75"
+    DRIVER_VERSION="535.104.05"
+    CUDA_VERSION="12.2.2"
+    CUDNN_VERSION="8.9.5.29"
+    #### added by yuanquan -end
     if [ "$(uname -m)" = "aarch64" ]; then
         echo "System is running on ARM / AArch64"
-        DRIVE_URL="https://us.download.nvidia.com/tesla/535.104.05/NVIDIA-Linux-aarch64-535.104.05.run"
-        CUDA_SDK_URL="https://developer.download.nvidia.com/compute/cuda/12.2.2/local_installers/cuda_12.2.2_535.104.05_linux_sbsa.run"
-        CUDNN_ARCHIVE_URL="https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/linux-sbsa/cudnn-linux-sbsa-8.9.5.29_cuda12-archive.tar.xz"
+        DRIVE_URL="https://us.download.nvidia.com/tesla/$DRIVER_VERSION/NVIDIA-Linux-aarch64-$DRIVER_VERSION.run"
+        CUDA_SDK_URL="https://developer.download.nvidia.com/compute/cuda/$CUDA_VERSION/local_installers/cuda_$CUDA_VERSION_$DRIVER_VERSION_linux_sbsa.run"
+        CUDNN_ARCHIVE_URL="https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/linux-sbsa/cudnn-linux-sbsa-$CUDNN_VERSION_cuda12-archive.tar.xz"
     else
-        DRIVE_URL="https://us.download.nvidia.com/tesla/535.104.05/NVIDIA-Linux-x86_64-535.104.05.run"
-        CUDA_SDK_URL="https://developer.download.nvidia.com/compute/cuda/12.2.2/local_installers/cuda_12.2.2_535.104.05_linux.run"
-        CUDNN_ARCHIVE_URL="https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/linux-x86_64/cudnn-linux-x86_64-8.9.5.29_cuda12-archive.tar.xz"
+        DRIVE_URL="https://us.download.nvidia.com/tesla/$DRIVER_VERSION/NVIDIA-Linux-x86_64-$DRIVER_VERSION.run"
+        CUDA_SDK_URL="https://developer.download.nvidia.com/compute/cuda/$CUDA_VERSION/local_installers/cuda_$CUDA_VERSION_$DRIVER_VERSION_linux.run"
+        CUDNN_ARCHIVE_URL="https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/linux-x86_64/cudnn-linux-x86_64-$CUDNN_VERSION_cuda12-archive.tar.xz"
     fi
 
     echo "Setting up GPU..."
