@@ -98,14 +98,14 @@ setup_gpu() {
         echo "Skipping GPU installation"
         return 0
     fi
-    #### added by yuanquan
-#   DRIVER_VERSION="560.35.03"
-#   CUDA_VERSION="12.6.1"
-#   CUDNN_VERSION="9.3.0.75"
-    DRIVER_VERSION="535.104.05"
-    CUDA_VERSION="12.2.2"
-    CUDNN_VERSION="8.9.5.29"
-    #### added by yuanquan -end
+######## added by yuanquan
+	DRIVER_VERSION="560.35.03"
+	CUDA_VERSION="12.6.1"
+	CUDNN_VERSION="9.3.0.75"
+#   DRIVER_VERSION="535.104.05"
+#   CUDA_VERSION="12.2.2"
+#   CUDNN_VERSION="8.9.5.29"
+######## added by yuanquan -end
     if [ "$(uname -m)" = "aarch64" ]; then
         echo "System is running on ARM / AArch64"
         DRIVE_URL="https://us.download.nvidia.com/tesla/$DRIVER_VERSION/NVIDIA-Linux-aarch64-$DRIVER_VERSION.run"
