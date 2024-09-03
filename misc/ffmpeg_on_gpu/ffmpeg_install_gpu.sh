@@ -108,13 +108,13 @@ setup_gpu() {
 ######## added by yuanquan -end
     if [ "$(uname -m)" = "aarch64" ]; then
         echo "System is running on ARM / AArch64"
-        DRIVE_URL="https://us.download.nvidia.com/tesla/$DRIVER_VERSION/NVIDIA-Linux-aarch64-$DRIVER_VERSION.run"
-        CUDA_SDK_URL="https://developer.download.nvidia.com/compute/cuda/$CUDA_VERSION/local_installers/cuda_$CUDA_VERSION_$DRIVER_VERSION_linux_sbsa.run"
-        CUDNN_ARCHIVE_URL="https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/linux-sbsa/cudnn-linux-sbsa-$CUDNN_VERSION_cuda12-archive.tar.xz"
+        DRIVE_URL="https://us.download.nvidia.com/tesla/${DRIVER_VERSION}/NVIDIA-Linux-aarch64-${DRIVER_VERSION}.run"
+        CUDA_SDK_URL="https://developer.download.nvidia.com/compute/cuda/${CUDA_VERSION}/local_installers/cuda_${CUDA_VERSION}_${DRIVER_VERSION}_linux_sbsa.run"
+        CUDNN_ARCHIVE_URL="https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/linux-sbsa/cudnn-linux-sbsa-${CUDNN_VERSION}_cuda12-archive.tar.xz"
     else
-        DRIVE_URL="https://us.download.nvidia.com/tesla/$DRIVER_VERSION/NVIDIA-Linux-x86_64-$DRIVER_VERSION.run"
-        CUDA_SDK_URL="https://developer.download.nvidia.com/compute/cuda/$CUDA_VERSION/local_installers/cuda_$CUDA_VERSION_$DRIVER_VERSION_linux.run"
-        CUDNN_ARCHIVE_URL="https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/linux-x86_64/cudnn-linux-x86_64-$CUDNN_VERSION_cuda12-archive.tar.xz"
+        DRIVE_URL="https://us.download.nvidia.com/tesla/${DRIVER_VERSION}/NVIDIA-Linux-x86_64-${DRIVER_VERSION}.run"
+        CUDA_SDK_URL="https://developer.download.nvidia.com/compute/cuda/$CUDA_VERSION/local_installers/cuda_${CUDA_VERSION}_${DRIVER_VERSION}_linux.run"
+        CUDNN_ARCHIVE_URL="https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/linux-x86_64/cudnn-linux-x86_64-${CUDNN_VERSION}_cuda12-archive.tar.xz"
     fi
 
     echo "Setting up GPU..."
