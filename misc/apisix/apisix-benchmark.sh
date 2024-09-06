@@ -31,7 +31,8 @@ cd /opt
 wget https://github.com/wg/wrk/archive/refs/tags/4.2.0.tar.gz
 tar zxf 4.2.0.tar.gz
 cd wrk-4.2.0
-make -j && ln -s /opt/wrk-4.2.0/wrk /usr/bin/wrk
+make -j
+ln -s /opt/wrk-4.2.0/wrk /usr/bin/wrk
 wrk -v
 
 # 安装 etcd
