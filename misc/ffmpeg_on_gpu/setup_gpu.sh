@@ -316,4 +316,4 @@ source $HOME_DIR/.bashrc
 # install_ffmpeg
 popd
 rm -fr $SRC_DIR
-i
+echo "Complete to setup GPU."

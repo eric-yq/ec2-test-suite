@@ -18,7 +18,7 @@ make -j$(nproc)
 ###################################################################################################
 # GPU 实例编译
 # 安装 nvidia driver, cuda, cudnn 等
-# wget https://raw.githubusercontent.com/eric-yq/ec2-test-suite/main/misc/setup_gpu.sh 
+# wget https://raw.githubusercontent.com/eric-yq/ec2-test-suite/main/misc/ffmpeg_on_gpu/setup_gpu.sh
 # bash setup_gpu.sh 
 # NVCC=$(find / -name nvcc)
 # NVCC_FOLDER=$(dirname $NVCC)
@@ -55,5 +55,8 @@ QUANTIZE_METHOD="Q4_0_4_8"
 # # Run inference:
 ./llama-cli -m dolphin-2.9.4-llama3.1-8b-Q4_0.gguf \
   -p "Building a visually appealing website can be done in ten simple steps:" \
-  -n 512 --n-gpu-layers 15000
+  -n 512 --n-gpu-layers 33 -b 1
+  
+# 监控GPU 资源利用率
+nvidia-smi --query-gpu=utilization.gpu,utilization.memory,memory.total,memory.used --format=csv -l 1
 
