@@ -16,6 +16,8 @@ sudo apt install build-essential -y
 git clone https://github.com/ggerganov/llama.cpp
 cd llama.cpp
 make -j$(nproc)
+# GPU 实例编译
+# make -j $(nproc) LLAMA_CUDA=1
 
 ./llama-cli -h
 
@@ -25,6 +27,7 @@ python -m venv venv
 source venv/bin/activate
 
 # Download model
+pip install -U "huggingface_hub[cli]"
 huggingface-cli download cognitivecomputations/dolphin-2.9.4-llama3.1-8b-gguf dolphin-2.9.4-llama3.1-8b-Q4_0.gguf --local-dir . --local-dir-use-symlinks False
 
 # Re-quantize the model：on Graviton3
@@ -40,4 +43,11 @@ QUANTIZE_METHOD="Q4_0_4_8"
 ./llama-cli -m dolphin-2.9.4-llama3.1-8b-${QUANTIZE_METHOD}.gguf \
   -p "Building a visually appealing website can be done in ten simple steps:" \
   -n 512 -t 64
+
  
+# GPU 上运行 #######################################################################################
+# # Run inference:
+# ./llama-cli -m dolphin-2.9.4-llama3.1-8b-Q4_0.gguf \
+#   -p "Building a visually appealing website can be done in ten simple steps:" \
+#   -n 512 --n-gpu-layers 15000
+

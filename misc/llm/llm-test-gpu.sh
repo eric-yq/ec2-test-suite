@@ -125,7 +125,6 @@ echo "[Info] \$(date +%Y%m%d.%H%M%S) Complete Successfully. "
 EOF
 chmod +x /usr/local/bin/run-llama-cpp
 
-
 ## 常用路径
 MODEL_ZOO="/root/gguf_model_zoo"
 PROMPTS_REPO="/root/prompts_repo"
@@ -291,29 +290,6 @@ run-llama-cpp $repo_id $filenames 04
 repo_id="RichardErkhov/01-ai_-_Yi-1.5-9B-32K-gguf"
 filenames="Yi-1.5-9B-32K.Q5_K_M.gguf"
 run-llama-cpp $repo_id $filenames 04
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
