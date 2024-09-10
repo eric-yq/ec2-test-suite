@@ -8,16 +8,23 @@ cd /root/
 
 # Install any prerequisites
 sudo apt update
-sudo apt install make cmake -y
-sudo apt install gcc g++ -y
-sudo apt install build-essential -y
+sudo apt install make cmake -y gcc g++ -y build-essential
 
 # Build llama.cpp
 git clone https://github.com/ggerganov/llama.cpp
 cd llama.cpp
 make -j$(nproc)
+
+###################################################################################################
 # GPU 实例编译
-# make -j $(nproc) LLAMA_CUDA=1
+# 安装 nvidia driver, cuda, cudnn 等
+# wget https://raw.githubusercontent.com/eric-yq/ec2-test-suite/main/misc/setup_gpu.sh 
+# bash setup_gpu.sh 
+# NVCC=$(find / -name nvcc)
+# NVCC_FOLDER=$(dirname $NVCC)
+# echo "PATH=$PATH:$NVCC_FOLDER" >> ~/.bashrc
+# source ~/.bashrc
+# make -j $(nproc) GGML_CUDA=1
 
 ./llama-cli -h
 
@@ -25,7 +32,6 @@ make -j$(nproc)
 sudo apt install python-is-python3 python3-pip python3-venv -y
 python -m venv venv
 source venv/bin/activate
-
 # Download model
 pip install -U "huggingface_hub[cli]"
 huggingface-cli download cognitivecomputations/dolphin-2.9.4-llama3.1-8b-gguf dolphin-2.9.4-llama3.1-8b-Q4_0.gguf --local-dir . --local-dir-use-symlinks False
@@ -47,7 +53,7 @@ QUANTIZE_METHOD="Q4_0_4_8"
  
 # GPU 上运行 #######################################################################################
 # # Run inference:
-# ./llama-cli -m dolphin-2.9.4-llama3.1-8b-Q4_0.gguf \
-#   -p "Building a visually appealing website can be done in ten simple steps:" \
-#   -n 512 --n-gpu-layers 15000
+./llama-cli -m dolphin-2.9.4-llama3.1-8b-Q4_0.gguf \
+  -p "Building a visually appealing website can be done in ten simple steps:" \
+  -n 512 --n-gpu-layers 15000
 

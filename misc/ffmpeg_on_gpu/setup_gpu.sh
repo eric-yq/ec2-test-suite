@@ -25,6 +25,12 @@ if lspci | grep -i "NVIDIA Corporation" >/dev/null; then
     HAS_GPU="true"
 fi
 
+OPUS_VER="opus-1.4"
+LIBAOM_VER="v3.7.0"
+LIBOGG_VER="libogg-1.3.5"
+LIBVORBIS_VER="libvorbis-1.3.7"
+LIBASS_URL=$(curl -s "https://api.github.com/repos/libass/libass/releases/latest" | awk -F'"' '/browser_download_url.*.tar.gz"/{print $4}')
+
 # Create source directory
 mkdir -p $SRC_DIR
 pushd $SRC_DIR
@@ -50,7 +56,6 @@ check_exit_code() {
         exit 1
     fi
 }
-
 # Utility function to push a wildcard
 pushdw() {
     pushd "$(find $HOME_DIR -type d -name "$1" | head -n 1)"
@@ -73,7 +78,8 @@ install_utils() {
     echo "Installing packages..."
     if [ "$package_manager" = "dnf" ]; then
         $package_manager -y groupinstall "Development Tools"
-        $package_manager install -y git autoconf openssl-devel cmake3 htop iotop yasm nasm jq freetype-devel fribidi-devel harfbuzz-devel fontconfig-devel bzip2-devel
+        $package_manager install -y git autoconf openssl-devel cmake3 htop iotop yasm nasm jq freetype-devel fribidi-devel harfbuzz-devel fontconfig-devel bzip2-devel kernel-modules-extra
+
     elif [ "$package_manager" = "apt" ]; then
         export DEBIAN_FRONTEND=noninteractive;
         export NEEDRESTART_MODE=a;
@@ -93,15 +99,23 @@ setup_gpu() {
         echo "Skipping GPU installation"
         return 0
     fi
+######## added by yuanquan
+    DRIVER_VERSION="560.35.03"
+    CUDA_VERSION="12.6.1"
+    CUDNN_VERSION="9.3.0.75"
+#   DRIVER_VERSION="535.104.05"
+#   CUDA_VERSION="12.2.2"
+#   CUDNN_VERSION="8.9.5.29"
+######## added by yuanquan -end
     if [ "$(uname -m)" = "aarch64" ]; then
         echo "System is running on ARM / AArch64"
-        DRIVE_URL="https://us.download.nvidia.com/tesla/535.104.05/NVIDIA-Linux-aarch64-535.104.05.run"
-        CUDA_SDK_URL="https://developer.download.nvidia.com/compute/cuda/12.2.2/local_installers/cuda_12.2.2_535.104.05_linux_sbsa.run"
-        CUDNN_ARCHIVE_URL="https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/linux-sbsa/cudnn-linux-sbsa-8.9.5.29_cuda12-archive.tar.xz"
+        DRIVE_URL="https://us.download.nvidia.com/tesla/${DRIVER_VERSION}/NVIDIA-Linux-aarch64-${DRIVER_VERSION}.run"
+        CUDA_SDK_URL="https://developer.download.nvidia.com/compute/cuda/${CUDA_VERSION}/local_installers/cuda_${CUDA_VERSION}_${DRIVER_VERSION}_linux_sbsa.run"
+        CUDNN_ARCHIVE_URL="https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/linux-sbsa/cudnn-linux-sbsa-${CUDNN_VERSION}_cuda12-archive.tar.xz"
     else
-        DRIVE_URL="https://us.download.nvidia.com/tesla/535.104.05/NVIDIA-Linux-x86_64-535.104.05.run"
-        CUDA_SDK_URL="https://developer.download.nvidia.com/compute/cuda/12.2.2/local_installers/cuda_12.2.2_535.104.05_linux.run"
-        CUDNN_ARCHIVE_URL="https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/linux-x86_64/cudnn-linux-x86_64-8.9.5.29_cuda12-archive.tar.xz"
+        DRIVE_URL="https://us.download.nvidia.com/tesla/${DRIVER_VERSION}/NVIDIA-Linux-x86_64-${DRIVER_VERSION}.run"
+        CUDA_SDK_URL="https://developer.download.nvidia.com/compute/cuda/$CUDA_VERSION/local_installers/cuda_${CUDA_VERSION}_${DRIVER_VERSION}_linux.run"
+        CUDNN_ARCHIVE_URL="https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/linux-x86_64/cudnn-linux-x86_64-${CUDNN_VERSION}_cuda12-archive.tar.xz"
     fi
 
     echo "Setting up GPU..."
@@ -128,10 +142,178 @@ setup_gpu() {
     rm -fr cu* NVIDIA*
 }
 
+install_ffmpeg_prereqs() {
+    # Install LIBAOM (AV1 Codec Library)
+    mkdir -p libaom &&
+        pushd libaom &&
+        git -c advice.detachedHead=false clone --depth 1 --branch $LIBAOM_VER https://aomedia.googlesource.com/aom &&
+        cmake \
+            -DBUILD_SHARED_LIBS=ON \
+            -DENABLE_DOCS=OFF \
+            -DCMAKE_INSTALL_LIBDIR=lib \
+            -DCMAKE_INSTALL_PREFIX:PATH=$USR_LOCAL_PREFIX ./aom &&
+        make -j $CPUS &&
+        make install
+    popd
+    check_installation "$USR_LOCAL_PREFIX/lib/libaom.so" "LIBAOM"
+
+    if [ "$HAS_GPU" == "true" ]; then
+        # Install ffnvcodec FFmpeg with NVIDIA GPU acceleration
+        git clone https://git.videolan.org/git/ffmpeg/nv-codec-headers.git &&
+            pushd nv-codec-headers &&
+            sudo make install PREFIX="$USR_LOCAL_PREFIX"
+        popd
+        check_installation "$USR_LOCAL_PREFIX/include/ffnvcodec/nvEncodeAPI.h" "Nvidia ffnvcodec"
+    fi
+
+    # Install LIBASS (portable subtitle renderer)
+    $DOWNLOAD ${LIBASS_URL} &&
+        tar -zxf libass*.tar.gz &&
+        pushdw "libass*" &&
+        ./configure --prefix="$USR_LOCAL_PREFIX" &&
+        make -j $CPUS &&
+        make install
+    popd
+    check_installation "$USR_LOCAL_PREFIX/lib/libass.so" "LIBASS"
+
+    # Install libmp3lame (MP3 Encoder)
+    curl -L https://sourceforge.net/projects/lame/files/latest/download -o lame.tar.gz &&
+        tar xzvf lame.tar.gz &&
+        pushdw "lame*" &&
+        ./configure --prefix="$USR_LOCAL_PREFIX" \
+            --bindir="/usr/bin" \
+            --enable-nasm &&
+        make -j $CPUS &&
+        make install
+    popd
+    check_installation "$USR_LOCAL_PREFIX/lib/libmp3lame.so" "libmp3lame"
+
+    # Install opus video codec
+    $DOWNLOAD https://ftp.osuosl.org/pub/xiph/releases/opus/$OPUS_VER.tar.gz &&
+        tar xzvf $OPUS_VER.tar.gz &&
+        pushd $OPUS_VER &&
+        ./configure --prefix="$USR_LOCAL_PREFIX" &&
+        make -j $CPUS &&
+        make install
+    popd
+    check_installation "$USR_LOCAL_PREFIX/lib/libopus.so" "opus"
+
+    # Install libogg (OGG Container format)
+    $DOWNLOAD http://downloads.xiph.org/releases/ogg/$LIBOGG_VER.tar.gz &&
+        tar xzvf $LIBOGG_VER.tar.gz &&
+        pushd $LIBOGG_VER &&
+        ./configure --prefix="$USR_LOCAL_PREFIX" &&
+        make -j $CPUS &&
+        make install
+    popd
+    check_installation "$USR_LOCAL_PREFIX/lib/libogg.so" "libogg"
+    ldconfig
+
+    # Install libvorbis (vorbis audio codec)
+    $DOWNLOAD http://downloads.xiph.org/releases/vorbis/$LIBVORBIS_VER.tar.gz &&
+        tar xzvf $LIBVORBIS_VER.tar.gz &&
+        pushd $LIBVORBIS_VER &&
+        ./configure --prefix="$USR_LOCAL_PREFIX" \
+            --with-ogg="$USR_LOCAL_PREFIX" &&
+        make -j $CPUS &&
+        make install
+    popd
+    check_installation "$USR_LOCAL_PREFIX/lib/libvorbis.so" "libvorbis"
+
+    # Install FDKAAC (AAC audio codec)
+    git clone --depth 1 https://github.com/mstorsjo/fdk-aac &&
+        pushd fdk-aac &&
+        autoreconf -fiv &&
+        ./configure --prefix="$USR_LOCAL_PREFIX" &&
+        make -j $CPUS &&
+        make install
+    popd
+    check_installation "$USR_LOCAL_PREFIX/lib/libfdk-aac.so" "FDKAAC"
+
+    # Install WEBM
+    git clone --depth 1 https://chromium.googlesource.com/webm/libvpx.git &&
+        pushd libvpx &&
+        ./configure --prefix="$USR_LOCAL_PREFIX" \
+            --disable-static --enable-shared \
+            --disable-examples --disable-unit-tests \
+            --enable-vp9-highbitdepth --as=yasm &&
+        make -j $CPUS &&
+        make install
+    popd
+    check_installation "$USR_LOCAL_PREFIX/lib/libvpx.so" "WEBM"
+
+    # Install X264 (H.264 Codec)
+    git clone --depth 1 https://code.videolan.org/videolan/x264.git &&
+        pushd x264 &&
+        PKG_CONFIG_PATH="$USR_LOCAL_PREFIX/lib/pkgconfig" ./configure \
+            --enable-shared --disable-static \
+            --prefix="$USR_LOCAL_PREFIX" \
+            --bindir="/usr/bin" &&
+        make -j $CPUS &&
+        make install
+    popd
+    check_installation "$USR_LOCAL_PREFIX/lib/libx264.so" "X264"
+
+    # Install X265 (H.265 Codec)
+    git clone https://bitbucket.org/multicoreware/x265_git.git &&
+        pushd x265_git/build/linux &&
+        cmake -G "Unix Makefiles" \
+            -DCMAKE_INSTALL_PREFIX="$USR_LOCAL_PREFIX" \
+            -DBUILD_SHARED_LIBS=ON \
+            ../../source &&
+        make -j $CPUS &&
+        make install
+    popd
+    check_installation "$USR_LOCAL_PREFIX/lib/libx265.so" "X265"
+}
+
+install_ffmpeg() {
+    if [ "$HAS_GPU" == "true" ]; then
+        NVIDIA_CFLAGS="-I$CUDA_HOME/include"
+        NVIDIA_LDFLAGS="-L$CUDA_HOME/lib64"
+        NVIDIA_FFMPEG_OPTS="--enable-cuda-nvcc --nvcc=$CUDA_HOME/bin/nvcc --enable-cuda --enable-cuvid --enable-nvenc"
+    fi
+
+    # Install FFMPEG (AV1 Codec Library)
+    $DOWNLOAD https://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2 &&
+        tar -jxf ffmpeg-snapshot.tar.bz2 &&
+        pushd ffmpeg &&
+        PKG_CONFIG_PATH="$USR_LOCAL_PREFIX/lib/pkgconfig:/usr/lib64/pkgconfig:/usr/share/pkgconfig:/usr/lib/pkgconfig:$USR_LOCAL_PREFIX/lib/pkgconfig" \
+            ./configure \
+            --prefix="$USR_LOCAL_PREFIX" \
+            --disable-static --enable-shared \
+            --extra-cflags="-I$USR_LOCAL_PREFIX/include $NVIDIA_CFLAGS" \
+            --extra-ldflags="-L$USR_LOCAL_PREFIX/lib $NVIDIA_LDFLAGS" \
+            --extra-libs='-lpthread -lm' \
+            --bindir="$USR_LOCAL_PREFIX/bin" \
+            --enable-gpl \
+            --enable-libaom \
+            --enable-libass \
+            --enable-libfdk-aac \
+            --enable-libfreetype \
+            --enable-libmp3lame \
+            --enable-libopus \
+            --enable-libvorbis \
+            --enable-libvpx \
+            --enable-libx264 \
+            --enable-libx265 \
+            --enable-nonfree \
+            --enable-openssl \
+            $NVIDIA_FFMPEG_OPTS &&
+        make -j $CPUS &&
+        make install
+    popd
+    check_installation "$USR_LOCAL_PREFIX/bin/ffmpeg" "ffmpeg"
+    check_installation "$USR_LOCAL_PREFIX/bin/ffprobe" "ffprobe"
+    ldconfig
+}
 
 # Execute Functions
 install_utils
 setup_gpu
 source $HOME_DIR/.bashrc
+# install_ffmpeg_prereqs
+# install_ffmpeg
 popd
 rm -fr $SRC_DIR
+i
