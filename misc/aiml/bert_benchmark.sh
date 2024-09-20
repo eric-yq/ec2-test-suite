@@ -1,6 +1,105 @@
 #!/bin/bash
 # OS: Ubuntu 22.04 
 
+
+# 基础编译环境
+apt update
+apt install -y build-essential
+ARCH=$(arch) 
+VER=3.29.6
+wget https://github.com/Kitware/CMake/releases/download/v${VER}/cmake-${VER}-linux-${ARCH}.sh
+sh cmake-${VER}-linux-${ARCH}.sh --skip-license --prefix=/usr
+cmake -version
+
+# 安装 conda
+cd /root/
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-$(arch).sh
+bash Miniconda3-latest-Linux-$(arch).sh -b -p /root/miniconda3/
+eval "$(/root/miniconda3/bin/conda shell.bash hook)"
+conda init
+source /root/.bashrc
+
+# 创建单独的环境 TensorFlow
+testname="tensorflow"
+conda create -y -q -n ${testname} python=3.11
+conda activate $testname
+
+# (Graviton only) 安装 hdf5，后面安装 h5py 时依赖 libhdf5.so
+cd ~
+wget https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-1_10_7.tar.gz
+tar zxf hdf5-1_10_7.tar.gz && cd hdf5-hdf5-1_10_7/
+./configure --enable-cxx --prefix=/usr/
+make -j$(nproc) && make install 
+find /usr/ -name "*hdf5*"
+HDF5_DIR=/usr/lib/ pip install tensorflow==2.15.1
+
+# 安装 TensorFlow 环境 x86 不需要指定 HDF5_DIR=/usr/lib/
+pip install tensorflow==2.15.1
+
+# TensorFlow Benchmark 工具
+cd /root
+apt install -y build-essential cmake libgl1-mesa-glx libglib2.0-0 libsm6 libxrender1 libxext6 python3-pip
+git clone https://github.com/mlcommons/inference.git --recursive
+cd inference
+# git checkout v2.0
+git checkout v4.0
+cd loadgen
+conda install -c conda-forge pybind11
+CFLAGS="-std=c++14" python3 setup.py bdist_wheel
+pip install dist/*.whl
+
+# 构建 Bert 的 benchmark, 也可以进入 inference 其他目录下构建其他的程序
+pip install transformers boto3
+cd /root/inference/language/bert
+make setup
+
+# 设置运行时环境变量
+# For TensorFlow versions older than 2.14.0, the default runtime backend is Eigen, but typically onednn+acl provides better performance. To enable the onednn+acl backend, set the following TF environment variable
+export TF_ENABLE_ONEDNN_OPTS=1
+# Graviton3(E) (e.g. c7g, c7gn, and hpc7g instances) supports BF16 format for ML acceleration. This can be enabled in oneDNN by setting the below environment variable
+grep -q bf16 /proc/cpuinfo && export DNNL_DEFAULT_FPMATH_MODE=BF16
+# Make sure the openmp threads are distributed across all the processes for multi process applications to avoid over subscription for the vcpus. For example if there is a single application process, then num_processes should be set to '1' so that all the vcpus are assigned to it with one-to-one mapping to omp threads
+num_vcpus=$(getconf _NPROCESSORS_ONLN)
+num_processes=1
+export OMP_NUM_THREADS=$((1 > ($num_vcpus/$num_processes) ? 1 : ($num_vcpus/$num_processes)))
+export OMP_PROC_BIND=false
+export OMP_PLACES=cores
+
+# 执行 benchmark
+cat << EOF > 1.sh
+echo "[Info] Sart to test --backend=tf --scenario=SingleStream..."
+python3 run.py --backend=tf --scenario=SingleStream
+
+echo "[Info] Sart to test --backend=tf --scenario=Offline..."
+python3 run.py --backend=tf --scenario=Offline
+
+echo "[Info] Sart to test --backend=tf --scenario=Server..."
+python3 run.py --backend=tf --scenario=Server
+
+echo "[Info] Sart to test --backend=tf --scenario=MultiStream..."
+python3 run.py --backend=tf --scenario=MultiStream
+
+echo "[Info] Complete all tests ."
+EOF
+
+nohup bash 1.sh &
+
+### 重新登录ssh 时步骤：
+testname="tensorflow"
+conda activate $testname
+export TF_ENABLE_ONEDNN_OPTS=1
+grep -q bf16 /proc/cpuinfo && export DNNL_DEFAULT_FPMATH_MODE=BF16
+num_vcpus=$(getconf _NPROCESSORS_ONLN)
+num_processes=1
+export OMP_NUM_THREADS=$((1 > ($num_vcpus/$num_processes) ? 1 : ($num_vcpus/$num_processes)))
+export OMP_PROC_BIND=false
+export OMP_PLACES=cores
+cd /root/inference/language/bert
+
+
+
+
+############## 以前的 #############################################################################
 # Reference:  这里使用 TorchBench framework.
 # https://aws.amazon.com/blogs/machine-learning/accelerated-pytorch-inference-with-torch-compile-on-aws-graviton-processors/
 

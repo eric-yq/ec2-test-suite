@@ -15,7 +15,7 @@ git clone https://github.com/ggerganov/llama.cpp
 cd llama.cpp
 make -j$(nproc)
 
-###################################################################################################
+# ##################################################################################################
 # GPU 实例编译
 # 安装 nvidia driver, cuda, cudnn 等
 # wget https://raw.githubusercontent.com/eric-yq/ec2-test-suite/main/misc/ffmpeg_on_gpu/setup_gpu.sh
@@ -36,6 +36,12 @@ source venv/bin/activate
 pip install -U "huggingface_hub[cli]"
 huggingface-cli download cognitivecomputations/dolphin-2.9.4-llama3.1-8b-gguf dolphin-2.9.4-llama3.1-8b-Q4_0.gguf --local-dir . --local-dir-use-symlinks False
 
+# Run original downloaded model
+QUANTIZE_METHOD="Q4_0"
+./llama-cli -m dolphin-2.9.4-llama3.1-8b-${QUANTIZE_METHOD}.gguf \
+  -p "Building a visually appealing website can be done in ten simple steps:" \
+  -n 512 -t 64
+
 # Re-quantize the model：on Graviton3
 QUANTIZE_METHOD="Q4_0_8_8"
 ./llama-quantize --allow-requantize dolphin-2.9.4-llama3.1-8b-Q4_0.gguf dolphin-2.9.4-llama3.1-8b-${QUANTIZE_METHOD}.gguf ${QUANTIZE_METHOD}
@@ -43,7 +49,6 @@ QUANTIZE_METHOD="Q4_0_8_8"
 # Re-quantize the model：on Graviton4
 QUANTIZE_METHOD="Q4_0_4_8"
 ./llama-quantize --allow-requantize dolphin-2.9.4-llama3.1-8b-Q4_0.gguf dolphin-2.9.4-llama3.1-8b-${QUANTIZE_METHOD}.gguf ${QUANTIZE_METHOD}
-
 
 # Run inference with re-quantized model:
 ./llama-cli -m dolphin-2.9.4-llama3.1-8b-${QUANTIZE_METHOD}.gguf \
