@@ -51,7 +51,7 @@ import time
 import concurrent.futures
 from functools import wraps
 
-NUM_REPEATS = 100
+NUM_REPEATS = 512
 
 def timer_decorator(func):
     @wraps(func)
