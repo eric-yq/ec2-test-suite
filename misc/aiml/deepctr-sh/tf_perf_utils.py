@@ -51,7 +51,7 @@ import time
 import concurrent.futures
 from functools import wraps
 
-NUM_REPEATS = 4
+NUM_REPEATS = 100
 
 def timer_decorator(func):
     @wraps(func)
@@ -81,7 +81,7 @@ def concurrency_decorator(concurrency_levels):
                             try:
                                 time_elapse, func_result = future.result()
                                 func_data = [i.item() for i in func_result]
-                                latencies_c.append((time_elapse, func_data))
+                                latencies_c.append((time_elapse, []))
                             except Exception as exc:
                                 print(f'generated exception: {exc}')
 

@@ -6,7 +6,7 @@ sess = ort.InferenceSession(f"{savename}", providers=["CPUExecutionProvider"])
 from tf_perf_utils import *
 from datetime import datetime
 TIMESTR = datetime.now().strftime("%y%m%d_%H%M")
-@concurrency_decorator([2, 2, 4, 8, 12, 16, 24, 32, 40, 48, 56, 64, 80, 96])
+@concurrency_decorator([2, 2, 4, 8, 16, 32, 48, 64, 80, 96])
 # @concurrency_decorator([1, 99, 96])
 # @concurrency_decorator([2, 4])
 @timer_decorator
