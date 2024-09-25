@@ -2,7 +2,7 @@
 
 ## Amazon Linux 2023
 
-yum install -y git
+yum install -y git perf
 
 # 安装 conda
 cd /root/
@@ -26,7 +26,7 @@ git clone https://github.com/shenweichen/DeepCTR.git
 cd DeepCTR
 python setup.py install
 
-# 
+# only for test.
 cat << EOF > test.py
 import onnxruntime as ort
 import numpy as np
@@ -60,7 +60,7 @@ EOF
 # get the model:
 cp /home/ec2-user/mtl_model3.onnx .
 
-python 1.py
+python test.py
 
 
 

@@ -1,6 +1,7 @@
 import onnxruntime as ort
 savename = 'converted_onnx_model/mtl_model_240920_0823.onnx'
 sess_options = ort.SessionOptions()
+# sess_options.add_session_config_entry("mlas.enable_gemm_fastmath_arm64_bfloat16", "1")
 sess = ort.InferenceSession(f"{savename}", providers=["CPUExecutionProvider"])
 
 from tf_perf_utils import *
