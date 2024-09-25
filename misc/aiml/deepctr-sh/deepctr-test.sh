@@ -19,7 +19,7 @@ conda activate $testname
 
 # 安装依赖包
 pip install onnxruntime==1.17.1
-pip install numpy==1.26.4 # deepctr需要numpy 1.x
+pip install numpy==1.26.4 pandas dool # deepctr需要numpy 1.x
 
 # 安装 DeepCTR
 git clone https://github.com/shenweichen/DeepCTR.git

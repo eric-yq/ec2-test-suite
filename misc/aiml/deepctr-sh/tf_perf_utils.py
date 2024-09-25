@@ -87,8 +87,8 @@ def concurrency_decorator(concurrency_levels):
 
                 latencies[concurrency] = latencies_c
 
-                print(f'Sleep between concurrency levels.')
-                time.sleep(2)
+                print(f'Sleep 5s between concurrency levels.')
+                time.sleep(5)
             
             return latencies
         return wrapper
