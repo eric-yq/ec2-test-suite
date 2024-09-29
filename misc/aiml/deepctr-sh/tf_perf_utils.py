@@ -1,57 +1,31 @@
 import os
 import numpy as np
 
-UID_SIZE = 100000
-IID_SIZE = 10000
-FEAT_SIZE = 64
+SEQ_SNAPSHOT_EMB = 192
 
-NUM_FEATS = 120
-FEAT_NAMES = [f'feat{i}' for i in range(NUM_FEATS)]
-
-SEQ_MAX_LENS = [200,100,50,50]
-SEQ_SNAPSHOT_FEATS = ['item_id'] + FEAT_NAMES[0:4]
-
-def generate_random_data(num_samples):
-
-    def _generate_hist_data(num_samples, max_length, seq_lengths, value_range):
-        hist_data = np.zeros((num_samples, max_length), dtype=np.int32)
-        for i in range(num_samples):
-            length = seq_lengths[i]
-            hist_data[i, :length] = np.random.randint(1, value_range + 1, length)
-        return hist_data
+def gen_emb_as_input(batch_size):
     
-    feats = {
-        'user': np.arange(1, num_samples+1, dtype=np.int32),
-        'item_id': np.random.randint(1, IID_SIZE, num_samples, dtype=np.int32),
-        'score': np.random.uniform(0.01, 1, num_samples).astype(np.float32),
-        'amount': np.random.uniform(0.01, 99.99, num_samples).astype(np.float32),
+    eqv_embs = {
+        'q_emb': np.random.rand(batch_size, 1, SEQ_SNAPSHOT_EMB).astype('float32'),
+        'feats_embs': np.random.rand(batch_size, 1, 1216).astype('float32'),
+        'seq1_emb': np.random.rand(batch_size, 200, SEQ_SNAPSHOT_EMB).astype('float32'),
+        'seq2_emb': np.random.rand(batch_size, 100, SEQ_SNAPSHOT_EMB).astype('float32'),
+        'seq3_emb': np.random.rand(batch_size, 50, SEQ_SNAPSHOT_EMB).astype('float32'),
+        'seq4_emb': np.random.rand(batch_size, 50, SEQ_SNAPSHOT_EMB).astype('float32'),
+        'seq0_length': np.random.randint(1, 201, size=(batch_size,1), dtype='uint8'),
+        'seq1_length': np.random.randint(1, 101, size=(batch_size,1), dtype='uint8'),
+        'seq2_length': np.random.randint(1, 51, size=(batch_size,1), dtype='uint8'),
+        'seq3_length': np.random.randint(1, 51, size=(batch_size,1), dtype='uint8')
     }
 
-    for fname in FEAT_NAMES:
-        feats[fname] = np.random.randint(1, FEAT_SIZE, num_samples, dtype=np.int32)
+    return eqv_embs
 
-    for i in range(0, len(SEQ_MAX_LENS)):
-        feats.update(
-            {f'seq{i}_length': np.random.randint(SEQ_MAX_LENS[i]//2, SEQ_MAX_LENS[i]+1, num_samples, dtype=np.int32)}
-        )
-
-        for semb_base in SEQ_SNAPSHOT_FEATS:
-            feats[f'hist{i}_{semb_base}'] = _generate_hist_data(num_samples, SEQ_MAX_LENS[i], feats[f'seq{i}_length'], IID_SIZE if semb_base == 'item_id' else FEAT_SIZE)
-
-    return feats
-
-def reshape_single_element_arrays(d):
-    for key, value in d.items():
-        if isinstance(value, np.ndarray):
-            if value.ndim == 1 and value.size == 1:
-                d[key] = value.reshape(1, 1)
-    return d
 
 import time
 import concurrent.futures
 from functools import wraps
 
-NUM_REPEATS = 128
+NUM_REPEATS = 32
 
 def timer_decorator(func):
     @wraps(func)
@@ -87,8 +61,8 @@ def concurrency_decorator(concurrency_levels):
 
                 latencies[concurrency] = latencies_c
 
-                print(f'Sleep 5s between concurrency levels.')
-                time.sleep(5)
+                print(f'Sleep between concurrency levels.')
+                time.sleep(2)
             
             return latencies
         return wrapper

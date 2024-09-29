@@ -1,4 +1,5 @@
 import onnxruntime as ort
+import random
 savename = 'converted_onnx_model/mtl_model_240920_0823.onnx'
 sess_options = ort.SessionOptions()
 sess = ort.InferenceSession(f"{savename}", providers=["CPUExecutionProvider"])
@@ -6,14 +7,13 @@ sess = ort.InferenceSession(f"{savename}", providers=["CPUExecutionProvider"])
 from tf_perf_utils import *
 from datetime import datetime
 TIMESTR = datetime.now().strftime("%y%m%d_%H%M")
-@concurrency_decorator([2, 2, 4, 8, 16, 32, 48, 64, 80, 96])
+@concurrency_decorator([2, 2, 4, 8, 16, 32, 48, 64])
 # @concurrency_decorator([1, 99, 96])
 # @concurrency_decorator([2, 4])
 @timer_decorator
 def call_local_inf():
-    num_samples = 1
-    feature_dict = generate_random_data(num_samples)
-    reshaped_dict = reshape_single_element_arrays(feature_dict)
+    num_samples = random.randint(90,110)
+    reshaped_dict = gen_emb_as_input(num_samples)
     func_res = sess.run(['p1', 'p2'], reshaped_dict)
     return func_res
 timed_results = call_local_inf()
