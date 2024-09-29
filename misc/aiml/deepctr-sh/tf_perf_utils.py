@@ -54,7 +54,7 @@ def concurrency_decorator(concurrency_levels):
                         for future in concurrent.futures.as_completed(futures):
                             try:
                                 time_elapse, func_result = future.result()
-                                func_data = [i.item() for i in func_result]
+                                # func_data = [i.item() for i in func_result]
                                 latencies_c.append((time_elapse, []))
                             except Exception as exc:
                                 print(f'generated exception: {exc}')

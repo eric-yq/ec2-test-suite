@@ -1,6 +1,6 @@
 import onnxruntime as ort
 import random
-savename = 'converted_onnx_model/mtl_model_240920_0823.onnx'
+savename = 'converted_onnx_model/mtl_model_240929_0343.onnx'
 sess_options = ort.SessionOptions()
 sess = ort.InferenceSession(f"{savename}", providers=["CPUExecutionProvider"])
 
