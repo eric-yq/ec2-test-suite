@@ -17,7 +17,7 @@ def call_local_inf():
     func_res = sess.run(['p1', 'p2'], reshaped_dict)
     return func_res
 timed_results = call_local_inf()
-print(timed_results)
+# print(timed_results)
 import json
 with open(f'output-detail-{TIMESTR}.json', 'w') as f:
     json.dump(timed_results, f, indent=2, allow_nan=False)
@@ -27,8 +27,10 @@ accums = {}
 stats = {}
 for k in timed_results.keys():
     accums[k] = [v[0] for v in timed_results[k]]
-    stats[k] = [np.mean(accums[k]), np.percentile(accums[k], 50), np.percentile(accums[k], 95), np.percentile(accums[k], 99)]
+    tot_req = sum([v[1] for v in timed_results[k]])
+    flatten_accum = accums[k]*tot_req
+    stats[k] = [tot_req, np.mean(flatten_accum), np.percentile(flatten_accum, 50), np.percentile(flatten_accum, 95), np.percentile(flatten_accum, 99)]
 
-df = pd.DataFrame.from_dict(stats, orient='index', columns=['mean', 'p50', 'p95', 'p99'])
+df = pd.DataFrame.from_dict(stats, orient='index', columns=['numreq', 'mean', 'p50', 'p95', 'p99'])
 df = df.reset_index().rename(columns={'index': 'concurrency'})
 df.to_csv(f'output-metrics-{TIMESTR}.csv', index = False)
