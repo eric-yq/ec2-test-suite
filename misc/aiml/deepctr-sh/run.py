@@ -15,9 +15,9 @@ def call_local_inf():
     num_samples = random.randint(90,110)
     reshaped_dict = gen_emb_as_input(num_samples)
     func_res = sess.run(['p1', 'p2'], reshaped_dict)
-    return func_res
+    return num_samples, func_res
 timed_results = call_local_inf()
-# print(timed_results)
+print(timed_results)
 import json
 with open(f'output-detail-{TIMESTR}.json', 'w') as f:
     json.dump(timed_results, f, indent=2, allow_nan=False)
