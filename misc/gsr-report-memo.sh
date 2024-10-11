@@ -20,19 +20,20 @@ Solutions Architect,Technical Account Manager,Customer Solutions Manager
 https://github.com/PowerShell/PowerShell/releases/download/v7.4.4/PowerShell-7.4.4-win-x64.msi
 https://github.com/PowerShell/PowerShell/releases/download/v7.4.4/PowerShell-7.4.4-win-x86.msi
 
+#####  Windows执行
+## 向某客户的 Account team 添加 role
+python.exe D:\GSR-adduser\add_users_to_sfdc_acc_team.py -wdir 'D:\GSR\' -gpath 'D:\GSR\' -cpath 'D:\GSR-adduser\customer_list.csv'
 
-# Windows执行
 ## 生成报告
 ./InstallAndRunGSR.ps1 -BatchMode -BatchFile 'D:\Customers-List.csv' -GsrInstallationLocation 'D:\'
  
 ## 发送报告
-python.exe D:\GSR-sendmail\SendEmail.py -hfile 'D:\GSR-sendmail\Dear Account Team.html' -rdir 'D:\GSR' -clst 'D:\Customers-List.csv'
-
+python.exe D:\GSR-sendmail\SendEmail.py -email -dintm -hfile 'D:\GSR-sendmail\Dear Account Team.html' -rdir 'D:\GSR' -clst 'D:\Customers-List.csv'
 
 
 
 ## 
-0013800001ORDnJAAX	Crypto.com (Foris Limited)	372042772205 
+0013800001ORDnJAAX	Crypto.com (Foris Li-gpath 'D:\GSR\'mited)	372042772205 
 
 00138000018EGKcAAO	Bybit-real	541347453293 
 https://aws-ciw-readonly.amazon.com/cost-management/home?spoofAccountId=541347453293
