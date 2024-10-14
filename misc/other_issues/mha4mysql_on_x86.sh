@@ -7,7 +7,7 @@ yum update
 yum install -y perl gcc wget
 yum install -y perl-DBD-MySQL perl-DBD-Pg perl-Config-Perl-V perl-PCP-LogImport perl-PCP-LogSummary perl-Sys-Syslog perl-Unix-Syslog perl-DBD-SQLite perl-XML-Catalog perl-libnetcfg
 
-yum install perl-App-cpanminus
+yum install -y perl-App-cpanminus
 cpan inc::Module::Install
 cpanm Config::Tiny
 cpanm Log::Dispatch

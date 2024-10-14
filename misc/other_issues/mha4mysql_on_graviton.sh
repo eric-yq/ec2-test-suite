@@ -40,10 +40,10 @@ yum install -y perl-Log-Dispatch
 yum install -y perl-Parallel-ForkManager
 yum install -y perl-Time-HiRes
 
-## Finally, install MHA node and Manager
+## Finally, download/install MHA node and Manager
 wget https://github.com/yoshinorim/mha4mysql-node/releases/download/v0.58/mha4mysql-node-0.58-0.el7.centos.noarch.rpm
-rpm -ivh mha4mysql-node-0.58-0.el7.centos.noarch.rpm
 wget https://github.com/yoshinorim/mha4mysql-manager/releases/download/v0.58/mha4mysql-manager-0.58-0.el7.centos.noarch.rpm
+rpm -ivh mha4mysql-node-0.58-0.el7.centos.noarch.rpm
 rpm -ivh mha4mysql-manager-0.58-0.el7.centos.noarch.rpm
 
 # [root@ip-172-31-56-109 ~]# rpm -ivh mha4mysql-manager-0.58-0.el7.centos.noarch.rpm
