@@ -23,6 +23,10 @@ https://aws-ciw-readonly.amazon.com/cost-management/home?spoofAccountId=74616675
 https://aws-ciw-readonly.amazon.com/cost-management/home?spoofAccountId=709016922719
 https://aws-ciw-readonly.amazon.com/cost-management/home?spoofAccountId=794608515269
 
+## Shein 。可以访问，
+https://aws-ciw-readonly.amazon.com/cost-management/home?spoofAccountId=793684541905
+
+
 Solutions Architect,Technical Account Manager,Customer Solutions Manager
 
 
