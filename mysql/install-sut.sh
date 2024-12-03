@@ -3,13 +3,28 @@
 SUT_NAME=${1}
 echo "$0: Install SUT_NAME: ${SUT_NAME}"
 
+## (optional) mount nvme disk
+disks="nvme1n1" 
+for disk in $disks
+do
+    echo "[INFO] Start to create partition on $disk..."
+    echo -e "g\nn\n1\n\n\nw" | fdisk /dev/$disk
+
+    echo "[INFO] Start to create filesystem on $device..."
+    partition=${disk}p1 && mkdir -p /data/$partition
+    device="/dev/$partition" && mkfs -t xfs -f $device
+
+    echo "[INFO] Start to modify /etc/fstab..."
+    uuid=$(blkid | grep $partition | awk -F "\"" '{print $2}')
+    echo "UUID=$uuid /data/$partition xfs  defaults,nofail  0  2" >> /etc/fstab
+done
+mount -a && df -h
+
+## functions
 install_public_tools(){
 	$PKGCMD update -y
 	$PKGCMD1 install -y epel
-	$PKGCMD install -y dmidecode net-tools dstat htop nload
-# 	$PKGCMD install -y stress-ng
-# 	$PKGCMD install -y perf
-	$PKGCMD install -y git
+	$PKGCMD install -y dmidecode net-tools htop git
 }
 install_mysql(){
     wget https://repo.mysql.com//${MYSQL_REPO}
@@ -17,25 +32,13 @@ install_mysql(){
     $PKGCMD install -y mysql-server --nogpgcheck
     $PKGCMD install -y mysql-devel --nogpgcheck
     $PKGCMD install -y mysql --nogpgcheck
-    systemctl start  ${MYSQL_SERVICE}
-	systemctl status ${MYSQL_SERVICE}
-}
-init_start_mysql(){
-	MYSQL_INIT_PASSWORD=$(grep 'temporary password' /var/log/mysqld.log | awk '{print $NF}')
-	if [[ x${MYSQL_INIT_PASSWORD} == x ]]; then
-        MYSQL_CMD_OPTIONS=""
-    else 
-        MYSQL_CMD_OPTIONS="--connect-expired-password -uroot -p${MYSQL_INIT_PASSWORD}"
-    fi
-    ## 修改初始密码
-    cat create_remote_login_user.sql
-	mysql ${MYSQL_CMD_OPTIONS} < create_remote_login_user.sql
 }
 modify_mycnf(){
 	## 修改配置文件
     cp ${MYSQL_CONF} ${MYSQL_CONF}.bak
     IPADDR=$(ifconfig | grep "inet " | grep -v "127.0.0.1" | awk -F " " '{print $2}')
     sed -i "s/127.0.0.1/${IPADDR}/g" ${MYSQL_CONF}
+    
     
 	## 获取 CPU数 和 内存数量（MB）
 	CPU_CORES=$(nproc)
@@ -44,7 +47,16 @@ modify_mycnf(){
 	## 变量计算
 	let XXX=${MEM_TOTAL_MB}*75/100
 
-    cat << EOF >> ${MYSQL_CONF}
+    mkdir -p /data/nvme1n1p1
+    cat << EOF > ${MYSQL_CONF}
+[mysqld]
+server-id=123
+datadir=/data/nvme1n1p1
+log-bin=/data/nvme1n1p1/mysql-bin
+socket=/var/lib/mysql/mysql.sock
+log-error=/var/log/mysqld.log
+pid-file=/var/run/mysqld/mysqld.pid
+
 # general
 max_connections=4000
 table_open_cache=8000
@@ -104,16 +116,22 @@ EOF
     systemctl restart ${MYSQL_SERVICE}
 	systemctl status  ${MYSQL_SERVICE}
 }
+init_start_mysql(){
+	MYSQL_INIT_PASSWORD=$(grep 'temporary password' /var/log/mysqld.log | awk '{print $NF}')
+	if [[ x${MYSQL_INIT_PASSWORD} == x ]]; then
+        MYSQL_CMD_OPTIONS=""
+    else 
+        MYSQL_CMD_OPTIONS="--connect-expired-password -uroot -p${MYSQL_INIT_PASSWORD}"
+    fi
+    ## 修改初始密码
+    cat create_remote_login_user.sql
+	mysql ${MYSQL_CMD_OPTIONS} < create_remote_login_user.sql
+}
 
 # 主要流程
-
 ## 获取OS 、CPU 架构信息。
 OS_NAME=$(egrep ^NAME /etc/os-release | awk -F "\"" '{print $2}')
-# OS_ID=$(egrep "^ID=" /etc/os-release | awk -F "\"" '{print $2}') 
 OS_VERSION=$(egrep ^VERSION_ID /etc/os-release | awk -F "\"" '{print $2}') 
-ARCH=$(lscpu | grep Architecture | awk -F " " '{print $NF}') 
-PN=$(dmidecode -s system-product-name | tr ' ' '_')
-
 if   [[ "$OS_NAME" == "Amazon Linux" ]]; then
 	if   [[ "$OS_VERSION" == "2" ]]; then
 		PKGCMD=yum
@@ -158,15 +176,6 @@ grant all privileges on *.* to 'root'@'%' with grant option;
 flush privileges;
 EOF
 	
-# elif [[ "$OS_NAME" == "CentOS Linux" ]] && [[ "$OS_VERSION" == "7" ]]; then
-# 	install_centos7_dependencies
-# 
-# elif [[ "$OS_NAME" == "CentOS Stream" ]] && [[ "$OS_VERSION" == "8" ]]; then
-# 	install_centos8_dependencies
-# 
-# elif [[ "$OS_NAME" == "CentOS Stream" ]] && [[ "$OS_VERSION" == "9" ]]; then
-# 	install_centos9_dependencies
-
 else
 	echo "$0: $OS_NAME not supported"
 	exit 1
@@ -175,7 +184,8 @@ fi
 # mysql installation
 install_public_tools
 install_mysql
-init_start_mysql
 modify_mycnf
+init_start_mysql
+
 	
 
