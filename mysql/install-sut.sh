@@ -24,7 +24,8 @@ mount -a && df -h
 install_public_tools(){
 	$PKGCMD update -y
 	$PKGCMD1 install -y epel
-	$PKGCMD install -y dmidecode net-tools htop git
+	$PKGCMD install -y dmidecode net-tools htop git python3-pip
+	pip3 install dool
 }
 install_mysql(){
     wget https://repo.mysql.com//${MYSQL_REPO}
