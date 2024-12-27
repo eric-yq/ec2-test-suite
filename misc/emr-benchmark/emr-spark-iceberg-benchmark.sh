@@ -5,13 +5,16 @@ aws configure
 ## 同步数据
 aws sync 
 
-## 启动 EMR 集群 /// 不好用。
+
+## 启动  EMR 7.1 cluster with Iceberg enabled
+
 aws emr create-cluster \
 --applications Name=Hadoop Name=Spark \
+--configurations file://configurations.json \
 --ec2-attributes '{"KeyName":"ericyq-global","InstanceProfile":"EMR_EC2_DefaultRole","SubnetId":"subnet-046de201cd71d1cde","EmrManagedSlaveSecurityGroup":"sg-0f63c1d8fc002c053","EmrManagedMasterSecurityGroup":"sg-0f63c1d8fc002c053"}' \
 --release-label emr-7.1.0 \
 --log-uri s3://$YOUR_S3_BUCKET/elasticmapreduce/ \
---instance-groups '[{"InstanceCount":8,"EbsConfiguration":{"EbsOptimized":true},"InstanceGroupType":"CORE","InstanceType":"r6id.4xlarge","Name":"Core - 2"},{"InstanceCount":1,"EbsConfiguration":{"EbsOptimized":true},"InstanceGroupType":"MASTER","InstanceType":"r6id.4xlarge","Name":"Master - 1"}]' \
+--instance-groups '[{"InstanceCount":4,"EbsConfiguration":{"EbsOptimized":true},"InstanceGroupType":"CORE","InstanceType":"r6id.4xlarge","Name":"Core - 2"},{"InstanceCount":1,"EbsConfiguration":{"EbsOptimized":true},"InstanceGroupType":"MASTER","InstanceType":"r6id.4xlarge","Name":"Master - 1"}]' \
 --auto-scaling-role EMR_AutoScaling_DefaultRole \
 --ebs-root-volume-size 10 \
 --service-role EMR_DefaultRole \
