@@ -35,9 +35,9 @@ yum install -y python3-pip htop
 pip3 install dool
 
 ### 执行mongodb的install-sut.sh
+# ......
 
 ### 执行benchmark 
-
 cat << EOF > /tmp/temp-setting
 export SUT_NAME="mongo"
 export INSTANCE_IP_MASTER="172.31.11.114"
@@ -45,18 +45,18 @@ export INSTANCE_TYPE="i3.2xlarge"
 export OS_TYPE="al2023"
 EOF
 source /tmp/temp-setting
-nohup yum benchmark/mongo-benchmark_v2.sh ${INSTANCE_IP_MASTER}um &
+nohup bash benchmark/mongo-benchmark_v2.sh ${INSTANCE_IP_MASTER} &
 
-
-### 客户端，YCSB实例安装（AL2023 需要注意OpenSSL 3.0）
-yum install -y git dmidecode htop python3-pip java-1.8.0-amazon-corretto
+##################################################################################################
+### 客户端，YCSB实例安装（AL2上需要Python2和JDK8环境）
+# yum install -y git dmidecode htop python3-pip java-1.8.0-amazon-corretto
 
 OS_NAME=$(egrep ^NAME /etc/os-release | awk -F "\"" '{print $2}')
 OS_VERSION=$(egrep ^VERSION_ID /etc/os-release | awk -F "\"" '{print $2}')
 ARCH=$(lscpu | grep Architecture | awk -F " " '{print $NF}')
 
 ## 添加 MongoDB Repo
-MONGO_XY="8.0"
+MONGO_XY="7.0"
 cat << EOF > /etc/yum.repos.d/mongodb-org-${MONGO_XY}-${ARCH}.repo
 [mongodb-org-${MONGO_XY}-${ARCH}]
 name=MongoDB Repository for ${MONGO_XY}-${ARCH}
@@ -66,7 +66,7 @@ enabled=1
 gpgkey=https://www.mongodb.org/static/pgp/server-${MONGO_XY}.asc
 EOF
 
-yum install -y mongodb-mongosh-shared-openssl3 
+yum install -y mongodb-mongosh
 git clone  https://github.com/eric-yq/ec2-test-suite.git
 
 
