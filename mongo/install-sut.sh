@@ -1,12 +1,12 @@
 #!/bin/bash
 
+## Only for Amazon Linux 2023
+
 SUT_NAME=${1}
 echo "$0: Install SUT_NAME: ${SUT_NAME}"
 
 install_public_tools(){
-# 	$PKGCMD update -y
-	$PKGCMD1 install -y epel
-	$PKGCMD install -y dmidecode net-tools dstat htop nload
+	yum install -y dmidecode
 	
 	## OS CONFIG
 	sysctl -w vm.max_map_count=98000
@@ -16,14 +16,13 @@ install_public_tools(){
 	sysctl -w net.core.somaxconn=65535
 }
 install_mongo(){
-    $PKGCMD install -y mongodb-org
+    yum install -y mongodb-mongosh-shared-openssl3
+    yum install -y mongodb-org
     MONGO_USER_GROUP=$(grep mongo /etc/passwd | awk -F ":" '{print $1}')
     
     mkdir -p /data/mongodb
 	chown -R ${MONGO_USER_GROUP}:${MONGO_USER_GROUP} /data/mongodb
 	cp ${MONGO_CONF} ${MONGO_CONF}.bak
-# 	sed -i 's/\/var\/lib\/mongodb/\/var\/lib\/mongo/g' ${MONGO_CONF}
-# 	sed -i 's/\/var\/lib\/mongo/\/data\/mongodb/g' ${MONGO_CONF}
 	
 	## 设置 cacheSizeGB
 	MEM_TOTAL_GB=$(free -g |grep Mem | awk -F " " '{print $2}')
@@ -49,8 +48,6 @@ operationProfiling:
 storage:
   dbPath: /data/mongodb
   directoryPerDB: true
-  journal:
-    enabled: true
   engine: wiredTiger
   wiredTiger:
     engineConfig:
@@ -69,15 +66,12 @@ EOF
 	sleep 5
 }
 init_start_mongo(){
-
     ## 创建 root 用户
 	mongosh << EOF
 use admin
 db.createUser({user:'root',pwd:'gv2mongo',roles:['root']});
 exit
 EOF
-	cp ${MONGO_CONF} ${MONGO_CONF}.bak.1
-# 	sed -i 's/bindIp: 127.0.0.1/bindIp: 0.0.0.0/g' ${MONGO_CONF}
 	echo "security:" >> ${MONGO_CONF}
 	echo "  authorization: enabled" >> ${MONGO_CONF}
 
@@ -94,7 +88,6 @@ EOF
 OS_NAME=$(egrep ^NAME /etc/os-release | awk -F "\"" '{print $2}')
 OS_VERSION=$(egrep ^VERSION_ID /etc/os-release | awk -F "\"" '{print $2}')
 ARCH=$(lscpu | grep Architecture | awk -F " " '{print $NF}')
-PN=$(dmidecode -s system-product-name | tr ' ' '_')
 
 echo "$0: 1. OS is ${OS_NAME} ${OS_VERSION} "
 
@@ -109,50 +102,10 @@ enabled=1
 gpgkey=https://www.mongodb.org/static/pgp/server-${MONGO_XY}.asc
 EOF
 
-if [[ "$OS_NAME" == "Amazon Linux" ]]; then
-    if [[ "$OS_VERSION" == "2" ]]; then
-		PKGCMD=yum
-		PKGCMD1=amazon-linux-extras
-    elif [[ "$OS_VERSION" == "2023" ]]; then
-		PKGCMD=dnf
-		PKGCMD1=dnf	
-    else
-		echo "$0: $OS_NAME $OS_VERSION not supported"
-		exit 1
-	fi
+# mongo conf
+MONGO_SERVICE="mongod"
+MONGO_CONF="/etc/mongod.conf"
 
-	# mongo conf
-	MONGO_SERVICE="mongod"
-	MONGO_CONF="/etc/mongod.conf"
-
-elif [[ "$OS_NAME" == "Ubuntu" ]]; then
-	PKGCMD=apt
-	PKGCMD1=apt
-
-	if [[ "$OS_VERSION" == "20.04" ]]; then
-		UBUNTU_RELEASE=focal
-
-	elif [[ "$OS_VERSION" == "22.04" ]]; then
-		UBUNTU_RELEASE=jammy
-
-	else
-		echo "$0: $OS_NAME $OS_VERSION not supported"
-		exit 1
-	fi
-	
-	${PKGCMD} install gnupg -y
-	wget -qO - https://www.mongodb.org/static/pgp/server-${MONGO_XY}.asc | apt-key add -
-	echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu ${UBUNTU_RELEASE}/mongodb-org/${MONGO_XY} multiverse" > /etc/apt/sources.list.d/mongodb-org-${MONGO_XY}.list
-	${PKGCMD} update
-		
-	# mongo conf
-	MONGO_SERVICE="mongod"
-	MONGO_CONF="/etc/mongod.conf"
-
-else
-	echo "$OS_NAME not supported"
-	exit 1
-fi
 
 # mongo installation
 install_public_tools

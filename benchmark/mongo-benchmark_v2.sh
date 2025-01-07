@@ -36,6 +36,7 @@ submit_task(){
 	echo "[Info] Load data ..." >> ${RESULT_FILE}
 	/root/ycsb-0.17.0/bin/ycsb load mongodb -P $(dirname $0)/workload_mongo_readonly -p mongodb.url=${MONGO_URL} \
 		-threads $(nproc) >> ${RESULT_FILE}
+		
     for i in ${THREAD_LIST}
     do
         ### 执行 Benchmark, run
@@ -47,7 +48,7 @@ submit_task(){
         /root/ycsb-0.17.0/bin/ycsb  run mongodb -P $(dirname $0)/workload_mongo_updateonly -p mongodb.url=${MONGO_URL} \
             -threads ${i} >> ${RESULT_FILE1}
             
-        echo "[Info] This Test, current Thread=${i}: Run benchmark - Mixed(R:U:I=4:4:2) ..." >> ${RESULT_FILE1}
+        echo "[Info] This Test, current Thread=${i}: Run benchmark - Mixed(20% each) ..." >> ${RESULT_FILE1}
         /root/ycsb-0.17.0/bin/ycsb  run mongodb -P $(dirname $0)/workload_mongo_mixed -p mongodb.url=${MONGO_URL} \
             -threads ${i} >> ${RESULT_FILE1} 
     

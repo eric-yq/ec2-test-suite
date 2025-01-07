@@ -37,6 +37,13 @@ pip3 install dool
 ### 执行mongodb的install-sut.sh
 
 ### 执行benchmark 
-bash benchmark/mongo-benchmark_v2.sh $IPADDR
 
+cat << EOF > /tmp/temp-setting
+export SUT_NAME="mongo"
+export INSTANCE_IP_MASTER="172.31.11.114"
+export INSTANCE_TYPE="i3.2xlarge"
+export OS_TYPE="al2023"
+EOF
+source /tmp/temp-setting
+nohup bash benchmark/mongo-benchmark_v2.sh ${INSTANCE_IP_MASTER} &
 
