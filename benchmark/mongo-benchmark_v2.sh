@@ -60,7 +60,7 @@ submit_task(){
 }
 
 remove_database(){
-mongo ${MONGO_URL} << EOF
+mongosh ${MONGO_URL} << EOF
 use ycsb
 db.dropDatabase()
 EOF
