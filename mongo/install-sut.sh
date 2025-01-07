@@ -15,6 +15,7 @@ install_public_tools(){
 	sysctl -w vm.max_map_count=128000
 	sysctl -w net.core.somaxconn=65535
 }
+
 install_mongo(){
     yum install -y mongodb-mongosh-shared-openssl3
     yum install -y mongodb-org
@@ -65,6 +66,7 @@ EOF
 	systemctl status ${MONGO_SERVICE}
 	sleep 5
 }
+
 init_start_mongo(){
     ## 创建 root 用户
 	mongosh << EOF
@@ -89,8 +91,6 @@ OS_NAME=$(egrep ^NAME /etc/os-release | awk -F "\"" '{print $2}')
 OS_VERSION=$(egrep ^VERSION_ID /etc/os-release | awk -F "\"" '{print $2}')
 ARCH=$(lscpu | grep Architecture | awk -F " " '{print $NF}')
 
-echo "$0: 1. OS is ${OS_NAME} ${OS_VERSION} "
-
 ## 添加 MongoDB Repo
 MONGO_XY="8.0"
 cat << EOF > /etc/yum.repos.d/mongodb-org-${MONGO_XY}-${ARCH}.repo
@@ -105,7 +105,6 @@ EOF
 # mongo conf
 MONGO_SERVICE="mongod"
 MONGO_CONF="/etc/mongod.conf"
-
 
 # mongo installation
 install_public_tools
