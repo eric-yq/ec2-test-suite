@@ -108,6 +108,6 @@ MONGO_CONF="/etc/mongod.conf"
 
 # mongo installation
 install_public_tools
-sleep 60
+sleep 10
 install_mongo
 init_start_mongo
