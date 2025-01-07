@@ -95,27 +95,27 @@ OS_NAME=$(egrep ^NAME /etc/os-release | awk -F "\"" '{print $2}')
 OS_VERSION=$(egrep ^VERSION_ID /etc/os-release | awk -F "\"" '{print $2}')
 ARCH=$(lscpu | grep Architecture | awk -F " " '{print $NF}')
 PN=$(dmidecode -s system-product-name | tr ' ' '_')
-MONGO_XY="6.0"
 
 echo "$0: 1. OS is ${OS_NAME} ${OS_VERSION} "
+
+## 添加 MongoDB Repo
+MONGO_XY="8.0"
+cat << EOF > /etc/yum.repos.d/mongodb-org-${MONGO_XY}-${ARCH}.repo
+[mongodb-org-${MONGO_XY}-${ARCH}]
+name=MongoDB Repository for ${MONGO_XY}-${ARCH}
+baseurl=https://repo.mongodb.org/yum/amazon/${OS_VERSION}/mongodb-org/${MONGO_XY}/${ARCH}/
+gpgcheck=1
+enabled=1
+gpgkey=https://www.mongodb.org/static/pgp/server-${MONGO_XY}.asc
+EOF
 
 if [[ "$OS_NAME" == "Amazon Linux" ]]; then
     if [[ "$OS_VERSION" == "2" ]]; then
 		PKGCMD=yum
 		PKGCMD1=amazon-linux-extras
-		cat << EOF > /etc/yum.repos.d/mongodb-org-${MONGO_XY}-${ARCH}.repo
-[mongodb-org-${MONGO_XY}-${ARCH}]
-name=MongoDB Repository for ${MONGO_XY}-${ARCH}
-baseurl=https://repo.mongodb.org/yum/amazon/2/mongodb-org/${MONGO_XY}/${ARCH}/
-gpgcheck=1
-enabled=1
-gpgkey=https://www.mongodb.org/static/pgp/server-${MONGO_XY}.asc
-EOF
     elif [[ "$OS_VERSION" == "2023" ]]; then
 		PKGCMD=dnf
-		PKGCMD1=dnf
-		echo "$0: $OS_NAME $OS_VERSION not supported"
-		exit 1
+		PKGCMD1=dnf	
     else
 		echo "$0: $OS_NAME $OS_VERSION not supported"
 		exit 1
