@@ -31,13 +31,12 @@ submit_task(){
     RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}-ycsb-load.txt"
     RESULT_FILE1="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}-ycsb-run.txt"
 
+	### 加载数据, load
+	echo "[Info] Load data ..." >> ${RESULT_FILE}
+	/root/ycsb-0.17.0/bin/ycsb load mongodb -P $(dirname $0)/workload_mongo_readonly -p mongodb.url=${MONGO_URL} \
+		-threads $(nproc) >> ${RESULT_FILE}
     for i in ${THREAD_LIST}
     do
-        ### 加载数据, load
-        echo "[Info] This Test, current Thread=${i} : Load data ..." >> ${RESULT_FILE}
-        /root/ycsb-0.17.0/bin/ycsb load mongodb -P $(dirname $0)/workload_mongo_readonly -p mongodb.url=${MONGO_URL} \
-            -threads ${i} >> ${RESULT_FILE}
-          
         ### 执行 Benchmark, run
         echo "[Info] This Test, current Thread=${i}: Run benchmark - Read only ..." >> ${RESULT_FILE1}
         /root/ycsb-0.17.0/bin/ycsb  run mongodb -P $(dirname $0)/workload_mongo_readonly -p mongodb.url=${MONGO_URL} \
