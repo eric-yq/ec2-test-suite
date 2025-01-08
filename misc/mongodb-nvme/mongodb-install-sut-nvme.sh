@@ -30,7 +30,6 @@ mkdir -p /mnt/$disk/mongodb /data/
 chmod 777 /mnt/$disk/mongodb
 ln -s /mnt/$disk/mongodb /data/mongodb
 
-
 yum install -y python3-pip htop
 pip3 install dool
 
