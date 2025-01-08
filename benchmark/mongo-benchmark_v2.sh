@@ -28,7 +28,7 @@ submit_task(){
     ## Profile: workload_mongo
 #   THREAD_LIST="16 32 48 64 80 96 112 128 144 160 176 192"
 #     THREAD_LIST="1 2 4 6 8 12 16 32 48 64 80 96"
-    THREAD_LIST="1 2 4 6 8 10 12 14 16 32"
+    THREAD_LIST="2 4 6 8 10 12 14 16 32"
 #     THREAD_LIST="1"
     RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}-ycsb-load.txt"
     RESULT_FILE1="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}-ycsb-run.txt"
@@ -49,12 +49,12 @@ submit_task(){
         /root/ycsb-0.17.0/bin/ycsb  run mongodb -P $(dirname $0)/workload_mongo_updateonly -p mongodb.url=${MONGO_URL} \
             -threads ${i} >> ${RESULT_FILE1}
             
-        echo "[Info] This Test, current Thread=${i}: Run benchmark - Mixed(20% each) ..." >> ${RESULT_FILE1}
+        echo "[Info] This Test, current Thread=${i}: Run benchmark - Mixed(20% Insert, 80% Read-Modify-Write) ..." >> ${RESULT_FILE1}
         /root/ycsb-0.17.0/bin/ycsb  run mongodb -P $(dirname $0)/workload_mongo_mixed -p mongodb.url=${MONGO_URL} \
             -threads ${i} >> ${RESULT_FILE1} 
     
         ### 完成测试后删除数据库
-        remove_database && \
+        # remove_database && \
         echo "[Info] This is Test-${i}: All benchmark tests completed, remove database." >> ${RESULT_FILE1}
         sleep 30
     done
