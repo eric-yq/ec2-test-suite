@@ -64,6 +64,7 @@ remove_database(){
 mongosh ${MONGO_URL} << EOF
 use ycsb
 db.dropDatabase()
+exit
 EOF
 }
 
