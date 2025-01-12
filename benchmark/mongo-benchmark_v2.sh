@@ -54,9 +54,9 @@ submit_task(){
         /root/ycsb-0.17.0/bin/ycsb  run mongodb -P $(dirname $0)/workload_mongo_rui -p mongodb.url=${MONGO_URL} \
             -threads ${i} >> ${RESULT_FILE1}
             
-        echo "[Info] This Test, current Thread=${i}: Run benchmark - Mixed(100% Read-Modify-Write) ..." >> ${RESULT_FILE1}
-        /root/ycsb-0.17.0/bin/ycsb  run mongodb -P $(dirname $0)/workload_mongo_mixed -p mongodb.url=${MONGO_URL} \
-            -threads ${i} >> ${RESULT_FILE1} 
+#         echo "[Info] This Test, current Thread=${i}: Run benchmark - Mixed(100% Read-Modify-Write) ..." >> ${RESULT_FILE1}
+#         /root/ycsb-0.17.0/bin/ycsb  run mongodb -P $(dirname $0)/workload_mongo_mixed -p mongodb.url=${MONGO_URL} \
+#             -threads ${i} >> ${RESULT_FILE1} 
     
         ### 完成测试后删除数据库
         # remove_database && \
