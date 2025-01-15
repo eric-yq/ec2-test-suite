@@ -16,28 +16,28 @@ unzip awscliv2.zip
 cp -rf /usr/local/bin/aws /usr/bin/aws
 aws --version
 
-aws_ak_value="xxx"
-aws_sk_value="xxx"
-aws_region_name="us-west-2"
-aws_s3_bucket_name="s3://ec2-core-benchmark-ericyq"
+aws_ak_value="XXX"
+aws_sk_value="+XXX"
+aws_region_name="us-west-1"
 aws configure set aws_access_key_id ${aws_ak_value}
 aws configure set aws_secret_access_key ${aws_sk_value}
 aws configure set default.region ${aws_region_name}
+aws_s3_bucket_name="s3://ec2-core-benchmark-ericyq"
 
 ## 安装 Java
 yum update -y
 
-## Corretto 11 --default
-yum install -y java-11-amazon-corretto dmidecode
-JDK_VERSION='corretto11'
+# ## Corretto 11 --default
+# yum install -y java-11-amazon-corretto dmidecode
+# JDK_VERSION='corretto11'
 
 ## Corretto 17
 # yum install java-17-amazon-corretto -y
 # JDK_VERSION='corretto17'
 
-## JDK 1.8
-# yum install -y java-1.8.0-openjdk
-# JDK_VERSION='openjdk8'
+# JDK 1.8
+yum install -y java-1.8.0-openjdk
+JDK_VERSION='openjdk8'
 
 ## JDK 1.11
 # amazon-linux-extras -y java-openjdk11
