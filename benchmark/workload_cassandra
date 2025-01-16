@@ -1,0 +1,16 @@
+recordcount=50000000
+operationcount=50000000
+workload=site.ycsb.workloads.CoreWorkload
+# threadcount=8
+threadcount=100
+readallfields=true
+readproportion=0.4
+updateproportion=0.4
+scanproportion=0
+insertproportion=0.2
+readmodifywriteproportion=0
+requestdistribution=zipfian
+insertorder=hashed
+# fieldlength=1024
+fieldlength=200
+fieldcount=10
