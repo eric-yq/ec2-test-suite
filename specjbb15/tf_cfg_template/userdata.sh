@@ -40,7 +40,7 @@ yum install -y java-1.8.0-openjdk
 JDK_VERSION='openjdk8'
 
 ## JDK 1.11
-# amazon-linux-extras install -y java-openjdk11
+# amazon-linux-extras install  -y java-openjdk11
 # JDK_VERSION='openjdk11'
 
 ## JDK 1.17
