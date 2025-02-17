@@ -3,7 +3,6 @@
 yum groupinstall -y "Development Tools"
 yum install -y java-11-amazon-corretto java-11-amazon-corretto-devel java-11-amazon-corretto-headless
 yum install -y cmake openssl-devel
-yum install -y v8-devel
 
 cd /root/
 VER=3.9.8
@@ -102,12 +101,14 @@ make -j
 # [root@ip-172-31-44-169 build64]# cd ..
 # [root@ip-172-31-44-169 openrasp-v8]# find . -name *.so
 # ./build64/java/libopenrasp_v8_java.so
+nm -D java/libopenrasp_v8_java.so | grep _ZN2v88platform18NewDefaultPlatformE
+
 mkdir -p ../java/src/main/resources/natives/linux_arm64 && cp java/libopenrasp_v8_java.so $_
-# cp java/libopenrasp_v8_java.so /usr/lib/aarch64-linux-gnu/jni/
 
 ## 打包
 cd ../java
-mvn install 
+mvn clean
+mvn install
 
 mvn clean install -DskipTests
 

@@ -8,18 +8,21 @@ ln -s /usr/bin/python2 /usr/bin/python
 export PKG_CONFIG_PATH=/usr/lib/pkgconfig:/usr/share/pkgconfig:/usr/lib/$(uname -p)-linux-gnu/pkgconfig
 
 cd /opt
-＃ 拉取编译工具
+# 拉取编译工具
 git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
 export PATH=/opt/depot_tools:$PATH
 
 # 拉取v8代码
-fetch v8
+fetch --nohooks v8
 cd v8
-git checkout 6584de6be21c377b55f4f2b923388f1b6b0169cb //openrasp-v8 脚本中提供的这个commit
+# # openrasp-v8 脚本中提供的下面这个 commit
+# git checkout 6584de6be21c377b55f4f2b923388f1b6b0169cb 
+# https://blog.csdn.net/tanjelly/article/details/134062127?spm=1001.2014.3001.5502 提供的
+git checkout 8.6.395.17 
 gclient sync -v
 
 # 安装编译工具
-cd /opt/v8/
+cd /opt/v8
 python build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
 
 # 构建配置
