@@ -1,9 +1,10 @@
 #!/bin/bash
 
 SUT_NAME="SUT_XXX"
+sleep 30
+echo "[Info] Sleep 30s to start run user data scripts..."
 
-yum install -y git awscli
-apt update -y && apt install -y git awscli
+yum install -y git
 
 ## 获取代码
 cd /root/
