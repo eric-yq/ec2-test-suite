@@ -43,7 +43,25 @@ SERVER_IP_ADDR=172.31.6.23
 docker run -d --name valkey -p 6379:6379 valkey/valkey:latest
 docker exec -it valkey valkey-cli -h $SERVER_IP_ADDR info
 
-##### benchmark sample
+##### valkey-benchmark sample
 # 对于服务器为2xlarge, 可以测试[10,20,30,40,50]
 docker exec -it valkey \
   valkey-benchmark -h $SERVER_IP_ADDR -n 10000000 -c 30
+  
+##### memtier_benchmark sample
+THREAD_LIST="2 4 6 8 10 12 16"
+for i in ${THREAD_LIST}
+do
+	redis-cli -h ${SUT_IP_ADDR} flushall
+	RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}-${i}.txt"
+	
+	OPTS="-t ${i} -c 4"
+	
+	memtier_benchmark ${OPTS} -s ${SUT_IP_ADDR} --test-time ${TEST_TIME} \
+	  --pipeline 10 --distinct-client-seed \
+	  --key-pattern=R:R --key-prefix=TEST \
+	  --random-data --data-size-range=1-4096 --data-size-pattern=S  \
+	  −−randomize --hide-histogram --run-count=3 --ratio=1:5 \
+	  --out-file=${RESULT_FILE}
+done
+
