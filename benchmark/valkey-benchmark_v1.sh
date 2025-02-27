@@ -31,4 +31,4 @@ do
 	  --out-file=${RESULT_FILE}
 done
 
-# −−randomize --pipeline 10 
+# --pipeline 10 
