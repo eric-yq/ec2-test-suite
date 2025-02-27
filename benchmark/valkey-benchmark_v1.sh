@@ -27,7 +27,7 @@ do
 	  --distinct-client-seed \
 	  --key-pattern=R:R --key-prefix=TEST \
 	  --random-data --data-size-range=1-512 --data-size-pattern=S  \
-	  --hide-histogram --run-count=3 --ratio=1:5 \
+	  --hide-histogram --run-count=1 --ratio=1:5 \
 	  --out-file=${RESULT_FILE}
 done
 
