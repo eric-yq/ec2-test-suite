@@ -26,7 +26,7 @@ do
 	memtier_benchmark ${OPTS} -s ${SUT_IP_ADDR} --test-time ${TEST_TIME} \
 	  --pipeline 10 --distinct-client-seed \
 	  --key-pattern=R:R --key-prefix=TEST \
-	  --random-data --data-size-range=1-4096 --data-size-pattern=S  \
+	  --random-data --data-size-range=1-512 --data-size-pattern=S  \
 	  −−randomize --hide-histogram --run-count=3 --ratio=1:5 \
 	  --out-file=${RESULT_FILE}
 done
