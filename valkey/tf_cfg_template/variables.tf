@@ -1,3 +1,4 @@
+## 手工设置下面几个变量
 variable "subnet_id" {
 	default = "SUBNET_ID_XXX"
 }
@@ -5,7 +6,6 @@ variable "subnet_id" {
 variable "vpc_security_group_ids" {
 	default = ["SG_ID_XXX"]
 }
-
 
 variable "ami_key_pair_name" {
 	default = "ericyq-global"
@@ -33,7 +33,7 @@ variable "root_block_volume_type" {
 	default = "gp3"
 }
 variable "root_block_volume_size" {
-	default = "80"
+	default = "8"
 }
 variable "root_block_iops" {
 	default = "3000"
@@ -45,7 +45,7 @@ variable "root_block_throughput" {
 ## 
 variable "region_name" {
 	description = "Name of the region"
-	default = "us-west-2"
+	default = "REGION_NAME_XXX"
 }
 
 variable "number_of_instances" {
