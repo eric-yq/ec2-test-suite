@@ -11,7 +11,7 @@ do
 	do
 		## 创建实例、安装软件
 		echo "$0: OS_TYPE=${os}, INSTANCE_TYPE=${ins}"
-		bash launch-instances-single.sh -s valkey -t ${ins} -o ${os}
+		bash launch-instances-single.sh -s redis -t ${ins} -o ${os}
 		
 		echo "$0: Sleep 300 seconds..."
 		sleep 300
@@ -19,11 +19,11 @@ do
 		## 执行 Benchmark 测试
 		echo "$0: Star to run benchmark"
 		source /tmp/temp-setting
-		bash benchmark/valkey-benchmark_v1.sh ${INSTANCE_IP_MASTER} 180
+		bash benchmark/redis-benchmark_v1.sh ${INSTANCE_IP_MASTER} 180
 		
 		## 停止实例
 		aws ec2 terminate-instances --instance-ids ${INSTANCE_ID}
 	done
 done
 
-echo "$0: Valkey benchmark completed."
+echo "$0: Redis benchmark completed."
