@@ -90,6 +90,20 @@ if [[ ${SUT_NAME} == "redis-cluster" ]] || \
         echo "export INSTANCE_IP_SLAVE=${INSTANCE_IP_SLAVE}" >> /tmp/temp-setting
         echo "export INSTANCE_IP_SLAVE1=${INSTANCE_IP_SLAVE1}" >> /tmp/temp-setting
         echo "export INSTANCE_IP_SLAVE2=${INSTANCE_IP_SLAVE2}" >> /tmp/temp-setting
+        
+        ## 输出实例ID，用于benchmark结束后释放实例
+        INSTANCE_ID_MASTER=$(terraform output -raw instance_id_0)
+        INSTANCE_ID_MASTER1=$(terraform output -raw instance_id_01)
+        INSTANCE_ID_MASTER2=$(terraform output -raw instance_id_02)
+        INSTANCE_ID_SLAVE=$(terraform output -raw instance_id_1)
+        INSTANCE_ID_SLAVE1=$(terraform output -raw instance_id_11)
+        INSTANCE_ID_SLAVE2=$(terraform output -raw instance_id_12)
+        echo "export INSTANCE_ID_MASTER=${INSTANCE_ID_MASTER}" >> /tmp/temp-setting
+        echo "export INSTANCE_ID_MASTER1=${INSTANCE_ID_MASTER1}" >> /tmp/temp-setting
+        echo "export INSTANCE_ID_MASTER2=${INSTANCE_ID_MASTER2}" >> /tmp/temp-setting
+        echo "export INSTANCE_ID_SLAVE=${INSTANCE_ID_SLAVE}" >> /tmp/temp-setting
+        echo "export INSTANCE_ID_SLAVE1=${INSTANCE_ID_SLAVE1}" >> /tmp/temp-setting
+        echo "export INSTANCE_ID_SLAVE2=${INSTANCE_ID_SLAVE2}" >> /tmp/temp-setting
 else 
         echo "${SUT_NAME} not supported. "
         exit 1

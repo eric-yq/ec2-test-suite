@@ -14,6 +14,12 @@ output "instance_private_ip_0" {
   value       = aws_instance.sut_server[0].private_ip
 }
 
+# master1
+output "instance_id_01" {
+  description = "ID of the EC2 instance"
+  value       = aws_instance.sut_server[1].id
+}
+
 output "instance_public_ip_01" {
   description = "Public IP address of the EC2 instance"
   value       = aws_instance.sut_server[1].public_ip
@@ -22,6 +28,12 @@ output "instance_public_ip_01" {
 output "instance_private_ip_01" {
   description = "Private IP address of the EC2 instance"
   value       = aws_instance.sut_server[1].private_ip
+}
+
+# master2
+output "instance_id_02" {
+  description = "ID of the EC2 instance"
+  value       = aws_instance.sut_server[2].id
 }
 
 output "instance_public_ip_02" {
@@ -50,6 +62,12 @@ output "instance_private_ip_1" {
   value       = aws_instance.sut_server_1[0].private_ip
 }
 
+# slave1
+output "instance_id_11" {
+  description = "ID of the EC2 instance"
+  value       = aws_instance.sut_server_1[1].id
+}
+
 output "instance_public_ip_11" {
   description = "Public IP address of the EC2 instance"
   value       = aws_instance.sut_server_1[1].public_ip
@@ -58,6 +76,12 @@ output "instance_public_ip_11" {
 output "instance_private_ip_11" {
   description = "Private IP address of the EC2 instance"
   value       = aws_instance.sut_server_1[1].private_ip
+}
+
+# slave2
+output "instance_id_12" {
+  description = "ID of the EC2 instance"
+  value       = aws_instance.sut_server_1[2].id
 }
 
 output "instance_public_ip_12" {
