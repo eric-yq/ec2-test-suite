@@ -19,6 +19,9 @@ install_public_tools(){
 	pip3 install dool
 	systemctl enable docker
 	systemctl start docker
+	
+	echo "vm.overcommit_memory = 1" >> /etc/sysctl.conf
+	sysctl vm.overcommit_memory=1
 }
 
 install_valkey(){
