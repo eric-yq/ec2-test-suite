@@ -29,17 +29,17 @@ EOF
 
 # 生成配置文件，for cluster node
 cat > /root/valkey.conf << EOF
-	port 6379
-	bind 0.0.0.0
-	protected-mode no
-	maxmemory ${XXX}gb
-	maxmemory-policy allkeys-lru
-	io-threads $YYY	
-	io-threads-do-reads yes
-	# for cluster
-	cluster-enabled yes
-	cluster-config-file cluster-nodes.conf
-	cluster-node-timeout 5000
+port 6379
+bind 0.0.0.0
+protected-mode no
+maxmemory ${XXX}gb
+maxmemory-policy allkeys-lru
+io-threads $YYY	
+io-threads-do-reads yes
+# for cluster
+cluster-enabled yes
+cluster-config-file cluster-nodes.conf
+cluster-node-timeout 5000
 EOF
 
 

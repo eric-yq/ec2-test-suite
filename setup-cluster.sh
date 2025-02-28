@@ -20,15 +20,21 @@ setup_redis_cluster(){
 
 setup_valkey_cluster(){
 	# 建立 3主3从 Valkey 集群
-	echo "yes" | docker exec -it valkey valkey-cli --cluster create  \
-      ${INSTANCE_IP_MASTER}:6379 ${INSTANCE_IP_MASTER1}:6379 ${INSTANCE_IP_MASTER2}:6379 \
-      ${INSTANCE_IP_SLAVE}:6379 ${INSTANCE_IP_SLAVE1}:6379 ${INSTANCE_IP_SLAVE2}:6379 \
-      --cluster-replicas 1 
+# 	echo "yes" | docker exec -it valkey valkey-cli --cluster create  \
+#       ${INSTANCE_IP_MASTER}:6379 ${INSTANCE_IP_MASTER1}:6379 ${INSTANCE_IP_MASTER2}:6379 \
+#       ${INSTANCE_IP_SLAVE}:6379 ${INSTANCE_IP_SLAVE1}:6379 ${INSTANCE_IP_SLAVE2}:6379 \
+#       --cluster-replicas 1 
+
+    echo "yes" | valkey-cli --cluster create  \
+        ${INSTANCE_IP_MASTER}:6379 ${INSTANCE_IP_MASTER1}:6379 ${INSTANCE_IP_MASTER2}:6379 \
+        ${INSTANCE_IP_SLAVE}:6379 ${INSTANCE_IP_SLAVE1}:6379 ${INSTANCE_IP_SLAVE2}:6379 \
+        --cluster-replicas 1 
     
     sleep 10
     
 	# 查看集群信息
-	docker exec -it valkey valkey-cli -h ${INSTANCE_IP_MASTER} cluster info
+# 	docker exec -it valkey valkey-cli -h ${INSTANCE_IP_MASTER} cluster info
+    valkey-cli -h ${INSTANCE_IP_MASTER} cluster info
 }
 
 setup_kafka_cluster(){
