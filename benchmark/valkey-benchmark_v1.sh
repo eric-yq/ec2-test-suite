@@ -19,12 +19,12 @@ do
 	if [[ ${SUT_NAME} == "valkey" ]]; then
 	   OPTS="-t ${i} -c 4"
 	elif [[ ${SUT_NAME} == "valkey-cluster" ]]; then
-	   OPTS="-t ${i} -c 8 --cluster-mode "
+	   OPTS="-t ${i} -c 4 --cluster-mode "
 	else 
 	    echo "$0: Not suport $SUT_NAME in his script. "
 	    exit 1
 	fi
-
+ 
 	memtier_benchmark ${OPTS} -s ${SUT_IP_ADDR} --test-time ${TEST_TIME} \
 	  --distinct-client-seed \
 	  --key-pattern=R:R --key-prefix=TEST \
