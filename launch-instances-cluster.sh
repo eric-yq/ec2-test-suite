@@ -33,7 +33,7 @@ then
     OS_TYPE=al2
 fi
 
-REGION_NAME="us-west-2"
+REGION_NAME=$(cloud-init query region)
 echo "" > /tmp/temp-setting
 echo "export REGION_NAME=${REGION_NAME}" >> /tmp/temp-setting
 echo "export INSTANCE_TYPE=${INSTANCE_TYPE}" >> /tmp/temp-setting
@@ -51,7 +51,15 @@ rm -rf tf_cfg_${SUT_NAME}
 cp -rf tf_cfg_template tf_cfg_${SUT_NAME}
 cd tf_cfg_${SUT_NAME}
 
+# 获取 Subnet ID 和 Security Group ID
+MAC=$(cloud-init query ds.meta_data.mac)
+SUBNET_ID_XXX=$(cloud-init query ds.meta_data.network.interfaces.macs.$MAC.subnet_id)
+SG_ID_XXX=$(cloud-init query ds.meta_data.network.interfaces.macs.$MAC.security_group_ids)
+
 ## 修改 variables.tf 内容 
+sed -i "s/REGION_NAME_XXX/${REGION_NAME}/g" variables.tf
+sed -i "s/SUBNET_ID_XXX/${SUBNET_ID_XXX}/g" variables.tf
+sed -i "s/SG_ID_XXX/${SG_ID_XXX}/g" variables.tf
 sed -i "s/INSTANCE_NAME_XXX/SUT_${SUT_NAME}/g" variables.tf
 sed -i "s/INSTANCE_TYPE_XXX/${INSTANCE_TYPE}/g" variables.tf
 sed -i "s/AMI_ID_XXX/${AMI_ID}/g" variables.tf
@@ -68,6 +76,7 @@ terraform apply --auto-approve
 echo "$0: Terraform completed."
 
 if [[ ${SUT_NAME} == "redis-cluster" ]] || \
+   [[ ${SUT_NAME} == "valkey-cluster" ]] || \
    [[ ${SUT_NAME} == "cassandra-cluster" ]] ; then
         INSTANCE_IP_MASTER=$(terraform output -raw instance_private_ip_0)
         INSTANCE_IP_MASTER1=$(terraform output -raw instance_private_ip_01)

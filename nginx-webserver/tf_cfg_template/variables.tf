@@ -1,12 +1,11 @@
-## 手工设置下面几个变量
-# for master
 variable "subnet_id" {
-	default = "subnet-046de201cd71d1cde"
+	default = "SUBNET_ID_XXX"
 }
-# for slave
-variable "subnet_id_1" {
-	default = "subnet-046de201cd71d1cde"
+
+variable "vpc_security_group_ids" {
+	default = ["SG_ID_XXX"]
 }
+
 
 variable "vpc_security_group_ids" {
 	default = ["sg-0d75ecd997cb2a4b4"]
