@@ -53,7 +53,7 @@ variable "root_block_throughput" {
 ## 
 variable "region_name" {
 	description = "Name of the region"
-	default = "us-west-2"
+	default = "REGION_NAME_XXX"
 }
 
 variable "number_of_instances" {

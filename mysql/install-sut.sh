@@ -152,7 +152,7 @@ if   [[ "$OS_NAME" == "Amazon Linux" ]]; then
 	MYSQL_SERVICE="mysqld"
 	MYSQL_CONF="/etc/my.cnf"
 
-	# 修改初始密码
+	# 修改初始密码，
 	cat << EOF > create_remote_login_user.sql
 alter user 'root'@'localhost' identified with mysql_native_password by 'DoNotChangeMe@@123';
 set global validate_password.policy=0;

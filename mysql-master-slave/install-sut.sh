@@ -27,7 +27,7 @@ init_start_mysql(){
     else 
         MYSQL_CMD_OPTIONS="--connect-expired-password -uroot -p${MYSQL_INIT_PASSWORD}"
     fi
-    ## 修改初始密码
+    ## 修改初始密码，
     cat create_remote_login_user.sql
 	mysql ${MYSQL_CMD_OPTIONS} < create_remote_login_user.sql
 }
