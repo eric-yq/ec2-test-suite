@@ -19,7 +19,7 @@ do
 	if [[ ${SUT_NAME} == "valkey" ]]; then
 	   OPTS="-t ${i} -c 4"
 	elif [[ ${SUT_NAME} == "valkey-cluster" ]]; then
-	   OPTS="-t ${i} -c 2 --cluster-mode "
+	   OPTS="-t ${i} -c 3 --cluster-mode "
 	else 
 	    echo "$0: Not suport $SUT_NAME in his script. "
 	    exit 1
