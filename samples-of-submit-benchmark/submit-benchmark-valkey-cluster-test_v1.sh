@@ -3,7 +3,7 @@
 # Redis Benchmark
 # 待测 EC2 规格和 OS
 os_types="al2023"
-instance_types="r6a.2xlarge r6g.2xlarge r6i.2xlarge r7a.2xlarge r7g.2xlarge r7i.2xlarge r8g.2xlarge" 
+instance_types="r8g.2xlarge r7a.2xlarge r7g.2xlarge r7i.2xlarge r6a.2xlarge r6g.2xlarge r6i.2xlarge" 
 
 for os in ${os_types} 
 do
@@ -13,8 +13,8 @@ do
 		echo "$0: OS_TYPE=${os}, INSTANCE_TYPE=${ins}"
 		bash launch-instances-cluster.sh -s valkey-cluster -t ${ins} -o ${os}
 
-		echo "$0: Sleep 300 seconds..."
-		sleep 300
+		echo "$0: Sleep 120 seconds..."
+		sleep 120
 
 		## 执行 Benchmark 测试
 		echo "$0: Star to run benchmark"
