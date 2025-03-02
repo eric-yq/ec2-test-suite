@@ -22,7 +22,7 @@ do
 		bash benchmark/valkey-benchmark_v1.sh ${INSTANCE_IP_MASTER} 180
 		
 		## 停止实例
-		aws ec2 terminate-instances --instance-ids ${INSTANCE_ID_MASTER} ${INSTANCE_ID_MASTER1} ${INSTANCE_ID_MASTER2} ${INSTANCE_ID_SLAVE} ${INSTANCE_ID_SLAVE1} ${INSTANCE_ID_SLAVE2}
+		aws ec2 terminate-instances --region $REGION_NAME --instance-ids ${INSTANCE_ID_MASTER} ${INSTANCE_ID_MASTER1} ${INSTANCE_ID_MASTER2} ${INSTANCE_ID_SLAVE} ${INSTANCE_ID_SLAVE1} ${INSTANCE_ID_SLAVE2}
 	done
 done
 
