@@ -10,13 +10,15 @@ install_public_tools(){
 	$PKGCMD install -y git irqbalance
 	$PKGCMD install -y python3-pip
 	pip3 install dool
-	systemctl enable irqbalance
+	systemctl enable irqbalance --now
 }
 os_configure(){
 	sysctl -w net.core.somaxconn=65535
 	sysctl -w net.core.rmem_max=16777216
 	sysctl -w net.core.wmem_max=16777216
-	sysctl -w net.ipv4.tcp_max_syn_backlog=65535
+	sysctl -w net.core.netdev_max_backlog=200000 # 增大接收队列长度（减少丢包）
+	sysctl -w net.core.netdev_budget=60000       # 每次软中断处理的最大数据包数
+	sysctl -w net.core.netdev_budget_usecs=8000  # 每次软中断的最大时间（微秒）
 	sysctl -w net.ipv4.tcp_tw_reuse=1
 	sysctl -w net.ipv4.tcp_fastopen=3
 	sysctl -w net.ipv4.tcp_congestion_control=bbr

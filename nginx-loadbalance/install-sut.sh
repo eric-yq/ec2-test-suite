@@ -13,12 +13,15 @@ install_public_tools(){
 # 	$PKGCMD1 install -y epel
 	$PKGCMD install -y git irqbalance python3-pip
 	pip3 install dool
-	systemctl enable irqbalance
+	systemctl enable irqbalance --now
 }
 os_configure(){
 	sysctl -w net.core.somaxconn=65535
 	sysctl -w net.core.rmem_max=16777216
 	sysctl -w net.core.wmem_max=16777216
+	sysctl -w net.core.netdev_max_backlog=200000 # 增大接收队列长度（减少丢包）
+	sysctl -w net.core.netdev_budget=60000       # 每次软中断处理的最大数据包数
+	sysctl -w net.core.netdev_budget_usecs=8000  # 每次软中断的最大时间（微秒）
 	sysctl -w net.ipv4.tcp_max_syn_backlog=65535
 	sysctl -w net.ipv4.tcp_tw_reuse=1
 	sysctl -w net.ipv4.tcp_fastopen=3
@@ -69,7 +72,7 @@ http {
     
     # 增大缓冲区减少分段
     proxy_buffers 256 16k;  # 256 个 16KB 缓冲区
-    proxy_buffer_size 32k
+    proxy_buffer_size 32k;
 
     # RPS tests     
     keepalive_timeout   300s;
@@ -78,6 +81,9 @@ http {
     # SSL/TLS TPS tests
     # keepalive_timeout 0;
     # keepalive_requests 1;
+    
+    types_hash_max_size 2048;
+    types_hash_bucket_size 128;
     
 ##################
     # SSL/TLS 优化
@@ -93,8 +99,8 @@ http {
     ssl_ecdh_curve X25519:secp384r1;  # 高效椭圆曲线
 
     # 启用 OCSP Stapling（减少客户端验证延迟）
-    ssl_stapling on;
-    ssl_stapling_verify on;
+#     ssl_stapling on;
+#     ssl_stapling_verify on;
 ##################
       
     ## 负载均衡配置，后端服务器组配置
