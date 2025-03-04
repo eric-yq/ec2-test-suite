@@ -140,7 +140,7 @@ cp /tmp/temp-setting tf_cfg_${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_I
 
 # exit 0
 
-echo "$0: Start waiting 300 seconds for NGINX LOAD-BALANCE UserData completed."
-sleep 300
+echo "$0: Start waiting 180 seconds for NGINX LOAD-BALANCE UserData completed."
+sleep 180
 
 echo "$0: Complete to set up NGINX 1 loadbalancer + 2 webservers."
