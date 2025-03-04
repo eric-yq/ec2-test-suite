@@ -7,16 +7,25 @@ install_public_tools(){
 	$PKGCMD update -y
 	$PKGCMD1 install -y epel
 	$PKGCMD install -y dmidecode htop
-	$PKGCMD install -y git 
+	$PKGCMD install -y git irqbalance
+	$PKGCMD install -y python3-pip
+	pip3 install dool
+	systemctl enable irqbalance
 }
 os_configure(){
 	sysctl -w net.core.somaxconn=65535
-	sysctl -w net.core.rmem_max=8388607
-	sysctl -w net.core.wmem_max=8388607
+	sysctl -w net.core.rmem_max=16777216
+	sysctl -w net.core.wmem_max=16777216
 	sysctl -w net.ipv4.tcp_max_syn_backlog=65535
+	sysctl -w net.ipv4.tcp_tw_reuse=1
+	sysctl -w net.ipv4.tcp_fastopen=3
+	sysctl -w net.ipv4.tcp_congestion_control=bbr
 	sysctl -w net.ipv4.ip_local_port_range="1024 65535"
-	sysctl -w net.ipv4.tcp_rmem="4096 8338607 8338607"
-	sysctl -w net.ipv4.tcp_wmem="4096 8338607 8338607"
+	sysctl -w net.ipv4.tcp_rmem="4096 87380 16777216"
+	sysctl -w net.ipv4.tcp_wmem="4096 65536 16777216"
+	sysctl -w fs.file-max=1000000
+	ulimit -n 1000000
+	echo never > /sys/kernel/mm/transparent_hugepage/enabled
 }
 install_nginx(){
 	$PKGCMD1 install -y ${NGINX_PKG_NAME}
@@ -36,7 +45,8 @@ pid /run/nginx.pid;
 
 events {
     use epoll;
-    worker_connections 10240;
+    multi_accept on;
+    worker_connections 65535;
 }
 
 http {
@@ -45,6 +55,22 @@ http {
     default_type application/octet-stream;
     sendfile     on;
     tcp_nopush   on;
+    tcp_nodelay  on;
+    
+    # 静态文件缓存
+    open_file_cache max=100000 inactive=60s;
+    open_file_cache_valid 90s;
+    open_file_cache_min_uses 2;
+    
+    gzip on;
+    gzip_min_length 1k;
+    gzip_comp_level 3;
+	gzip_disable "msie6";
+	gzip_vary on;
+	gzip_proxied any;
+	gzip_buffers 16 8k;
+	gzip_http_version 1.1;
+	gzip_types application/atom+xml application/geo+json application/javascript application/x-javascript application/json application/ld+json application/manifest+json application/rdf+xml application/rss+xml application/xhtml+xml application/xml font/eot font/otf font/ttf image/svg+xml text/css text/javascript text/plain text/xml;
     
     keepalive_timeout  300s;     
     keepalive_requests 1234567890;
@@ -52,16 +78,6 @@ http {
     server {
         listen       80;
         root         /usr/share/nginx/html;
-        
-		gzip on;
-		gzip_disable "msie6";
-		gzip_vary on;
-		gzip_proxied any;
-		gzip_comp_level 5;
-		gzip_buffers 16 8k;
-		gzip_http_version 1.1;
-		gzip_min_length 1k;
-		gzip_types application/atom+xml application/geo+json application/javascript application/x-javascript application/json application/ld+json application/manifest+json application/rdf+xml application/rss+xml application/xhtml+xml application/xml font/eot font/otf font/ttf image/svg+xml text/css text/javascript text/plain text/xml;
     }
 }
 EOF

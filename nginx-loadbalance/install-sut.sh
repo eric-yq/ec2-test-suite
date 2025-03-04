@@ -11,17 +11,26 @@ echo "$0: INSTANCE_IP_WEB2: ${INSTANCE_IP_WEB2}"
 install_public_tools(){
 	$PKGCMD update -y
 	$PKGCMD1 install -y epel
-	$PKGCMD install -y dmidecode net-tools htop
-	$PKGCMD install -y git
+	$PKGCMD install -y dmidecode htop
+	$PKGCMD install -y git irqbalance
+	$PKGCMD install -y python3-pip
+	pip3 install dool
+	systemctl enable irqbalance
 }
 os_configure(){
 	sysctl -w net.core.somaxconn=65535
-	sysctl -w net.core.rmem_max=8388607
-	sysctl -w net.core.wmem_max=8388607
+	sysctl -w net.core.rmem_max=16777216
+	sysctl -w net.core.wmem_max=16777216
 	sysctl -w net.ipv4.tcp_max_syn_backlog=65535
+	sysctl -w net.ipv4.tcp_tw_reuse=1
+	sysctl -w net.ipv4.tcp_fastopen=3
+	sysctl -w net.ipv4.tcp_congestion_control=bbr
 	sysctl -w net.ipv4.ip_local_port_range="1024 65535"
-	sysctl -w net.ipv4.tcp_rmem="4096 8338607 8338607"
-	sysctl -w net.ipv4.tcp_wmem="4096 8338607 8338607"
+	sysctl -w net.ipv4.tcp_rmem="4096 87380 16777216"
+	sysctl -w net.ipv4.tcp_wmem="4096 65536 16777216"
+	sysctl -w fs.file-max=1000000
+	ulimit -n 1000000
+	echo never > /sys/kernel/mm/transparent_hugepage/enabled
 }
 install_nginx(){
 	$PKGCMD1 install -y ${NGINX_PKG_NAME}
@@ -47,9 +56,9 @@ pid /run/nginx.pid;
 
 events {
     use epoll;
-    worker_connections 10240;
+    worker_connections 65535;
     multi_accept on;
-    accept_mutex on;
+    accept_mutex off;
 }
 
 http {
@@ -60,13 +69,32 @@ http {
     tcp_nopush          on;
 
     # RPS tests
+    keepalive           64;        
     keepalive_timeout   300s;
-    keepalive_requests  1234567890;
+    keepalive_requests  1000;
     
     # SSL/TLS TPS tests
     # keepalive_timeout 0;
     # keepalive_requests 1;
-        
+    
+##################
+    # SSL/TLS 优化
+    ssl_session_cache shared:SSL:50m;
+    ssl_session_timeout 1h;
+    ssl_session_tickets off;    # 禁用 Session Tickets（避免密钥轮换问题）
+    ssl_buffer_size 4k;         # 减少 SSL 写入延迟
+
+    # 加密算法优化
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256;
+    ssl_prefer_server_ciphers on;
+    ssl_ecdh_curve X25519:secp384r1;  # 高效椭圆曲线
+
+    # 启用 OCSP Stapling（减少客户端验证延迟）
+    ssl_stapling on;
+    ssl_stapling_verify on;
+##################
+      
     ## 负载均衡配置，后端服务器组配置
     upstream nginx-webserver-group {
         server ${INSTANCE_IP_WEB1}  weight=100;
@@ -75,13 +103,13 @@ http {
 
     server {
         listen       80;
-        listen       443 ssl backlog=102400 ;
+        listen       443 ssl http2 backlog=102400 ;
         
         ssl_certificate     ${NGINX_CONF_DIR}/rsa-cert.crt;
         ssl_certificate_key ${NGINX_CONF_DIR}/rsa-key.key;
-        ssl_ciphers         ECDHE-RSA-AES256-GCM-SHA384;
-        ssl_session_tickets off;
-        ssl_session_cache   off;
+#         ssl_ciphers         ECDHE-RSA-AES256-GCM-SHA384;
+#         ssl_session_tickets off;
+#         ssl_session_cache   off;
 
         root         /usr/share/nginx/html;
         
