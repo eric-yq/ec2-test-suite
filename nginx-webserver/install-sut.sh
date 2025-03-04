@@ -73,7 +73,7 @@ http {
 	gzip_types application/atom+xml application/geo+json application/javascript application/x-javascript application/json application/ld+json application/manifest+json application/rdf+xml application/rss+xml application/xhtml+xml application/xml font/eot font/otf font/ttf image/svg+xml text/css text/javascript text/plain text/xml;
     
     keepalive_timeout  300s;     
-    keepalive_requests 1234567890;
+    keepalive_requests 1000000;
     
     server {
         listen       80;

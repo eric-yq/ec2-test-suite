@@ -68,10 +68,9 @@ http {
     sendfile            on;
     tcp_nopush          on;
 
-    # RPS tests
-    keepalive           64;        
+    # RPS tests     
     keepalive_timeout   300s;
-    keepalive_requests  1000;
+    keepalive_requests  1000000;
     
     # SSL/TLS TPS tests
     # keepalive_timeout 0;
@@ -99,6 +98,7 @@ http {
     upstream nginx-webserver-group {
         server ${INSTANCE_IP_WEB1}  weight=100;
         server ${INSTANCE_IP_WEB2}  weight=100;
+        keepalive 64;           # 保持长连接
     }
 
     server {
