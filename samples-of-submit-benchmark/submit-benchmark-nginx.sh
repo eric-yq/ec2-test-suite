@@ -16,5 +16,10 @@ do
 		echo "$0: Star to run benchmark"
 		source /tmp/temp-setting
 		bash benchmark/nginx-benchmark.sh ${INSTANCE_IP_LOADBALANCE}
+		
+		## 停止实例
+		aws ec2 terminate-instances --region $REGION_NAME --instance-ids \
+		  ${INSTANCE_ID_LOADBALANCE} ${INSTANCE_ID_WEB1} ${INSTANCE_ID_WEB2} &
+		  
 	done
 done
