@@ -24,7 +24,7 @@ do
 	    echo "$0: Not suport $SUT_NAME in his script. "
 	    exit 1
 	fi
- 
+
 	memtier_benchmark ${OPTS} -s ${SUT_IP_ADDR} --test-time ${TEST_TIME} \
 	  --distinct-client-seed \
 	  --key-pattern=R:R --key-prefix=TEST \

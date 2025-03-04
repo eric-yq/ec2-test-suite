@@ -7,7 +7,7 @@ install_public_tools(){
 	$PKGCMD update -y
 	$PKGCMD1 install -y epel
 	$PKGCMD install -y dmidecode htop
-	$PKGCMD install -y git
+	$PKGCMD install -y git 
 }
 os_configure(){
 	sysctl -w net.core.somaxconn=65535
@@ -112,7 +112,7 @@ elif [[ "$OS_NAME" == "Ubuntu" ]]; then
 	PKGCMD=apt
 	PKGCMD1=apt
 	NGINX_PKG_NAME="nginx"
-	# mysql conf
+	# nginx conf
 	NGINX_SERVICE="nginx"
 	NGINX_CONF="/etc/nginx/nginx.conf"
 

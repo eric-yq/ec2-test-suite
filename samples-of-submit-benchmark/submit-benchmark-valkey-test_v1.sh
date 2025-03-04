@@ -13,8 +13,8 @@ do
 		echo "$0: OS_TYPE=${os}, INSTANCE_TYPE=${ins}"
 		bash launch-instances-single.sh -s valkey -t ${ins} -o ${os}
 		
-		echo "$0: Sleep 300 seconds..."
-		sleep 300
+		echo "$0: Sleep 120 seconds..."
+		sleep 120
 		
 		## 执行 Benchmark 测试
 		echo "$0: Star to run benchmark"
