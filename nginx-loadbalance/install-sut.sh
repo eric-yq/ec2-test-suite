@@ -68,11 +68,19 @@ http {
     default_type        application/octet-stream;
     sendfile            on;
     tcp_nopush          on;
-    tcp_nodelay  off;
+    tcp_nodelay         off;
     
     # 增大缓冲区减少分段
     proxy_buffers 256 16k;  # 256 个 16KB 缓冲区
     proxy_buffer_size 32k;
+    
+    # 增加缓冲区大小
+    client_body_buffer_size 128k;
+    client_max_body_size 100m;
+    client_header_buffer_size 1k;
+    large_client_header_buffers 4 4k;
+    output_buffers 1 32k;
+    postpone_output 1460;
 
     # RPS tests     
     keepalive_timeout   300s;
@@ -97,10 +105,6 @@ http {
     ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256;
     ssl_prefer_server_ciphers on;
     ssl_ecdh_curve X25519:secp384r1;  # 高效椭圆曲线
-
-    # 启用 OCSP Stapling（减少客户端验证延迟）
-#     ssl_stapling on;
-#     ssl_stapling_verify on;
 ##################
       
     ## 负载均衡配置，后端服务器组配置
@@ -112,7 +116,8 @@ http {
 
     server {
         listen       80;
-        listen       443 ssl http2 backlog=102400 ;
+        listen       443 ssl backlog=102400 ;
+        http2        on;
         
         ssl_certificate     ${NGINX_CONF_DIR}/rsa-cert.crt;
         ssl_certificate_key ${NGINX_CONF_DIR}/rsa-key.key;
@@ -136,8 +141,6 @@ EOF
 ## 获取OS 、CPU 架构信息。
 OS_NAME=$(egrep ^NAME /etc/os-release | awk -F "\"" '{print $2}')
 OS_VERSION=$(egrep ^VERSION_ID /etc/os-release | awk -F "\"" '{print $2}') 
-ARCH=$(lscpu | grep Architecture | awk -F " " '{print $NF}') 
-PN=$(dmidecode -s system-product-name | tr ' ' '_')
 
 if   [[ "$OS_NAME" == "Amazon Linux" ]]; then
 	if   [[ "$OS_VERSION" == "2" ]]; then

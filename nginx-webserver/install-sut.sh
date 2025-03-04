@@ -6,9 +6,7 @@ echo "$0: Install SUT_NAME: ${SUT_NAME}"
 install_public_tools(){
 # 	$PKGCMD update -y
 # 	$PKGCMD1 install -y epel
-	$PKGCMD install -y dmidecode htop
-	$PKGCMD install -y git irqbalance
-	$PKGCMD install -y python3-pip
+	$PKGCMD install -y git irqbalance python3-pip
 	pip3 install dool
 	systemctl enable irqbalance --now
 }
@@ -109,8 +107,6 @@ EOF
 ## 获取OS 、CPU 架构信息。
 OS_NAME=$(egrep ^NAME /etc/os-release | awk -F "\"" '{print $2}')
 OS_VERSION=$(egrep ^VERSION_ID /etc/os-release | awk -F "\"" '{print $2}') 
-ARCH=$(lscpu | grep Architecture | awk -F " " '{print $NF}') 
-PN=$(dmidecode -s system-product-name | tr ' ' '_')
 
 if   [[ "$OS_NAME" == "Amazon Linux" ]]; then
 	if   [[ "$OS_VERSION" == "2" ]]; then
