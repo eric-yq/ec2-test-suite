@@ -4,8 +4,8 @@ SUT_NAME=${1}
 echo "$0: Install SUT_NAME: ${SUT_NAME}"
 
 install_public_tools(){
-	$PKGCMD update -y
-	$PKGCMD1 install -y epel
+# 	$PKGCMD update -y
+# 	$PKGCMD1 install -y epel
 	$PKGCMD install -y dmidecode htop
 	$PKGCMD install -y git irqbalance
 	$PKGCMD install -y python3-pip

@@ -9,11 +9,9 @@ echo "$0: INSTANCE_IP_WEB1: ${INSTANCE_IP_WEB1}"
 echo "$0: INSTANCE_IP_WEB2: ${INSTANCE_IP_WEB2}"
 
 install_public_tools(){
-	$PKGCMD update -y
-	$PKGCMD1 install -y epel
-	$PKGCMD install -y dmidecode htop
-	$PKGCMD install -y git irqbalance
-	$PKGCMD install -y python3-pip
+# 	$PKGCMD update -y
+# 	$PKGCMD1 install -y epel
+	$PKGCMD install -y git irqbalance python3-pip
 	pip3 install dool
 	systemctl enable irqbalance
 }
@@ -107,9 +105,6 @@ http {
         
         ssl_certificate     ${NGINX_CONF_DIR}/rsa-cert.crt;
         ssl_certificate_key ${NGINX_CONF_DIR}/rsa-key.key;
-#         ssl_ciphers         ECDHE-RSA-AES256-GCM-SHA384;
-#         ssl_session_tickets off;
-#         ssl_session_cache   off;
 
         root         /usr/share/nginx/html;
         
