@@ -65,6 +65,11 @@ http {
     default_type        application/octet-stream;
     sendfile            on;
     tcp_nopush          on;
+    tcp_nodelay  off;
+    
+    # 增大缓冲区减少分段
+    proxy_buffers 256 16k;  # 256 个 16KB 缓冲区
+    proxy_buffer_size 32k
 
     # RPS tests     
     keepalive_timeout   300s;

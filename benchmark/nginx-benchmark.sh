@@ -41,7 +41,7 @@ do
 done = function(summary, latency, requests)
    io.write("------------------------------\n")
    rps = summary.requests / (summary.duration/1000/1000)
-   io.write(string.format("%s, %s, RPS=%g , Latency(P50)=%d us, Latency(P90)=%d us, Latency(P99)=%d us, Latency(P99.99)=%d us\n", "$INSTANCE_TYPE" , "$i" , rps, latency:percentile(50),latency:percentile(90),latency:percentile(99),latency:percentile(99.99)))
+   io.write(string.format("%s, %s, RPS, %g, %d, %d, %d, %d\n", "$INSTANCE_TYPE" , "$i" , rps, latency:percentile(50),latency:percentile(90),latency:percentile(99),latency:percentile(99.99)))
 end
 EOF
 

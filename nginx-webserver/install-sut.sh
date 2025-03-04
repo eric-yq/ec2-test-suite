@@ -55,7 +55,11 @@ http {
     default_type application/octet-stream;
     sendfile     on;
     tcp_nopush   on;
-    tcp_nodelay  on;
+    tcp_nodelay  off;
+    
+    # 增大缓冲区减少分段
+    proxy_buffers 256 16k;  # 256 个 16KB 缓冲区
+    proxy_buffer_size 32k;
     
     # 静态文件缓存
     open_file_cache max=100000 inactive=60s;
