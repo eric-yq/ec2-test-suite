@@ -2,6 +2,10 @@ variable "subnet_id" {
 	default = "SUBNET_ID_XXX"
 }
 
+variable "subnet_id_1" {
+	default = "SUBNET_ID_XXX"
+}
+
 variable "vpc_security_group_ids" {
 	default = ["SG_ID_XXX"]
 }
