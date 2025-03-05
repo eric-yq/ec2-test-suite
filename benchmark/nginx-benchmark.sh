@@ -9,7 +9,7 @@ source /tmp/temp-setting
 RESULT_PATH="/root/ec2-test-suite/benchmark-result-files"
 mkdir -p ${RESULT_PATH}
 
-
+# 操作系统优化配置
 sysctl -w net.core.somaxconn=65535
 sysctl -w net.core.rmem_max=16777216
 sysctl -w net.core.wmem_max=16777216
@@ -24,11 +24,8 @@ sysctl -w fs.file-max=1000000
 ulimit -n 1000000
 echo never > /sys/kernel/mm/transparent_hugepage/enabled
 
-
 # 命令
 THREADS=${INSTANCE_VCPU_NUM}
-# CONNECTIONS="8 16 32"
-# CONNECTIONS="8 16 32 48 64 96 128 192 256"
 CONNECTIONS="10 20 30 40 60 80 100 150 200 300"
 # RESOURCE_FILE="test.html"
 RESOURCE_FILE="1kb.bin"

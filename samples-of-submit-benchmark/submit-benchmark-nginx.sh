@@ -2,7 +2,11 @@
 
 # 待测 EC2 规格和 OS
 os_types="al2023"
-instance_types="c8g.2xlarge c7a.2xlarge c7g.2xlarge c7i.2xlarge c6a.2xlarge c6g.2xlarge c6i.2xlarge c5.2xlarge" 
+instance_types="c8g.2xlarge c7g.2xlarge c7i.2xlarge c6i.2xlarge \
+  c8g.2xlarge c7g.2xlarge c7i.2xlarge c6i.2xlarge \
+  c8g.2xlarge c7g.2xlarge c7i.2xlarge c6i.2xlarge \
+  c8g.2xlarge c7g.2xlarge c7i.2xlarge c6i.2xlarge \
+  c8g.2xlarge c7g.2xlarge c7i.2xlarge c6i.2xlarge" 
 
 for os in ${os_types} 
 do
@@ -20,6 +24,5 @@ do
 		## 停止实例
 		aws ec2 terminate-instances --region $REGION_NAME --instance-ids \
 		  ${INSTANCE_ID_LOADBALANCE} ${INSTANCE_ID_WEB1} ${INSTANCE_ID_WEB2} &
-		  
 	done
 done
