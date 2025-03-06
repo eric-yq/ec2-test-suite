@@ -82,6 +82,24 @@ http {
     server {
         listen       80;
         root         /usr/share/nginx/html;
+        
+        # 用于 GET 请求
+		location /get {
+			root /usr/share/nginx/html;
+			index index.html;
+			access_log off;  # 提高性能
+		}
+		
+		# 用于 POST 请求
+		location /post {
+			client_body_buffer_size 128k;
+			client_max_body_size 128k;
+			access_log off;  # 提高性能
+		
+			# 简单返回 200 OK
+			return 200;
+		}
+    
     }
 }
 EOF
