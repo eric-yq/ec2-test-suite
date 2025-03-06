@@ -109,6 +109,9 @@ EOF
 	
 	## nginx（web 服务器）生成静态资源
 	cd /usr/share/nginx/html
+	mkdir -p get
+	cp index.html get/
+	
 	touch 0kb.bin
 	dd if=/dev/zero of=1kb.bin  bs=1KB  count=1
 	dd if=/dev/zero of=10kb.bin bs=10KB count=1
