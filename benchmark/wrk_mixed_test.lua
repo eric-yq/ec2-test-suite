@@ -26,7 +26,7 @@ request = function()
   end
 end
 
-done = function()
+done = function(summary, latency, requests)
   -- 统计 RPS 和 Latency
   io.write("\n--- Performnce Metric ---\n")
   rps = summary.requests / (summary.duration/1000/1000)
