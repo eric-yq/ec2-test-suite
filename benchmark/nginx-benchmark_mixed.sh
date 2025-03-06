@@ -43,7 +43,7 @@ do
 # EOF
 
 	~/wrk-4.2.0/wrk --threads $THREADS --connections $i --duration $DURATION \
-		--script $(dirname $0)/wrk_mixed_test.lua https://$SUT_IP_ADDR >> $RESULT_FILE
+		--script $(dirname $0)/wrk_mixed_test.lua  https://$SUT_IP_ADDR >> $RESULT_FILE
 		
 # 	~/wrk-4.2.0/wrk --threads ${THREADS} --connections ${CONNECTIONS} --duration ${DURATION} \
 # 		--script ~/wrk-4.2.0/report.lua -H 'Connection: close' \
