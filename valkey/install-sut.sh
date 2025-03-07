@@ -17,13 +17,15 @@ fi
 install_public_tools(){
 	yum install -y dmidecode net-tools htop git python3-pip docker
 	pip3 install dool
-	systemctl enable docker
-	systemctl start docker
+# 	systemctl enable docker
+# 	systemctl start docker
 }
 
 install_valkey(){
     # docker pull valkey/valkey:7.2.8
     yum install -y valkey
+    systemctl stop valkey
+    systemctl enable valkey
     
 	## 获取 CPU数 和 内存容量
 	CPU_CORES=$(nproc)
@@ -34,7 +36,7 @@ install_valkey(){
 	let YYY=${CPU_CORES}-2
 
 	# 生成配置文件
-	cat > /root/valkey.conf << EOF
+	cat > /etc/valkey/valkey.conf << EOF
 	port 6379
 	bind 0.0.0.0
 	protected-mode no
@@ -53,7 +55,9 @@ start_valkey(){
 # 	  valkey/valkey:7.2.8 \
 # 	  valkey-server /etc/valkey/valkey.conf
 
-    valkey-server /root/valkey.conf
+#     valkey-server /root/valkey.conf
+
+    systemctl restart valkey
     
     sleep 5 && valkey-cli info
 }

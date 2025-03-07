@@ -27,6 +27,8 @@ install_public_tools(){
 install_valkey(){
     # docker pull valkey/valkey:7.2.8
     yum install -y valkey
+    systemctl stop valkey
+    systemctl enable valkey
     
 	## 获取 CPU数 和 内存容量
 	CPU_CORES=$(nproc)
@@ -60,7 +62,10 @@ start_valkey(){
 # 	  valkey/valkey:7.2.8 \
 # 	  valkey-server /etc/valkey/valkey.conf
     
-    valkey-server /root/valkey.conf
+#     valkey-server /root/valkey.conf
+
+    systemctl restart valkey
+    
     sleep 5 && valkey-cli info
 }
 
