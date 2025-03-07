@@ -56,7 +56,7 @@ MAC=$(cloud-init query ds.meta_data.mac)
 SUBNET_ID_XXX=$(cloud-init query ds.meta_data.network.interfaces.macs.$MAC.subnet_id)
 SG_ID_XXX=$(cloud-init query ds.meta_data.network.interfaces.macs.$MAC.security_group_ids)
 
-# 获取placement group name
+# 获取 placement group name
 ins_id=$(cloud-init query ds.meta_data.instance_id)
 PG_NAME_XXX=$(aws ec2 describe-instances \
   --instance-ids $ins_id \
