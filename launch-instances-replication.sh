@@ -35,7 +35,7 @@ then
     OS_TYPE=al2
 fi
 
-REGION_NAME="us-west-2"
+REGION_NAME=$(cloud-init query region)
 echo "" > /tmp/temp-setting
 echo "export REGION_NAME=${REGION_NAME}" >> /tmp/temp-setting
 echo "export INSTANCE_TYPE=${INSTANCE_TYPE}" >> /tmp/temp-setting
@@ -53,7 +53,23 @@ rm -rf tf_cfg_${SUT_NAME}
 cp -rf tf_cfg_template tf_cfg_${SUT_NAME}
 cd tf_cfg_${SUT_NAME}
 
+# 获取 Subnet ID 和 Security Group ID
+MAC=$(cloud-init query ds.meta_data.mac)
+SUBNET_ID_XXX=$(cloud-init query ds.meta_data.network.interfaces.macs.$MAC.subnet_id)
+SG_ID_XXX=$(cloud-init query ds.meta_data.network.interfaces.macs.$MAC.security_group_ids)
+
+# 获取 placement group name
+ins_id=$(cloud-init query ds.meta_data.instance_id)
+PG_NAME_XXX=$(aws ec2 describe-instances \
+  --instance-ids $ins_id \
+  --query "Reservations[0].Instances[0].Placement.GroupName" \
+  --output text)
+
 ## 修改 variables.tf 内容 
+sed -i "s/REGION_NAME_XXX/${REGION_NAME}/g" variables.tf
+sed -i "s/SUBNET_ID_XXX/${SUBNET_ID_XXX}/g" variables.tf
+sed -i "s/SG_ID_XXX/${SG_ID_XXX}/g" variables.tf
+sed -i "s/PG_NAME_XXX/${PG_NAME_XXX}/g" variables.tf
 sed -i "s/INSTANCE_NAME_XXX/SUT_${SUT_NAME}/g" variables.tf
 sed -i "s/INSTANCE_TYPE_XXX/${INSTANCE_TYPE}/g" variables.tf
 sed -i "s/AMI_ID_XXX/${AMI_ID}/g" variables.tf
@@ -75,6 +91,36 @@ INSTANCE_IP_SLAVE1=$(terraform output -raw instance_private_ip_2)
 echo "export INSTANCE_IP_MASTER=${INSTANCE_IP_MASTER}" >> /tmp/temp-setting
 echo "export INSTANCE_IP_SLAVE=${INSTANCE_IP_SLAVE}" >> /tmp/temp-setting
 echo "export INSTANCE_IP_SLAVE1=${INSTANCE_IP_SLAVE1}" >> /tmp/temp-setting
+# 
+# 
+# ## 输出公网IP地址
+# INSTANCE_PUBLIC_IP_MASTER=$(terraform output -raw instance_public_ip_0)
+# INSTANCE_PUBLIC_IP_MASTER2=$(terraform output -raw instance_public_ip_01)
+# INSTANCE_PUBLIC_IP_MASTER2=$(terraform output -raw instance_public_ip_02)
+# INSTANCE_PUBLIC_IP_SLAVE=$(terraform output -raw instance_public_ip_1)
+# INSTANCE_PUBLIC_IP_SLAVE1=$(terraform output -raw instance_public_ip_11)
+# INSTANCE_PUBLIC_IP_SLAVE2=$(terraform output -raw instance_public_ip_12)
+# echo "export INSTANCE_PUBLIC_IP_MASTER=${INSTANCE_PUBLIC_IP_MASTER}" >> /tmp/temp-setting
+# echo "export INSTANCE_PUBLIC_IP_MASTER1=${INSTANCE_PUBLIC_IP_MASTER1}" >> /tmp/temp-setting
+# echo "export INSTANCE_PUBLIC_IP_MASTER2=${INSTANCE_PUBLIC_IP_MASTER2}" >> /tmp/temp-setting
+# echo "export INSTANCE_PUBLIC_IP_SLAVE=${INSTANCE_PUBLIC_IP_SLAVE}" >> /tmp/temp-setting
+# echo "export INSTANCE_PUBLIC_IP_SLAVE1=${INSTANCE_PUBLIC_IP_SLAVE1}" >> /tmp/temp-setting
+# echo "export INSTANCE_PUBLIC_IP_SLAVE2=${INSTANCE_PUBLIC_IP_SLAVE2}" >> /tmp/temp-setting
+# 
+# ## 输出实例ID，用于benchmark结束后释放实例
+# INSTANCE_ID_MASTER=$(terraform output -raw instance_id_0)
+# INSTANCE_ID_MASTER1=$(terraform output -raw instance_id_01)
+# INSTANCE_ID_MASTER2=$(terraform output -raw instance_id_02)
+# INSTANCE_ID_SLAVE=$(terraform output -raw instance_id_1)
+# INSTANCE_ID_SLAVE1=$(terraform output -raw instance_id_11)
+# INSTANCE_ID_SLAVE2=$(terraform output -raw instance_id_12)
+# echo "export INSTANCE_ID_MASTER=${INSTANCE_ID_MASTER}" >> /tmp/temp-setting
+# echo "export INSTANCE_ID_MASTER1=${INSTANCE_ID_MASTER1}" >> /tmp/temp-setting
+# echo "export INSTANCE_ID_MASTER2=${INSTANCE_ID_MASTER2}" >> /tmp/temp-setting
+# echo "export INSTANCE_ID_SLAVE=${INSTANCE_ID_SLAVE}" >> /tmp/temp-setting
+# echo "export INSTANCE_ID_SLAVE1=${INSTANCE_ID_SLAVE1}" >> /tmp/temp-setting
+# echo "export INSTANCE_ID_SLAVE2=${INSTANCE_ID_SLAVE2}" >> /tmp/temp-setting
+# 
 
 cd ..
 mv tf_cfg_${SUT_NAME}  tf_cfg_${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}

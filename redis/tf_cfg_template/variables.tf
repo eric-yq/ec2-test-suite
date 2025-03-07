@@ -6,6 +6,10 @@ variable "vpc_security_group_ids" {
 	default = ["SG_ID_XXX"]
 }
 
+variable "placement_group_name" {
+	default = "PG_NAME_XXX"
+}
+
 variable "ami_key_pair_name" {
 	default = "ericyq-global"
 }
@@ -32,13 +36,13 @@ variable "root_block_volume_type" {
 	default = "gp3"
 }
 variable "root_block_volume_size" {
-	default = "300"
+	default = "40"
 }
 variable "root_block_iops" {
-	default = "15000"
+	default = "3000"
 }
 variable "root_block_throughput" {
-	default = "500"
+	default = "125"
 }
 
 ## 

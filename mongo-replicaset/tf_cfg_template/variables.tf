@@ -33,6 +33,10 @@ variable "ami_id" {
 	default = "AMI_ID_XXX"
 }
 
+variable "placement_group_name" {
+	default = "PG_NAME_XXX"
+}
+
 variable "userdata_file" {
 	default = "USERDATA_FILE_XXX"
 }
