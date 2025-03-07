@@ -136,7 +136,7 @@ mv tf_cfg_${SUT_NAME}  tf_cfg_${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE
 cp /tmp/temp-setting tf_cfg_${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}/temp-setting
 
 echo "$0: Start waiting 180 seconds for UserData completed."
-sleep 180
+sleep 300
 
 cd ..
 bash ./setup-cluster.sh
