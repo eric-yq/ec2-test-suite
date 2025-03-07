@@ -40,7 +40,7 @@ install_valkey(){
 	let YYY=${CPU_CORES}-2
 
 	# 生成配置文件
-	cat > /root/valkey.conf << EOF
+	cat > /etc/valkey/valkey.conf << EOF
 	port 6379
 	bind 0.0.0.0
 	protected-mode no
