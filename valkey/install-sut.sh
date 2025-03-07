@@ -15,8 +15,9 @@ else
 fi
 	
 install_public_tools(){
-	yum install -y dmidecode net-tools htop git python3-pip docker
+	yum install -y python3-pip
 	pip3 install dool
+# 	yum install -y docker
 # 	systemctl enable docker
 # 	systemctl start docker
 }
