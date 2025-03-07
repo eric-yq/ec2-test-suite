@@ -6,7 +6,7 @@ request = function()
   if math.random() < 0.75 then
     method = "GET"
     local queryString = string.rep("a", 120)
-    return wrk.format(method, "/get?" .. queryString)
+    return wrk.format(method, "/get/?" .. queryString)
   else
     method = "POST"
     post_count = post_count + 1
