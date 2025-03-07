@@ -135,7 +135,7 @@ cd ..
 mv tf_cfg_${SUT_NAME}  tf_cfg_${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}
 cp /tmp/temp-setting tf_cfg_${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}/temp-setting
 
-echo "$0: Start waiting 180 seconds for UserData completed."
+echo "$0: Start waiting 300 seconds for UserData completed."
 sleep 300
 
 cd ..
