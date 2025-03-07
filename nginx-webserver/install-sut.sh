@@ -99,7 +99,6 @@ http {
 			# 简单返回 200 OK
 			return 200;
 		}
-    
     }
 }
 EOF

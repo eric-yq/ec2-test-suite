@@ -11,6 +11,12 @@ variable "ami_key_pair_name" {
 	default = "ericyq-global"
 }
 
+
+variable "placement_group_name" {
+	default = "PG_NAME_XXX"
+}
+
+
 ## 不要手工修改。
 variable "instance_name" {
 	default = "INSTANCE_NAME_XXX"

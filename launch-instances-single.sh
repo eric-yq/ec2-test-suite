@@ -53,10 +53,18 @@ MAC=$(cloud-init query ds.meta_data.mac)
 SUBNET_ID_XXX=$(cloud-init query ds.meta_data.network.interfaces.macs.$MAC.subnet_id)
 SG_ID_XXX=$(cloud-init query ds.meta_data.network.interfaces.macs.$MAC.security_group_ids)
 
+# 获取placement group name
+ins_id=$(cloud-init query ds.meta_data.instance_id)
+PG_NAME_XXX=$(aws ec2 describe-instances \
+  --instance-ids $ins_id \
+  --query "Reservations[0].Instances[0].Placement.GroupName" \
+  --output text)
+  
 ## 修改 variables.tf 内容 
 sed -i "s/REGION_NAME_XXX/${REGION_NAME}/g" variables.tf
 sed -i "s/SUBNET_ID_XXX/${SUBNET_ID_XXX}/g" variables.tf
 sed -i "s/SG_ID_XXX/${SG_ID_XXX}/g" variables.tf
+sed -i "s/PG_NAME_XXX/${PG_NAME_XXX}/g" variables.tf
 sed -i "s/INSTANCE_NAME_XXX/SUT_${SUT_NAME}/g" variables.tf
 sed -i "s/INSTANCE_TYPE_XXX/${INSTANCE_TYPE}/g" variables.tf
 sed -i "s/AMI_ID_XXX/${AMI_ID}/g" variables.tf

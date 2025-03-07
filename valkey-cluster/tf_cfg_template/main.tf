@@ -19,6 +19,7 @@ resource "aws_instance" "sut_server" {
   ami 						= var.ami_id
   subnet_id					= var.subnet_id
   vpc_security_group_ids 	= var.vpc_security_group_ids
+  placement_group           = var.placement_group_name
   key_name 					= var.ami_key_pair_name
   user_data 				= file(var.userdata_file)
 
@@ -40,6 +41,7 @@ resource "aws_instance" "sut_server_1" {
   ami 						= var.ami_id
   subnet_id					= var.subnet_id_1
   vpc_security_group_ids 	= var.vpc_security_group_ids
+  placement_group           = var.placement_group_name
   key_name 					= var.ami_key_pair_name
   user_data 				= file(var.userdata_file)
 
