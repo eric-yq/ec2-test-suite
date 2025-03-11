@@ -14,13 +14,13 @@ do
 		echo "$0: OS_TYPE=${os}, INSTANCE_TYPE=${ins}"
 		bash launch-instances-single.sh -s valkey -t ${ins} -o ${os}
 		
-		echo "$0: Sleep 300 seconds..."
-		sleep 300
+		echo "$0: Sleep 180 seconds..."
+		sleep 180
 		
 		## 执行 Benchmark 测试
 		echo "$0: Star to run benchmark"
 		source /tmp/temp-setting
-		bash benchmark/valkey-benchmark_zhangkai.sh ${INSTANCE_IP_MASTER}
+		bash benchmark/valkey-benchmark_shein.sh ${INSTANCE_IP_MASTER}
 		
 		## 停止实例
 		# aws ec2 terminate-instances --region $REGION_NAME --instance-ids ${INSTANCE_ID} &
