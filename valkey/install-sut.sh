@@ -93,6 +93,6 @@ start_valkey(){
 
 ## 主要流程
 install_public_tools
-# install_valkey
-install_valkey1
+install_valkey
+# install_valkey1
 start_valkey
