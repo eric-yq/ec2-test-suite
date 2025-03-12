@@ -22,6 +22,7 @@ install_public_tools(){
 # 	systemctl start docker
 }
 
+## 多线程配置
 install_valkey(){
     # docker pull valkey/valkey:7.2.8
     yum install -y valkey
@@ -49,6 +50,32 @@ install_valkey(){
 EOF
 }
 
+## 单线程配置
+install_valkey1(){
+    # docker pull valkey/valkey:7.2.8
+    yum install -y valkey
+    systemctl stop valkey
+    systemctl enable valkey
+    
+	## 获取 CPU数 和 内存容量
+	CPU_CORES=$(nproc)
+	MEM_TOTAL_GB=$(free -g |grep Mem | awk -F " " '{print $2}')
+
+	## 变量计算
+	let XXX=${MEM_TOTAL_GB}*80/100
+	let YYY=${CPU_CORES}-2
+
+	# 生成配置文件
+	cat > /etc/valkey/valkey.conf << EOF
+	port 6379
+	bind 0.0.0.0
+	protected-mode no
+	daemonize yes
+	maxmemory ${XXX}gb
+	maxmemory-policy allkeys-lru
+EOF
+}
+
 start_valkey(){
 # 	docker run -d --name valkey \
 # 	  -p 6379:6379 \
@@ -65,5 +92,6 @@ start_valkey(){
 
 ## 主要流程
 install_public_tools
-install_valkey
+# install_valkey
+install_valkey1
 start_valkey
