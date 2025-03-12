@@ -65,7 +65,6 @@ install_valkey1(){
 
 	## 变量计算
 	let XXX=${MEM_TOTAL_GB}*80/100
-	let YYY=${CPU_CORES}-2
 
 	# 生成配置文件
 	cat > /etc/valkey/valkey.conf << EOF
