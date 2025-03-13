@@ -9,7 +9,8 @@ SUT_IP_ADDR=${1}
 PORT=${2}
 DATASIZE=32
 # OPTS="-t 2 -c 5 --pipeline=10"
-OPTS="-t 2 -c 5"
+OPTS="-t 2 -c 5 --pipeline=30"
+# OPTS="-t 2 -c 5"
 
 source /tmp/temp-setting
 RESULT_PATH="/root/ec2-test-suite/benchmark-result-files"
