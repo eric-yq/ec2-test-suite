@@ -78,7 +78,7 @@ start_valkey(){
     let PODS_NUMBER=${CPU_CORES}*75/100
     for i in $(seq 1 $PODS_NUMBER)
     do
-        let PORT=${i}+6000
+        let PORT=${i}+8880
 	    docker run -d --name valkey-$PORT \
 	      -p $PORT:6379 \
 	      -v /root/valkey.conf:/etc/valkey/valkey.conf \
