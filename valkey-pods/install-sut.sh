@@ -162,7 +162,8 @@ start_valkey(){
 }
 
 start_dool_monitor(){
-    
+    cd /root/
+    nohup dool -cmndryt --net-packets --bits 60 25 &
 }
 
 ## 主要流程
@@ -170,3 +171,4 @@ install_public_tools
 # install_valkey
 install_valkey1
 start_valkey
+start_dool_monitor
