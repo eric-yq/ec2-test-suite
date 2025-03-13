@@ -21,7 +21,7 @@ do
 		echo "$0: Star to run benchmark"
 		source /tmp/temp-setting
 		
-		let PODS_NUMBER=${INSTANCE_VCPU_NUM}*75/100
+		let PODS_NUMBER=${INSTANCE_VCPU_NUM}*50/100
 		echo "$0: Start to run Valkey benchmark on: ${ins}(${INSTANCE_IP_MASTER})..."
 		for i in $(seq 1 $PODS_NUMBER)
 		do
