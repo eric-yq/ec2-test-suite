@@ -5,7 +5,6 @@
 ## 使用方法： bash valkey-benchmark_shein-pods.sh <IP地址> <端口号>
 #####################################################################
 
-## 场景 1
 SUT_IP_ADDR=${1}
 PORT=${2}
 DATASIZE=32
