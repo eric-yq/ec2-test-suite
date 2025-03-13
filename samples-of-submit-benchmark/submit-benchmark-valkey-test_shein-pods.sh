@@ -12,7 +12,7 @@ do
 	do
 		## 创建实例、安装软件
 		echo "$0: OS_TYPE=${os}, INSTANCE_TYPE=${ins}"
-		bash launch-instances-single.sh -s valkey -t ${ins} -o ${os}
+		bash launch-instances-single.sh -s valkey-pods -t ${ins} -o ${os}
 		
 		echo "$0: Sleep 180 seconds..."
 		sleep 180
@@ -21,7 +21,8 @@ do
 		echo "$0: Star to run benchmark"
 		source /tmp/temp-setting
 		
-		let PODS_NUMBER=${INSTANCE_VCPU_NUM}*75/100
+		let PODS_NUMBER=${INSTANCE_VCPU_NUM}*75/10
+		echo "$0: Start to run Valkey benchmark on: ${ins}(${INSTANCE_IP_MASTER})..."
 		for i in $(seq 1 $PODS_NUMBER)
 		do
 		    let PORT=${i}+8880
@@ -30,7 +31,7 @@ do
 		
 		# 等待所有后台进程结束
 		wait
-		echo "$0: Valkey benchmark completed on: ${ins}."
+		echo "$0: Valkey benchmark completed on: ${ins}(${INSTANCE_IP_MASTER})."
 		
 		## 停止实例
 		# aws ec2 terminate-instances --region $REGION_NAME --instance-ids ${INSTANCE_ID} &
