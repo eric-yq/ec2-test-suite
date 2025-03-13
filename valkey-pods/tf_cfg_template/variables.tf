@@ -45,7 +45,7 @@ variable "root_block_iops" {
 	default = "3000"
 }
 variable "root_block_throughput" {
-	default = "125"
+	default = "300"
 }
 
 ## 
