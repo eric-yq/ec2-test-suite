@@ -73,9 +73,9 @@ start_valkey(){
 
     sysctl vm.overcommit_memory=1
     
-    # 计算启动 pods 的数量，VCPU数的75%，16 核->12 pods
+    # 计算启动 pods 的数量，VCPU数的50%，16 核->8 pods
     CPU_CORES=$(nproc)
-    let PODS_NUMBER=${CPU_CORES}*75/100
+    let PODS_NUMBER=${CPU_CORES}*50/100
     for i in $(seq 1 $PODS_NUMBER)
     do
         let PORT=${i}+8880
