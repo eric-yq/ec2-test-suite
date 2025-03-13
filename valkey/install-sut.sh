@@ -73,16 +73,7 @@ EOF
 }
 
 start_valkey(){
-# 	docker run -d --name valkey \
-# 	  -p 6379:6379 \
-# 	  -v /root/valkey.conf:/etc/valkey/valkey.conf \
-# 	  valkey/valkey:7.2.8 \
-# 	  valkey-server /etc/valkey/valkey.conf
-
-#     valkey-server /root/valkey.conf
-
-    systemctl restart valkey
-    
+    systemctl restart valkey   
     sleep 5 && valkey-cli info
 }
 
