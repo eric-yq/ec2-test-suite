@@ -26,7 +26,7 @@ do
 		for i in $(seq 1 $PODS_NUMBER)
 		do
 		    let PORT=${i}+8880
-		    nohup benchmark/valkey-benchmark_shein-pods.sh ${INSTANCE_IP_MASTER} ${PORT} &
+		    nohup bash benchmark/valkey-benchmark_shein-pods.sh ${INSTANCE_IP_MASTER} ${PORT} &
 		done
 		
 		# 等待所有后台进程结束
