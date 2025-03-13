@@ -17,14 +17,10 @@ fi
 install_public_tools(){
 	yum install -y python3-pip
 	pip3 install dool
-# 	yum install -y docker
-# 	systemctl enable docker
-# 	systemctl start docker
 }
 
 ## 多线程配置
 install_valkey(){
-    # docker pull valkey/valkey:7.2.8
     yum install -y valkey
     systemctl stop valkey
     systemctl enable valkey
@@ -36,25 +32,24 @@ install_valkey(){
 	## 变量计算
 	let XXX=${MEM_TOTAL_GB}*80/100
 # 	let YYY=${CPU_CORES}-2
-# 	let YYY=${CPU_CORES}*50/100
-    let YYY=3
+	let YYY=${CPU_CORES}*50/100
+#   let YYY=3
 
 	# 生成配置文件
 	cat > /etc/valkey/valkey.conf << EOF
-	port 6379
-	bind 0.0.0.0
-	protected-mode no
-	daemonize yes
-	maxmemory ${XXX}gb
-	maxmemory-policy allkeys-lru
-	io-threads $YYY	
-	io-threads-do-reads yes
+port 6379
+bind 0.0.0.0
+protected-mode no
+daemonize yes
+maxmemory ${XXX}gb
+maxmemory-policy allkeys-lru
+io-threads $YYY	
+io-threads-do-reads yes
 EOF
 }
 
 ## 单线程配置
 install_valkey1(){
-    # docker pull valkey/valkey:7.2.8
     yum install -y valkey
     systemctl stop valkey
     systemctl enable valkey
@@ -68,12 +63,12 @@ install_valkey1(){
 
 	# 生成配置文件
 	cat > /etc/valkey/valkey.conf << EOF
-	port 6379
-	bind 0.0.0.0
-	protected-mode no
-	daemonize yes
-	maxmemory ${XXX}gb
-	maxmemory-policy allkeys-lru
+port 6379
+bind 0.0.0.0
+protected-mode no
+daemonize yes
+maxmemory ${XXX}gb
+maxmemory-policy allkeys-lru
 EOF
 }
 
@@ -93,6 +88,6 @@ start_valkey(){
 
 ## 主要流程
 install_public_tools
-# install_valkey
-install_valkey1
+install_valkey
+# install_valkey1
 start_valkey

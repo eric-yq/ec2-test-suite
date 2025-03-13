@@ -32,5 +32,3 @@ do
 	  −−randomize --hide-histogram --run-count=3 --ratio=1:5 \
 	  --out-file=${RESULT_FILE}
 done
-
-# --pipeline 10 
