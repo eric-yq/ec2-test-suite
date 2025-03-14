@@ -65,8 +65,17 @@ fs.aio-max-nr = 1048576
 fs.inotify.max_user_watches = 524288
 EOF
 sudo sysctl -p /etc/sysctl.d/99-network-performance.conf
-##################################################################
-
+##################################################################	
+# 中断亲和性设置    
+systemctl stop irqbalance
+IFACE=$(ip route | grep default | awk '{print $5}')
+irqs=$(grep "${IFACE}-Tx-Rx" /proc/interrupts | awk -F':' '{print $1}')
+cpu=0
+for i in $irqs; do
+  echo $cpu > /proc/irq/$i/smp_affinity_list
+  let cpu=${cpu}+1
+done
+#####################################################################
 
 SUT_IP_ADDR=${1}
 PORT=${2}
