@@ -9,20 +9,8 @@ source /tmp/temp-setting
 RESULT_PATH="/root/ec2-test-suite/benchmark-result-files"
 mkdir -p ${RESULT_PATH}
 
-# 操作系统优化配置
-sysctl -w net.core.somaxconn=65535
-sysctl -w net.core.rmem_max=16777216
-sysctl -w net.core.wmem_max=16777216
-sysctl -w net.ipv4.tcp_max_syn_backlog=65535
-sysctl -w net.ipv4.tcp_tw_reuse=1
-sysctl -w net.ipv4.tcp_fastopen=3
-sysctl -w net.ipv4.tcp_congestion_control=bbr
-sysctl -w net.ipv4.ip_local_port_range="1024 65535"
-sysctl -w net.ipv4.tcp_rmem="4096 87380 16777216"
-sysctl -w net.ipv4.tcp_wmem="4096 65536 16777216"
-sysctl -w fs.file-max=1000000
-ulimit -n 1000000
-echo never > /sys/kernel/mm/transparent_hugepage/enabled
+# 执行OS优化
+bash $(dirname $0)/os-optimization.sh
 
 # 命令
 THREADS=${INSTANCE_VCPU_NUM}

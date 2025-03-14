@@ -20,7 +20,9 @@ install_public_tools(){
 	yum install -y docker
 	systemctl enable docker
 	systemctl start docker
-	
+}
+
+os_configure(){
 	#OS优化
 	#####################################################################
 	# 禁用透明大页面（Transparent Huge Pages）
@@ -109,18 +111,11 @@ EOF
     #####################################################################
     # 其他
     cat >> /etc/security/limits.conf << EOF
-# 为 valkey 用户或运行 valkey 的用户设置限制
-valkey soft nofile 1000000
-valkey hard nofile 1000000
-valkey soft nproc 65535
-valkey hard nproc 65535
-
-# 如果使用 root 或其他用户运行，也需要设置
+# 如果使用 root 或其他用户运行
 root soft nofile 1000000
 root hard nofile 1000000
 root soft nproc 65535
 root hard nproc 65535
-
 # 对所有用户设置
 * soft nofile 1000000
 * hard nofile 1000000
@@ -202,6 +197,7 @@ start_dool_monitor(){
 
 ## 主要流程
 install_public_tools
+os_configure
 # install_valkey
 install_valkey1
 start_valkey

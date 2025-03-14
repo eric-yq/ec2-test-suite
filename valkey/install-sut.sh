@@ -17,6 +17,24 @@ fi
 install_public_tools(){
 	yum install -y python3-pip
 	pip3 install dool
+}
+
+os_configure(){
+	#OS优化
+	#####################################################################
+	# 禁用透明大页面（Transparent Huge Pages）
+    echo never > /sys/kernel/mm/transparent_hugepage/enabled
+    echo never > /sys/kernel/mm/transparent_hugepage/defrag
+    # 添加到 /etc/rc.local 以便在启动时生效
+    cat >> /etc/rc.local << EOF
+if test -f /sys/kernel/mm/transparent_hugepage/enabled; then
+  echo never > /sys/kernel/mm/transparent_hugepage/enabled
+fi
+if test -f /sys/kernel/mm/transparent_hugepage/defrag; then
+  echo never > /sys/kernel/mm/transparent_hugepage/defrag
+fi
+EOF
+    chmod +x /etc/rc.local
 	#####################################################################
     # 网络优化配置
     sudo tee /etc/sysctl.d/99-network-performance.conf > /dev/null << 'EOF'
@@ -88,6 +106,18 @@ EOF
       let cpu=${cpu}+1
     done
     #####################################################################
+    # 其他
+    cat >> /etc/security/limits.conf << EOF
+# 如果使用 root 或其他用户运行
+root soft nofile 1000000
+root hard nofile 1000000
+root soft nproc 65535
+root hard nproc 65535
+# 对所有用户设置
+* soft nofile 1000000
+* hard nofile 1000000
+EOF
+    echo 1 > /proc/sys/vm/overcommit_memory
 }
 
 ## 多线程配置
@@ -150,6 +180,7 @@ start_valkey(){
 
 ## 主要流程
 install_public_tools
+os_configure
 install_valkey
 # install_valkey1
 start_valkey
