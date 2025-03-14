@@ -21,7 +21,7 @@ do
 		## 执行 Benchmark 测试
 		echo "$0: Star to run benchmark"
 		source /tmp/temp-setting
-		bash benchmark/valkey-benchmark_shein.sh ${INSTANCE_IP_MASTER}
+		bash benchmark/valkey-benchmark_shein.sh ${INSTANCE_IP_MASTER} 6379
 		
 		## 停止实例
 		aws ec2 stop-instances --region $REGION_NAME --instance-ids ${INSTANCE_ID} &
@@ -44,7 +44,7 @@ do
 		## 执行 Benchmark 测试
 		echo "$0: Star to run benchmark"
 		source /tmp/temp-setting
-		bash benchmark/valkey-benchmark_shein.sh ${INSTANCE_IP_MASTER} 
+		bash benchmark/valkey-benchmark_shein.sh ${INSTANCE_IP_MASTER} 6379
 		
 		## 停止实例
 		aws ec2 stop-instances --region $REGION_NAME --instance-ids ${INSTANCE_ID} &
