@@ -1,10 +1,10 @@
 #!/bin/bash
 
 SUT_NAME="SUT_XXX"
-sleep 30
 echo "[Info] Sleep 30s to start run user data scripts..."
+sleep 30
 
-yum install -y git
+yum install -yq git
 
 ## 获取代码
 cd /root/
