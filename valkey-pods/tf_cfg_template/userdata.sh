@@ -1,8 +1,8 @@
 #!/bin/bash
 
 SUT_NAME="SUT_XXX"
-sleep 30
-echo "[Info] Sleep 30s to start run user data scripts..."
+sleep 10
+echo "[Info] Sleep 10s to start run user data scripts..."
 
 yum install -yq git
 
