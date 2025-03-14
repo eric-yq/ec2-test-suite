@@ -15,14 +15,15 @@ else
 fi
 	
 install_public_tools(){
-	yum install -y python3-pip
+	yum install -yq python3-pip docker
 	pip3 install dool
-	yum install -y docker
 	systemctl enable docker
 	systemctl start docker
 }
 
 os_configure(){
+    echo "[Info] Perform OS optimization..."
+    sleep 3
 	#OS优化
 	#####################################################################
 	# 禁用透明大页面（Transparent Huge Pages）
