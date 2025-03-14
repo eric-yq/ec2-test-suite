@@ -78,7 +78,6 @@ fs.inotify.max_user_watches = 524288
 EOF
     sudo sysctl -p /etc/sysctl.d/99-network-performance.conf
     #####################################################################
-
 }
 
 ## 多线程配置
