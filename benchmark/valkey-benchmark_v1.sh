@@ -2,8 +2,8 @@
 
 ## 使用方法： bash valkey-benchmark_v1.sh <IP地址> <执行时间(秒)>
 
-# 执行OS优化
-bash /root/ec2-test-suite/benchmark/os-optimization.sh
+# # 执行OS优化
+# bash /root/ec2-test-suite/benchmark/os-optimization.sh
 
 # 获取测试信息
 SUT_IP_ADDR=${1}
