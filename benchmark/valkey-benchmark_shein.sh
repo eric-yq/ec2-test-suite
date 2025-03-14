@@ -5,8 +5,8 @@
 ## 使用方法： bash valkey-benchmark_shein.sh <IP地址> <端口号>
 #####################################################################
 
-# 执行OS优化
-bash /root/ec2-test-suite/benchmark/os-optimization.sh
+# # 执行OS优化
+# bash /root/ec2-test-suite/benchmark/os-optimization.sh
 
 ## 场景 1
 SUT_IP_ADDR=${1}
