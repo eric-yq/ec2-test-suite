@@ -120,8 +120,8 @@ EOF
     echo 1 > /proc/sys/vm/overcommit_memory
 }
 
-## 多线程配置
-install_valkey(){
+## 单线程配置
+install_valkey1(){
     yum install -y valkey
     systemctl stop valkey
     systemctl enable valkey
@@ -132,9 +132,6 @@ install_valkey(){
 
 	## 变量计算
 	let XXX=${MEM_TOTAL_GB}*80/100
-# 	let YYY=${CPU_CORES}-2
-# 	let YYY=${CPU_CORES}*50/100
-    let YYY=3
 
 	# 生成配置文件
 	cat > /etc/valkey/valkey.conf << EOF
@@ -144,19 +141,16 @@ protected-mode no
 daemonize yes
 maxmemory ${XXX}gb
 maxmemory-policy allkeys-lru
-io-threads $YYY	
-io-threads-do-reads yes
 EOF
 }
 
 start_valkey(){
     systemctl restart valkey   
     sleep 5 && valkey-cli info
-    
 }
 
 ## 主要流程
 install_public_tools
 os_configure
-install_valkey
+install_valkey1
 start_valkey

@@ -11,7 +11,6 @@ bash /root/ec2-test-suite/benchmark/os-optimization.sh
 SUT_IP_ADDR=${1}
 PORT=${2}
 DATASIZE=32
-# OPTS="-t 2 -c 5 --pipeline=10"
 OPTS="-t 2 -c 5 --pipeline=30"
 # OPTS="-t 2 -c 5"
 
