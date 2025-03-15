@@ -3,9 +3,10 @@
 # Redis Benchmark
 # 待测 EC2 规格和 OS
 os_types="al2023"
-instance_types="r6i.4xlarge r7g.4xlarge r8g.4xlarge r6g.4xlarge" 
+
 
 ### SUT_NAME=valkey ,shein sample
+instance_types="r6i.4xlarge r7g.4xlarge r8g.4xlarge r6g.4xlarge" 
 echo "$0: Valkey benchmark, single node..."
 for os in ${os_types} 
 do
@@ -29,6 +30,7 @@ do
 done
 
 ### SUT_NAME=valkey1 ,shein sample
+instance_types="r6i.4xlarge r7g.4xlarge r8g.4xlarge r6g.4xlarge" 
 echo "$0: Valkey benchmark, single node..."
 for os in ${os_types} 
 do
