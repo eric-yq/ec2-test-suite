@@ -13,6 +13,9 @@ source /tmp/temp-setting
 RESULT_PATH="/root/ec2-test-suite/benchmark-result-files"
 mkdir -p ${RESULT_PATH}
 
+VALKEY_CFG="${RESULT_PATH}/${SUT_NAME}_config_${INSTANCE_TYPE}_${SUT_IP_ADDR}.txt"
+valkey-cli CONFIG GET * > ${VALKEY_CFG}
+
 THREAD_LIST="2 4 6 8 10 12 16"
 for i in ${THREAD_LIST}
 do
