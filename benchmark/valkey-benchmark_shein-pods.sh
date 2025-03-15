@@ -6,7 +6,7 @@
 #####################################################################
 
 # 执行OS优化
-bash /root/ec2-test-suite/benchmark/os-optimization.sh
+# bash /root/ec2-test-suite/benchmark/os-optimization.sh
 
 SUT_IP_ADDR=${1}
 PORT=${2}
