@@ -18,7 +18,7 @@ mkdir -p ${RESULT_PATH}
 
 # 获取valkey服务器配置
 VALKEY_CFG="${RESULT_PATH}/${SUT_NAME}_config_${INSTANCE_TYPE}_${SUT_IP_ADDR}.txt"
-valkey-cli -h ${SUT_IP_ADDR} CONFIG GET * > ${VALKEY_CFG}
+valkey-cli -h ${SUT_IP_ADDR} config get \* > ${VALKEY_CFG}
 
 # 执行benchmark
 RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${SUT_IP_ADDR}_set_shein.txt"

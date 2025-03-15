@@ -52,6 +52,7 @@ do
 done
 
 ### SUT_NAME=valkey, self-design sample
+instance_types="r6i.2xlarge r7g.2xlarge r8g.2xlarge r6g.2xlarge" 
 echo "$0: Valkey benchmark, single node..."
 for os in ${os_types} 
 do
