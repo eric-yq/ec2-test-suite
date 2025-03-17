@@ -53,44 +53,60 @@ docker run -d -p 5001:8080 -e DYNAMIC_CONFIG_ENABLED=true provectuslabs/kafka-ui
 # 构建 benchmark 工具
 cd /root/
 # git clone https://github.com/openmessaging/openmessaging-benchmark
-unzip openmessaging-benchmark.zip 
+git clone https://github.com/openmessaging/benchmark.git openmessaging-benchmark
 cd openmessaging-benchmark/
 mvn clean verify -e
 
 # 执行 benchmark 的函数
+#####################################################################
+#!/bin/bash
+# run.sh
 run_benchmark() {
 	# 设置要测试的 Kafka 规格和 workload
-	KAFKA_EC2="$1"
-	KAFKA_EC2_IPADDR="$2"
+	INSTYPE="$1"
+	IPADDR="$2"
 	WORKLOAD="$3"
 	
-	echo $KAFKA_EC2 $KAFKA_EC2_IPADDR $WORKLOAD
-
 	# 修改 driver文件的配置，Kafka server 地址
-	rm -rf driver-kafka-$KAFKA_EC2
-	cp -r  driver-kafka driver-kafka-$KAFKA_EC2
-	sed -i.bak "s/localhost/$KAFKA_EC2_IPADDR/g" driver-kafka-$KAFKA_EC2/kafka-*.yaml
-	sed -i "s/replicationFactor: 3/replicationFactor: 1/g" driver-kafka-$KAFKA_EC2/kafka-*.yaml
-	sed -i "s/min.insync.replicas=2/min.insync.replicas=1/g" driver-kafka-$KAFKA_EC2/kafka-*.yaml
-
-    echo "[INFO] Start to run benchmark."
-    
-	# 测试
-	bin/benchmark --drivers driver-kafka-$KAFKA_EC2/kafka-throughput.yaml workloads/$WORKLOAD.yaml \
-	  > output_$KAFKA_EC2_$WORKLOAD.log
+	DRIVER_FOLDER="driver-kafka-${INSTYPE}-${IPADDR}"
+	rm -rf ${DRIVER_FOLDER}
+	cp -r  driver-kafka ${DRIVER_FOLDER}
+	sed -i "s/localhost/$IPADDR/g" ${DRIVER_FOLDER}/kafka-*.yaml
+	sed -i "s/replicationFactor: 3/replicationFactor: 1/g" ${DRIVER_FOLDER}/kafka-*.yaml
+	sed -i "s/min.insync.replicas=2/min.insync.replicas=1/g" ${DRIVER_FOLDER}/kafka-*.yaml
+	
+	# 执行 benchmark
+	XXX=$(grep testDurationMinutes workloads/$WORKLOAD.yaml | awk -F " " '{print $2}')
+	let YYY=(XXX+1)*60+30
+	TIMESTAMP=$(date +%Y%m%d%H%M%S)
+	RESULT_PATH=./result-${INSTYPE}-${IPADDR}-${TIMESTAMP}
+	OUTPUT_LOG=${RESULT_PATH}/output_$INSTYPE_$WORKLOAD.log
+	mkdir -p ${RESULT_PATH}
+	
+	echo "[INFO] Start to run benchmark: $INSTYPE, $IPADDR, $WORKLOAD"
+	echo "[Info] testDurationMinutes: $XXX minutes, and benchmark will be stopped after $YYY [($XXX+1)*60+30)] seconds."
+	
+	timeout ${YYY}s bin/benchmark \
+	  --drivers ${DRIVER_FOLDER}/kafka-throughput.yaml workloads/$WORKLOAD.yaml \
+	  --output ${RESULT_PATH}/output.json > ${OUTPUT_LOG}
+	
+	sleep 3
 	
 	# 生成 csv 结果文件
-	bin/benchmark --csv ./
-	 
+	echo "[INFO] Start to generate csv result file."
+	bin/benchmark --csv ./${RESULT_PATH}
+	
 	# 保存日志和结果文件
-	mkdir -p result_files_$KAFKA_EC2
-	mv output_$KAFKA_EC2_$WORKLOAD.log results-*.csv $WORKLOAD-*.json result_files_$KAFKA_EC2/
+	mv ${DRIVER_FOLDER} benchmark-worker.log results-*.csv ${RESULT_PATH}/
 	
 	echo "[INFO] Complete to run benchmark."
-	return 0
 }
+run_benchmark $1 $2 $3
+#####################################################################
+# 执行上面脚本
+bash run.sh r7gd.2xlarge 172.31.11.94 simple-workload
 
-# run_benchmark i3.2xlarge   172.31.47.75 simple-workload
+# run_bnchmark i3.2xlarge   172.31.47.75 simple-workload
 # run_benchmark i4g.2xlarge  172.31.44.179 simple-workload
 # run_benchmark i4i.2xlarge  172.31.41.71 simple-workload
 # run_benchmark i7ie.2xlarge 172.31.45.2 simple-workload
@@ -136,15 +152,15 @@ ssh-keygen -f ~/.ssh/kafka_aws
 
 
 cd /root/openmessaging-benchmark/driver-kafka/deploy
-cp -r ssd-deployment ssd-deployment-$KAFKA_EC2
-cd ssd-deployment-$KAFKA_EC2
+cp -r ssd-deployment ssd-deployment-$INSTYPE
+cd ssd-deployment-$INSTYPE
 
 # 获取一些环境信息
 REGION=$(cloud-init query ds.meta_data.placement.region)
 AZ=$(cloud-init query ds.meta_data.placement.availability-zone)
 
 # 查询 AL2023 最新AMI ID
-ARCH_KAFKA=$(aws ec2 describe-instance-types --instance-types $KAFKA_EC2 --query 'InstanceTypes[*].ProcessorInfo.SupportedArchitectures' --output text)
+ARCH_KAFKA=$(aws ec2 describe-instance-types --instance-types $INSTYPE --query 'InstanceTypes[*].ProcessorInfo.SupportedArchitectures' --output text)
 AMI_KAFKA=$(aws ssm get-parameter --name /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-$ARCH_KAFKA --region $REGION --query Parameter.Value --output text)
 ARCH_CLIENT=$(aws ec2 describe-instance-types --instance-types $CLINET_EC2_SIZE --query 'InstanceTypes[*].ProcessorInfo.SupportedArchitectures' --output text)
 AMI_CLIENT=$(aws ssm get-parameter --name /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-$ARCH_CLIENT --region $REGION --query Parameter.Value --output text)
@@ -159,8 +175,8 @@ ami             = "$AMI_KAFKA"  // AL2023
 ami-client      = "$AMI_CLIENT" // AL2023
 
 instance_types = {
-  "kafka"     = "$KAFKA_EC2"
-  "zookeeper" = "$KAFKA_EC2"
+  "kafka"     = "$INSTYPE"
+  "zookeeper" = "$INSTYPE"
   "client"    = "c6i.4xlarge"
 }
 
@@ -182,7 +198,7 @@ terraform apply --auto-approve
 terraform-inventory --list ./ > 
 
 # 执行 ansible playbook
-# ansible-playbook --user root --inventory `which terraform-inventory` deploy_$KAFKA_EC2.yaml
+# ansible-playbook --user root --inventory `which terraform-inventory` deploy_$INSTYPE.yaml
 
 
 

@@ -29,7 +29,7 @@ mount -a && df -h
 # 如果只使用一块 instancestore 磁盘的话，可以选用上面循环的最后一个 $disk
 
 
-yum install -y java-11-amazon-corretto python3-pip git
+yum install -yq java-11-amazon-corretto java-11-amazon-corretto-devel python3-pip git
 pip install dool
 cd /root/
 wget https://dlcdn.apache.org/kafka/3.9.0/kafka_2.13-3.9.0.tgz
@@ -49,7 +49,7 @@ KAFKA_CLUSTER_ID="$(bin/kafka-storage.sh random-uuid)"
 bin/kafka-storage.sh format --standalone -t $KAFKA_CLUSTER_ID -c config/kraft/reconfig-server.properties
 
 # 启动
-bin/kafka-server-start.sh config/kraft/reconfig-server.properties &
+nohup bin/kafka-server-start.sh config/kraft/reconfig-server.properties &
 
 # 停止
 # bin/kafka-server-stop.sh
@@ -67,9 +67,10 @@ BROKER_IPADDR="172.31.45.2"   # i7ie.2xlarge，
 BROKER_IPADDR="172.31.44.179" # i4g.2xlarge，
 BROKER_IPADDR="172.31.38.141" # i8g.2xlarge，
 
+SIZE=300
 for i in $(seq 1 3)
 do 
-	bin/kafka-producer-perf-test.sh --topic kafka-test --num-records 50000000 --throughput -1 --record-size 300 --producer-props bootstrap.servers=$BROKER_IPADDR:9092 acks=1
+	bin/kafka-producer-perf-test.sh --topic kafka-test --num-records 50000000 --throughput -1 --record-size $SIZE --producer-props bootstrap.servers=$BROKER_IPADDR:9092 acks=1
 	sleep 5
 done
 
