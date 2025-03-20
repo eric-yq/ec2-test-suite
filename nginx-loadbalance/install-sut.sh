@@ -16,22 +16,6 @@ install_public_tools(){
 	systemctl enable irqbalance --now
 }
 os_configure(){
-# 	sysctl -w net.core.somaxconn=65535
-# 	sysctl -w net.core.rmem_max=16777216
-# 	sysctl -w net.core.wmem_max=16777216
-# 	sysctl -w net.core.netdev_max_backlog=200000 # 增大接收队列长度（减少丢包）
-# 	sysctl -w net.core.netdev_budget=60000       # 每次软中断处理的最大数据包数
-# 	sysctl -w net.core.netdev_budget_usecs=8000  # 每次软中断的最大时间（微秒）
-# 	sysctl -w net.ipv4.tcp_max_syn_backlog=65535
-# 	sysctl -w net.ipv4.tcp_tw_reuse=1
-# 	sysctl -w net.ipv4.tcp_fastopen=3
-# 	sysctl -w net.ipv4.tcp_congestion_control=bbr
-# 	sysctl -w net.ipv4.ip_local_port_range="1024 65535"
-# 	sysctl -w net.ipv4.tcp_rmem="4096 87380 16777216"
-# 	sysctl -w net.ipv4.tcp_wmem="4096 65536 16777216"
-# 	sysctl -w fs.file-max=1000000
-# 	ulimit -n 1000000
-# 	echo never > /sys/kernel/mm/transparent_hugepage/enabled
 
 	#OS优化
 	#####################################################################

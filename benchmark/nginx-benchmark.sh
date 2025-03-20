@@ -10,7 +10,7 @@ RESULT_PATH="/root/ec2-test-suite/benchmark-result-files"
 mkdir -p ${RESULT_PATH}
 
 # 执行OS优化
-bash $(dirname $0)/os-optimization.sh
+bash /root/ec2-test-suite/benchmark/os-optimization.sh
 
 # 命令
 THREADS=${INSTANCE_VCPU_NUM}
