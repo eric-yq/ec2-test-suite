@@ -94,7 +94,7 @@ aws s3 cp ${aws_s3_bucket_name}/software/specjbb2015-1.02.tar.gz .
 tar -xzf specjbb2015-1.02.tar.gz
 
 ## 获取 CPU数 和 内存数量（KB）
-CPU_CORES=$(cat /proc/cpuinfo | grep processor | wc -l)
+CPU_CORES=$(nproc)
 MEM_TOTAL_MB=$(free -m |grep Mem | awk -F " " '{print $2}')
 
 ## 变量计算

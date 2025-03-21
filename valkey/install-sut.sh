@@ -81,7 +81,7 @@ net.ipv6.conf.all.disable_ipv6 = 1
 net.ipv6.conf.default.disable_ipv6 = 1
 
 # 内存管理优化
-vm.swappiness = 10
+vm.swappiness = 0
 vm.dirty_ratio = 10
 vm.dirty_background_ratio = 5
 vm.min_free_kbytes = 1048576
