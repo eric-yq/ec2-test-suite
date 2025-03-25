@@ -97,14 +97,6 @@ cat << EOF > $HADOOP_HOME/etc/hadoop/core-site.xml
         <name>hadoop.tmp.dir</name>
         <value>${HADOOP_HOME}/tmp</value>
     </property>
-    <property>
-        <name>hadoop.proxyuser.hive.hosts</name>
-        <value>*</value>
-    </property>
-    <property>
-        <name>hadoop.proxyuser.hive.groups</name>
-        <value>*</value>
-    </property>
 </configuration>
 EOF
 
