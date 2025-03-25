@@ -1,3 +1,17 @@
+
+## 安装docker
+yum install -y docker python3-pip htop iotop
+pip3 install dool
+systemctl start docker
+
+## 安装Docker compose
+ARCH=$(arch)
+curl -SL https://github.com/docker/compose/releases/download/v2.12.2/docker-compose-linux-${ARCH} -o /usr/bin/docker-compose
+chmod +x /usr/bin/docker-compose
+
+
+
+
 ##############################################################################################################
 # Install Porcess Watch, on Ubuntu 22.04
 # https://learn.arm.com/learning-paths/servers-and-cloud-computing/processwatch/
