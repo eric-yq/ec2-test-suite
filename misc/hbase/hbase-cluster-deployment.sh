@@ -28,6 +28,8 @@ done
 mount -a && df -h 
 
 WORK_DIR=/mnt/nvme1n1
+echo "export WORK_DIR=$WORK_DIR" >> ~/.bashrc
+source ~/.bashrc
 sudo mkdir -p $WORK_DIR
 sudo chmod -R 777 $WORK_DIR
 
@@ -36,11 +38,11 @@ IPADDR_NODE1="172.31.10.182"
 IPADDR_NODE2="172.31.0.107"
 IPADDR_NODE3="172.31.11.40"
 
-sudo cat >> /etc/hosts << EOL
+sudo cat >> /etc/hosts << EOF
 $IPADDR_NODE1 node1
 $IPADDR_NODE2 node2
 $IPADDR_NODE3 node3
-EOL
+EOF
 
 # 安装基础软件
 sudo yum install -y java-11-amazon-corretto-devel python3-pip iotop htop
@@ -53,9 +55,8 @@ exit
 # 配置 3 节点的无密码登录
 sudo su - ec2-user
 
-# node1/2/3 操作：生成密钥用于无密码登录：
+# node1/2/3：生成密钥用于无密码登录：
 ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
-# cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 chmod 0600 ~/.ssh/authorized_keys
 cat ~/.ssh/id_rsa.pub 
 vim ~/.ssh/authorized_keys
@@ -70,7 +71,6 @@ ssh node3
 # 在 node-1 安装和配置 Hadoop 软件
 # 设置软件栈版本：
 HADOOP_VERSION=3.3.5
-WORK_DIR=/mnt/nvme1n1
 ARCH=$(arch)
 if [[ "$ARCH" == "aarch64" ]]; then
     ARCH="-aarch64"
@@ -194,11 +194,8 @@ scp -rq $HADOOP_HOME node3:$WORK_DIR
 # node1初始化 HDFS 节点，启动 DFS 和 Yarn：
 $HADOOP_HOME/bin/hdfs namenode -format
 $HADOOP_HOME/sbin/start-dfs.sh
-# grep clusterID $(find $HADOOP_HOME/ -name VERSION)
 $HADOOP_HOME/sbin/start-yarn.sh
 jps
-
-
 
 ######################################################################################################
 # 节点 1 安装 zookeeper
@@ -247,7 +244,7 @@ source  ~/.bashrc
 
 mkdir -p $HADOOP_HOME/hdfs/data/{zookeeper,hbase-tmp,hbase-pid,hbase-logs}
 
-cat >> $HBASE_HOME/conf/hbase-env.sh   << EOF
+cat >> $HBASE_HOME/conf/hbase-env.sh << EOF
 export JAVA_HOME=/usr/lib/jvm/jre
 export HBASE_MANAGES_ZK=false
 export HBASE_PID_DIR=$HADOOP_HOME/hdfs/data/hbase-pid
@@ -305,8 +302,6 @@ ssh node2 "jps"
 ssh node3 "jps"
 
 
-
-
-
+######################################################################################################
 ### Reference
 # https://www.hangge.com/blog/cache/detail_3435.html
