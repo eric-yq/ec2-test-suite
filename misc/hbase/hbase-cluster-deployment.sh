@@ -30,13 +30,13 @@ mount -a && df -h
 WORK_DIR=/mnt/nvme1n1
 echo "export WORK_DIR=$WORK_DIR" >> ~/.bashrc
 source ~/.bashrc
-sudo mkdir -p $WORK_DIR
-sudo chmod -R 777 $WORK_DIR
+mkdir -p $WORK_DIR
+chmod 777 -R $WORK_DIR
 
-# 将3个节点主机名写入 /etc/hosts 文件
-IPADDR_NODE1="172.31.10.182"
-IPADDR_NODE2="172.31.0.107"
-IPADDR_NODE3="172.31.11.40"
+# 将3个节点主机名写入 /etc/hosts 文件 <==== 在这里填写节点的IP地址
+IPADDR_NODE1="172.31.36.18"
+IPADDR_NODE2="172.31.38.32"
+IPADDR_NODE3="172.31.43.55"
 
 sudo cat >> /etc/hosts << EOF
 $IPADDR_NODE1 node1
@@ -53,19 +53,24 @@ exit
 
 ######################################################################################################
 # 配置 3 节点的无密码登录
-sudo su - ec2-user
+# 回到了 ec2-user 用户
+
+WORK_DIR=/mnt/nvme1n1
+echo "export WORK_DIR=$WORK_DIR" >> ~/.bashrc
+source ~/.bashrc
 
 # node1/2/3：生成密钥用于无密码登录：
 ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
 chmod 0600 ~/.ssh/authorized_keys
 cat ~/.ssh/id_rsa.pub 
+
 vim ~/.ssh/authorized_keys
 ### 将 node1/2/3  节点的【cat ~/.ssh/id_rsa.pub】输出结果添加到所有节点的 authorized_keys 文件
 
 # 在 node1/2/3 分别验证无密码登录
-ssh node1
-ssh node2
-ssh node3
+ssh node1 hostname
+ssh node2 hostname 
+ssh node3 hostname
 
 ######################################################################################################
 # 在 node-1 安装和配置 Hadoop 软件
@@ -89,6 +94,7 @@ mv hadoop-$HADOOP_VERSION hadoop
 
 cat >> ~/.bashrc << EOF
 export HADOOP_HOME=${WORK_DIR}/hadoop
+export JAVA_HOME=/usr/lib/jvm/jre
 export PATH=$HADOOP_HOME/sbin:$HADOOP_HOME/bin:$PATH
 EOF
 source ~/.bashrc
@@ -183,6 +189,7 @@ EOF
 
 # 修改 workers 文件
 cat << EOF > $HADOOP_HOME/etc/hadoop/workers
+node1
 node2
 node3
 EOF
@@ -212,6 +219,7 @@ echo "dataLogDir=$WORK_DIR/zookeeper/data/log" >> zoo.cfg
 echo "server.1=node1:2888:3888" >> zoo.cfg
 echo "server.2=node2:2888:3888" >> zoo.cfg
 echo "server.3=node3:2888:3888" >> zoo.cfg
+diff zoo.cfg zoo_sample.cfg
 
 # 传到 node2/3 节点
 scp -rq $WORK_DIR/zookeeper node2:$WORK_DIR
@@ -235,10 +243,16 @@ ssh node3 "$WORK_DIR/zookeeper/bin/zkServer.sh status"
 ######################################################################################################
 ## 安装 Hbase
 cd $WORK_DIR
+
+# wget https://archive.apache.org/dist/hbase/2.3.6/hbase-2.3.6-bin.tar.gz
+# tar zxf hbase-2.3.6-bin.tar.gz
+# mv hbase-2.3.6 hbase
+
 HBASE_VERSION=2.5.11
 wget https://downloads.apache.org/hbase/$HBASE_VERSION/hbase-$HBASE_VERSION-hadoop3-bin.tar.gz
 tar zxf hbase-${HBASE_VERSION}-hadoop3-bin.tar.gz
 mv hbase-${HBASE_VERSION}-hadoop3 hbase
+
 echo "export HBASE_HOME=${WORK_DIR}/hbase" >> ~/.bashrc
 source  ~/.bashrc
 
@@ -286,6 +300,7 @@ cat > $HBASE_HOME/conf/hbase-site.xml << EOF
 EOF
 
 cat > $HBASE_HOME/conf/regionservers << EOF
+node1
 node2
 node3
 EOF
@@ -301,7 +316,16 @@ ssh node1 "jps"
 ssh node2 "jps"
 ssh node3 "jps"
 
+# 验证 Hbase 是否正常运行，在 3 个节点通过 dool 查看资源利用率
+$HBASE_HOME/bin/hbase pe --nomapred --oneCon=true --valueSize=100 --rows=150000 --autoFlush=true --presplit=8 randomWrite 8
+
+
 
 ######################################################################################################
 ### Reference
 # https://www.hangge.com/blog/cache/detail_3435.html
+
+# Freewheel 测试集群配置
+# 服务版本：Hadoop 3.3.2 + HBase 2.3.6
+# Intel集群：2 * m5.xlarge Master + 3 * i4i.4xlarge RegionServer + JDK 8
+# ARM集群：2 * m8g.xlarge Master + 3 * i8g.4xlarge RegionServer + JDK 11
