@@ -1,0 +1,47 @@
+# Environment Prepare
+
+* Only support Linux
+* JDK installed, version must be above 1.8
+* Python installed, version must be 2.4/2.5/2.6/2.7
+
+# Configuration
+
+## HBase Connection Configuration
+
+Set hbase connection in "conf/hbase-site.xml"
+
+## Environment Configuration
+
+Configure "conf/ahbench-env.properties" file with:
+* JAVA_HOME     : JDK installed path
+* HBASE_VERSION : HBase cluster version, 1 or 2
+* COMPRESSION   : Compression algorithm for testing table, default is SNAPPY.
+                  ZSTD is available when testing AliHBaseUE
+
+## Benchmark settings Configuration
+
+Configure "conf/ahbench-settings.properties" file with:
+* COMPRESSION   : Compression algorithm for testing table, default is SNAPPY.
+                  ZSTD is available when testing AliHBaseUE
+* ENCODING      : Encoding algorithm for testing table, default is DIFF. INDEX
+                  is available when testing AliHBaseUE
+
+# Run
+
+* Execute "./fast_test" to start a quick benchmark test. This test may exam 
+  the test works correctly
+* Execute "./full_test" to start a full benchmark test. This test may last 
+  very long
+* Execute "./single_test" to start a single insert(write). 
+* Execute "./batch_test" to start a batch insert(write). 
+
+# Result 
+
+* For fast test, check "logs/fast_throughput.csv" or "logs/fast_spike_latency.csv"
+* For full test, check "logs/full_throughput.csv" or "logs/full_spike_latency.csv"
+
+# Link
+
+To see the design of test suite,  visit [HBaseUE doc](https://help.aliyun.com/document_detail/119561.html) 
+
+

@@ -1,0 +1,4 @@
+# threads= 
+# load=0 or 1
+threads=200
+maxexecutiontime=1200

@@ -1,0 +1,1 @@
+tname=_TABLENAME_; rs=_REGIONS_; cprs=_COMPRESSION_; kl=_KEYLEN_; encode=_ENCODING_; create tname, {NAME => 'f', DATA_BLOCK_ENCODING => encode, COMPRESSION => cprs}, {SPLITS => (1..(rs-1)).map{|i| "user#{(i * ((2**63-1)/(rs-1))).to_s.rjust(kl, "0")}"} }

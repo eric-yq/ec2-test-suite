@@ -1,5 +1,8 @@
 #!/bin/bash 
 
+# 所有节点先进行操作系统优化
+# 参考 benchmark/os-optimization.sh 
+
 ######################################################################################################
 # node1/2/3 操作：3个实例挂载磁盘
 sudo su - root
@@ -270,7 +273,10 @@ export HBASE_LOG_DIR=$HBASE_HOME/hbase-logs
 export HBASE_DISABLE_HADOOP_CLASSPATH_LOOKUP="true"
 EOF
 
+## 下面的 hbase-site.xml 配置是根据 16c128g size 进行优化
 cat > $HBASE_HOME/conf/hbase-site.xml << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 <configuration>
     <property>
         <name>hbase.cluster.distributed</name>
@@ -279,10 +285,10 @@ cat > $HBASE_HOME/conf/hbase-site.xml << EOF
     <property>
         <name>hbase.rootdir</name>
         <value>hdfs://node1:9000/hbase</value>
-    </property> 
+    </property>
     <property>
         <name>hbase.tmp.dir</name>
-        <value>${HADOOP_HOME}/hdfs/data/hbase-tmp</value>
+        <value>/mnt/nvme1n1/hadoop/hdfs/data/hbase-tmp</value>
     </property>
     <property>
         <name>hbase.unsafe.stream.capability.enforce</name>
@@ -300,7 +306,106 @@ cat > $HBASE_HOME/conf/hbase-site.xml << EOF
         <name>zookeeper.znode.parent</name>
         <value>/hbase</value>
     </property>
-</configuration>
+    <property>
+        <name>hbase.regionserver.handler.count</name>
+        <value>128</value>        <!-- 默认为30，可根据CPU核心数增加，如CPU核心数×2 -->
+    </property>
+
+    <!-- 内存配置 -->
+    <property>
+        <name>hbase.regionserver.global.memstore.size</name>
+        <value>0.4</value>
+        <description>RegionServer中所有memstore使用的堆内存比例，调高以提升写性能</description>
+    </property>
+
+    <property>
+        <name>hbase.regionserver.global.memstore.size.lower.limit</name>
+        <value>0.38</value>
+        <description>触发memstore刷新的下限</description>
+    </property>
+
+    <property>
+        <name>hbase.hregion.memstore.flush.size</name>
+        <value>268435456</value>
+        <description>单个memstore刷新阈值，设为256MB</description>
+    </property>
+
+    <property>
+        <name>hbase.regionserver.maxlogs</name>
+        <value>64</value>
+        <description>单个RegionServer上允许的最大WAL文件数</description>
+    </property>
+
+    <property>
+        <name>hbase.regionserver.hlog.blocksize</name>
+        <value>268435456</value>
+        <description>WAL文件块大小，设为256MB</description>
+    </property>
+
+    <property>
+        <name>hbase.hregion.max.filesize</name>
+        <value>10737418240</value>
+        <description>Region分裂阈值，设为10GB</description>
+    </property>
+
+    <!-- 缓存配置 -->
+    <property>
+        <name>hfile.block.cache.size</name>
+        <value>0.4</value>
+        <description>BlockCache占用的堆内存比例，提高读性能</description>
+    </property>
+
+    <property>
+        <name>hbase.bucketcache.size</name>
+        <value>10240</value>
+        <description>堆外缓存大小</description>
+    </property>
+
+    <property>
+        <name>hbase.bucketcache.ioengine</name>
+        <value>offheap</value>
+        <description>使用堆外内存作为二级缓存</description>
+    </property>
+
+    <property>
+        <name>hbase.rs.cacheblocksonwrite</name>
+        <value>true</value>
+        <description>写入时缓存数据块</description>
+    </property>
+
+    <!-- RPC 连接池优化 -->
+    <property>
+        <name>hbase.client.ipc.pool.size</name>
+        <value>10</value>
+        <description>客户端 RPC 连接池大小，增加并发连接数</description>
+    </property>
+
+    <property>
+        <name>hbase.client.ipc.pool.type</name>
+        <value>RoundRobinPool</value>
+        <description>连接池类型，使用轮询方式分配连接</description>
+    </property>
+
+    <property>
+        <name>hbase.client.max.perserver.tasks</name>
+        <value>20</value>
+        <description>每个服务器允许的最大并发任务数</description>
+    </property>
+
+    <!-- 网络缓冲区设置 -->
+    <property>
+        <name>hbase.ipc.server.tcpnodelay</name>
+        <value>true</value>
+        <description>禁用 Nagle 算法，减少小数据包的延迟</description>
+    </property>
+
+    <!-- 批量操作优化 -->
+    <property>
+        <name>hbase.client.write.buffer</name>
+        <value>8388608</value>
+        <description>客户端写缓冲区大小，设为 8MB，提高批量写入性能</description>
+    </property>
+</configuration>  
 EOF
 
 cat > $HBASE_HOME/conf/regionservers << EOF

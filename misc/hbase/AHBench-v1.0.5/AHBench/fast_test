@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Copyright Alibaba Group Holding Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/suite/default_suite --fastmode $* -r fast_
+
+AHBENCH_HOME=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+
+${AHBENCH_HOME}/bin/run_suite ${AHBENCH_HOME}/suite/default_suite.py --prefix fast \
+  -p ahbench.table.records=10000000 \
+  -p ahbench.test.flush.wait=5 \
+  -p ahbench.test.compact.wait=60 \
+  -p ahbench.default_suite.runtime=120 \
+  $*

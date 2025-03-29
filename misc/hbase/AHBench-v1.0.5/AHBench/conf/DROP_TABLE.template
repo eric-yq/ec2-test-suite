@@ -1,0 +1,1 @@
+tname=_TABLENAME_; sleept=_SLEEPSEC_; disable tname; sleep(sleept); drop tname;
