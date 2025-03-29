@@ -39,16 +39,16 @@ net.core.netdev_budget_usecs = 10000
 net.core.dev_weight = 600
 
 # 连接跟踪优化
-net.netfilter.nf_conntrack_max = 2097152
-net.netfilter.nf_conntrack_tcp_timeout_established = 86400
-net.netfilter.nf_conntrack_tcp_timeout_time_wait = 30
+# net.netfilter.nf_conntrack_max = 2097152
+# net.netfilter.nf_conntrack_tcp_timeout_established = 86400
+# net.netfilter.nf_conntrack_tcp_timeout_time_wait = 30
 
 # 禁用IPv6（如果不需要）
 net.ipv6.conf.all.disable_ipv6 = 1
 net.ipv6.conf.default.disable_ipv6 = 1
 
 # 内存管理优化
-vm.swappiness = 10
+vm.swappiness = 0
 vm.dirty_ratio = 10
 vm.dirty_background_ratio = 5
 vm.min_free_kbytes = 1048576
@@ -63,6 +63,20 @@ fs.inotify.max_user_watches = 524288
 EOF
 sudo sysctl -p /etc/sysctl.d/99-network-performance.conf
 
+ulimit -n 1000000
+
+cat >> /etc/security/limits.conf << EOF
+# 如果使用 root 或其他用户运行，也需要设置
+root soft nofile 1000000
+root hard nofile 1000000
+root soft nproc 65535
+root hard nproc 65535
+
+# 对所有用户设置
+* soft nofile 1000000
+* hard nofile 1000000
+EOF
+
 ##############################################################################
 # 中断亲和性设置 ，绑定在指定CPU上。   
 systemctl stop irqbalance
@@ -76,17 +90,5 @@ done
 
 ##############################################################################
 # 其他配置
-ulimit -n 1000000
 echo never > /sys/kernel/mm/transparent_hugepage/enabled
 echo 1 > /proc/sys/vm/overcommit_memory
-cat >> /etc/security/limits.conf << EOF
-# 如果使用 root 或其他用户运行，也需要设置
-root soft nofile 1000000
-root hard nofile 1000000
-root soft nproc 65535
-root hard nproc 65535
-
-# 对所有用户设置
-* soft nofile 1000000
-* hard nofile 1000000
-EOF

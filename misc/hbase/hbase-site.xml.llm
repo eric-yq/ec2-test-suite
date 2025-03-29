@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+  <!-- 基本配置 -->
+    <property>
+        <name>hbase.cluster.distributed</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>hbase.rootdir</name>
+        <value>hdfs://node1:9000/hbase</value>
+        <description>Root directory in HDFS for HBase</description>
+    </property>
+    <property>
+        <name>hbase.tmp.dir</name>
+        <value>/mnt/nvme1n1/hadoop/hdfs/data/hbase-tmp</value>
+    </property>
+    <property>
+        <name>hbase.unsafe.stream.capability.enforce</name>
+        <value>false</value>
+    </property>
+    <property>
+        <name>hbase.zookeeper.quorum</name>
+        <value>node1,node2,node3</value>
+    </property>
+    <property>
+        <name>hbase.zookeeper.property.clientPort</name>
+        <value>2181</value>
+    </property>
+    <property>
+        <name>zookeeper.znode.parent</name>
+        <value>/hbase</value>
+    </property>
+  
+  <!-- 内存配置 -->
+  <property>
+    <name>hbase.regionserver.global.memstore.size</name>
+    <value>0.4</value>
+    <description>RegionServer中所有memstore使用的堆内存比例，调高以提升写性能</description>
+  </property>
+  
+  <property>
+    <name>hbase.regionserver.global.memstore.size.lower.limit</name>
+    <value>0.38</value>
+    <description>触发memstore刷新的下限</description>
+  </property>
+  
+  <property>
+    <name>hbase.hregion.memstore.flush.size</name>
+    <value>268435456</value>
+    <description>单个memstore刷新阈值，设为256MB</description>
+  </property>
+  
+  <property>
+    <name>hbase.regionserver.maxlogs</name>
+    <value>64</value>
+    <description>单个RegionServer上允许的最大WAL文件数</description>
+  </property>
+  
+  <property>
+    <name>hbase.regionserver.hlog.blocksize</name>
+    <value>268435456</value>
+    <description>WAL文件块大小，设为256MB</description>
+  </property>
+  
+  <property>
+    <name>hbase.hregion.max.filesize</name>
+    <value>10737418240</value>
+    <description>Region分裂阈值，设为10GB</description>
+  </property>
+  
+  <!-- 读写优化 -->
+  <property>
+    <name>hbase.regionserver.handler.count</name>
+    <value>64</value>
+    <description>RPC处理线程数，约为CPU核心数的2倍</description>
+  </property>
+  
+  <property>
+    <name>hbase.hstore.blockingStoreFiles</name>
+    <value>20</value>
+    <description>触发compaction的store文件数量</description>
+  </property>
+  
+  <property>
+    <name>hbase.hstore.compaction.max</name>
+    <value>10</value>
+    <description>单次compaction最多选择的文件数</description>
+  </property>
+  
+  <property>
+    <name>hbase.hstore.compactionThreshold</name>
+    <value>6</value>
+    <description>触发minor compaction的最小文件数</description>
+  </property>
+  
+  <property>
+    <name>hbase.hregion.majorcompaction</name>
+    <value>604800000</value>
+    <description>major compaction间隔，设为7天</description>
+  </property>
+  
+  <!-- 压缩线程配置 -->
+  <property>
+    <name>hbase.regionserver.thread.compaction.small</name>
+    <value>8</value>
+    <description>小型压缩线程数</description>
+  </property>
+  
+  <property>
+    <name>hbase.regionserver.thread.compaction.large</name>
+    <value>4</value>
+    <description>大型压缩线程数</description>
+  </property>
+  
+  <!-- 缓存配置 -->
+  <property>
+    <name>hfile.block.cache.size</name>
+    <value>0.4</value>
+    <description>BlockCache占用的堆内存比例，提高读性能</description>
+  </property>
+  
+  <property>
+    <name>hbase.bucketcache.size</name>
+    <value>10240</value>
+    <description>堆外缓存大小</description>
+  </property>
+  
+  <property>
+    <name>hbase.bucketcache.ioengine</name>
+    <value>offheap</value>
+    <description>使用堆外内存作为二级缓存</description>
+  </property>
+  
+  <property>
+    <name>hbase.rs.cacheblocksonwrite</name>
+    <value>true</value>
+    <description>写入时缓存数据块</description>
+  </property>
+  
+  <!-- 网络配置 -->
+
+  
+  <!-- 预分区和批处理配置 -->
+  <property>
+    <name>hbase.table.sanity.checks</name>
+    <value>false</value>
+    <description>关闭表格健全性检查以提高性能</description>
+  </property>
+  
+  <property>
+    <name>hbase.client.write.buffer</name>
+    <value>8388608</value>
+    <description>客户端写缓冲区大小，设为8MB</description>
+  </property>
+  
+  <property>
+    <name>hbase.client.keyvalue.maxsize</name>
+    <value>10485760</value>
+    <description>允许的最大KeyValue大小，设为10MB</description>
+  </property>
+  
+  <!-- Region平衡配置 -->
+  <property>
+    <name>hbase.balancer.period</name>
+    <value>300000</value>
+    <description>负载均衡器运行周期，设为5分钟</description>
+  </property>
+  
+  <property>
+    <name>hbase.master.loadbalance.bytable</name>
+    <value>true</value>
+    <description>按表进行负载均衡</description>
+  </property>
+  
+  <property>
+    <name>hbase.regions.slop</name>
+    <value>0.2</value>
+    <description>Region分布不均衡容忍度</description>
+  </property>
+  
+  <!-- WAL配置 -->
+
+  <!-- 性能优化 -->
+  <property>
+    <name>hbase.ipc.server.callqueue.handler.factor</name>
+    <value>0.1</value>
+    <description>RPC队列处理因子</description>
+  </property>
+  
+  <property>
+    <name>hbase.ipc.server.callqueue.read.ratio</name>
+    <value>0.5</value>
+    <description>读请求队列比例</description>
+  </property>
+  
+  <property>
+    <name>hbase.ipc.server.callqueue.scan.ratio</name>
+    <value>0.5</value>
+    <description>扫描请求队列比例</description>
+  </property>
+  
+  <property>
+    <name>hbase.regionserver.metahandler.count</name>
+    <value>10</value>
+    <description>处理meta表请求的处理器数量</description>
+  </property>
+  
+  <property>
+    <name>hbase.hstore.compaction.throughput.lower.bound</name>
+    <value>52428800</value>
+    <description>compaction吞吐量下限，设为50MB/sec</description>
+  </property>
+  
+  <property>
+    <name>hbase.hstore.compaction.throughput.higher.bound</name>
+    <value>104857600</value>
+    <description>compaction吞吐量上限，设为100MB/sec</description>
+  </property>
+  
+  <property>
+    <name>hbase.hstore.flusher.count</name>
+    <value>4</value>
+    <description>memstore刷新线程数</description>
+  </property>
+  
+  <!-- 数据块编码和压缩 -->
+  <property>
+    <name>hbase.regionserver.codecs</name>
+    <value>snappy,lz4,gz</value>
+    <description>可用的压缩编解码器</description>
+  </property>
+  
+  <property>
+    <name>hbase.table.max.rowsize</name>
+    <value>1073741824</value>
+    <description>最大行大小，设为1GB</description>
+  </property>
+  
+  <!-- 预读取配置 -->
+  <property>
+    <name>hbase.client.scanner.caching</name>
+    <value>1000</value>
+    <description>客户端扫描缓存大小</description>
+  </property>
+  
+  <property>
+    <name>hfile.block.bloom.cacheonwrite</name>
+    <value>true</value>
+    <description>写入时缓存Bloom过滤器</description>
+  </property>
+  
+  <property>
+    <name>io.storefile.bloom.block.size</name>
+    <value>131072</value>
+    <description>Bloom过滤器块大小，设为128KB</description>
+  </property>
+  
+  <!-- 高级调优参数 -->
+  <property>
+    <name>hbase.hregion.memstore.mslab.enabled</name>
+    <value>true</value>
+    <description>启用memstore-local allocation buffer</description>
+  </property>
+  
+  <property>
+    <name>hbase.hregion.memstore.mslab.chunksize</name>
+    <value>2097152</value>
+    <description>MSLAB块大小，设为2MB。建议根据工作负载特性进行系统分析以确定最佳块大小。</description>
+  </property>
+  
+  <property>
+    <name>hbase.master.procedure.threads</name>
+    <value>16</value>
+    <description>Master处理过程线程数</description>
+  </property>
+  
+  <property>
+    <name>hbase.procedure.regionserver.classes</name>
+    <value>org.apache.hadoop.hbase.master.flush.FlushTableProcedure</value>
+    <description>RegionServer过程类</description>
+  </property>
+  
+  <property>
+    <name>hbase.bulkload.staging.dir</name>
+    <value>${hbase.rootdir}/staging</value>
+    <description>批量加载临时目录</description>
+  </property>
+  
+  <!-- GC调优相关配置 -->
+  <property>
+    <name>hbase.regionserver.checksum.verify</name>
+    <value>false</value>
+    <description>验证数据块校验和</description>
+  </property>
+
+  <property>
+    <name>hbase.master.hfilecleaner.ttl</name>
+    <value>3600000</value>
+    <description>日志清理时间阈值，设为7天</description>
+  </property>
+  
+  <!-- 监控和安全配置 -->
+
+</configuration>

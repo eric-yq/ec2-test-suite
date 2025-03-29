@@ -238,6 +238,10 @@ ssh node3 "$WORK_DIR/zookeeper/bin/zkServer.sh start"
 ssh node1 "$WORK_DIR/zookeeper/bin/zkServer.sh status"
 ssh node2 "$WORK_DIR/zookeeper/bin/zkServer.sh status"
 ssh node3 "$WORK_DIR/zookeeper/bin/zkServer.sh status"
+# 停止 zookeeper
+ssh node1 "$WORK_DIR/zookeeper/bin/zkServer.sh stop"
+ssh node2 "$WORK_DIR/zookeeper/bin/zkServer.sh stop"
+ssh node3 "$WORK_DIR/zookeeper/bin/zkServer.sh stop"
 
 
 ######################################################################################################
@@ -256,13 +260,13 @@ mv hbase-${HBASE_VERSION}-hadoop3 hbase
 echo "export HBASE_HOME=${WORK_DIR}/hbase" >> ~/.bashrc
 source  ~/.bashrc
 
-mkdir -p $HADOOP_HOME/hdfs/data/{zookeeper,hbase-tmp,hbase-pid,hbase-logs}
+mkdir -p $HBASE_HOME/{zookeeper,hbase-tmp,hbase-pid,hbase-logs}
 
 cat >> $HBASE_HOME/conf/hbase-env.sh << EOF
 export JAVA_HOME=/usr/lib/jvm/jre
 export HBASE_MANAGES_ZK=false
-export HBASE_PID_DIR=$HADOOP_HOME/hdfs/data/hbase-pid
-export HBASE_LOG_DIR=$HADOOP_HOME/hdfs/data/hbase-logs
+export HBASE_PID_DIR=$HBASE_HOME/hbase-pid
+export HBASE_LOG_DIR=$HBASE_HOME/hbase-logs
 export HBASE_DISABLE_HADOOP_CLASSPATH_LOOKUP="true"
 EOF
 
@@ -324,6 +328,8 @@ $HBASE_HOME/bin/hbase pe --nomapred --oneCon=true --valueSize=100 --rows=150000 
 ######################################################################################################
 ### Reference
 # https://www.hangge.com/blog/cache/detail_3435.html
+# https://community.cloudera.com/t5/Community-Articles/Tuning-Hbase-for-optimized-performance-Part-1/ta-p/248137
+
 
 # Freewheel 测试集群配置
 # 服务版本：Hadoop 3.3.2 + HBase 2.3.6
