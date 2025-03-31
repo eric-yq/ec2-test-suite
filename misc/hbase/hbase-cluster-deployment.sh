@@ -435,12 +435,9 @@ $HBASE_HOME/bin/hbase pe --nomapred --oneCon=true --valueSize=100 --rows=150000 
 # https://community.cloudera.com/t5/Community-Articles/Tuning-Hbase-for-optimized-performance-Part-1/ta-p/248137
 
 
-# Freewheel 测试集群配置
+# Freewheel 测试集群版本
 # 服务版本：Hadoop 3.3.2 + HBase 2.3.6
 # Intel集群：2 * m5.xlarge Master + 3 * i4i.4xlarge RegionServer + JDK 8
 # ARM集群：2 * m8g.xlarge Master + 3 * i8g.4xlarge RegionServer + JDK 11
 wget https://archive.apache.org/dist/hadoop/common/hadoop-3.3.2/hadoop-3.3.2.tar.gz
-tar zxf hadoop-3.3.2.tar.gz
-mv hadoop-3.3.2 hadoop
-
 wget https://archive.apache.org/dist/hbase/2.3.6/hbase-2.3.6-bin.tar.gz
