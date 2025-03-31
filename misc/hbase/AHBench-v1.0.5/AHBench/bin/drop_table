@@ -1,0 +1,46 @@
+#!/bin/bash
+#
+# Copyright Alibaba Group Holding Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+source $(dirname ${BASH_SOURCE[0]})/util
+
+[[ $# -eq 0 ]] && {
+  red_echo "Usage: $(basename $0) <tablename>"; exit 1;
+}
+
+table_name=$1
+
+green_echo "Input parameters for $(basename $0):"
+echo "table_name = $table_name"
+
+sleep_sec=${SLEEPSEC:-5}
+
+green_echo "Dropping $table_name ..."
+
+template_file=${CONF_DIR}/DROP_TABLE.template
+tmp=${TMP_DIR}/_drop_cmd
+
+cat ${template_file} | sed "s/_TABLENAME_/\"$table_name\"/g" | sed "s/_SLEEPSEC_/$sleep_sec/g" > ${tmp}
+
+green_echo "Dropping table with clause:"
+cat ${tmp}
+
+green_echo "Dropping table using HBASE_SHELL":
+echo ${HBASE_SHELL}
+
+echo
+echo
+
+${HBASE_SHELL} < ${tmp}  2>&1 | tee -a ${LOG_DIR}/drop_table.log

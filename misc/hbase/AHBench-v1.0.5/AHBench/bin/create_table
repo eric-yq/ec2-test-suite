@@ -1,0 +1,76 @@
+#!/usr/bin/env python2.7
+#
+# Copyright Alibaba Group Holding Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+import os
+import subprocess
+import sys
+import util
+
+try:
+    mod = __import__('argparse')
+    import argparse
+except ImportError:
+    print >> sys.stderr, 'argparse not found. Try installing it via "pip".'
+    sys.exit(1)
+
+UTIL_ENV = util.UTIL_ENV
+TEMPLATE_NAME = 'CREATE_TABLE.template'
+CONF_DIR = UTIL_ENV["CONF_DIR"]
+TMP_DIR = UTIL_ENV["TMP_DIR"]
+LOG_DIR = UTIL_ENV["LOG_DIR"]
+HBASE_SHELL = os.path.join(UTIL_ENV["HBASE_SHELL"])
+TEMPLATE_PATH = os.path.join(CONF_DIR, TEMPLATE_NAME)
+TMP_CLAUSE = os.path.join(TMP_DIR, '_ct_cmd')
+LOG_PATH = os.path.join(LOG_DIR, 'create_table.log')
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Create hbase table with arguments")
+
+    parser.add_argument(dest='table_name', help='Table name to create', type=str)
+    parser.add_argument('--encoding', dest='encoding', help='Encoding algorithm for table',
+                        default='DIFF', type=str)
+    parser.add_argument('--compression', dest='compression', help='Compression algorithm for table',
+                        default='SNAPPY', type=str)
+    parser.add_argument('--regions', dest='regions', help='Regions count for table',
+                        default=200, type=int)
+    parser.add_argument('--keylen', dest='key_length', help='Key lengths for table',
+                        default=19, type=int)
+
+    input_args = parser.parse_args()
+    util.green_print("Input parameters for table creation: ")
+    print "    TableName   :   %s" % input_args.table_name
+    print "    Compression :   %s" % input_args.compression
+    print "    Encoding    :   %s" % input_args.encoding
+    print "    Regions     :   %s" % input_args.regions
+    print "    Key Length  :   %s" % input_args.key_length
+
+    temp_in = open(TEMPLATE_PATH, 'r')
+    clause_out = open(TMP_CLAUSE, 'w+')
+
+    for line in temp_in.readlines():
+        output_line = line \
+            .replace('_TABLENAME_', "'%s'" % input_args.table_name) \
+            .replace('_REGIONS_', '%d' % input_args.regions) \
+            .replace('_KEYLEN_', '%d' % input_args.key_length) \
+            .replace('_ENCODING_', "'%s'" % input_args.encoding) \
+            .replace('_COMPRESSION_', "'%s'" % input_args.compression)
+        clause_out.write(output_line)
+        clause_out.write('\n')
+
+    temp_in.close()
+    clause_out.close()
+
+    subprocess.check_call('source %s/util; %s < %s | tee -a %s' % (UTIL_ENV['BIN_DIR'], HBASE_SHELL, TMP_CLAUSE, LOG_PATH), shell=True)

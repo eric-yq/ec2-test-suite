@@ -37,9 +37,9 @@ mkdir -p $WORK_DIR
 chmod 777 -R $WORK_DIR
 
 # 将3个节点主机名写入 /etc/hosts 文件 <==== 在这里填写节点的IP地址
-IPADDR_NODE1="172.31.36.18"
-IPADDR_NODE2="172.31.38.32"
-IPADDR_NODE3="172.31.43.55"
+IPADDR_NODE1="172.31.41.204"
+IPADDR_NODE2="172.31.46.82"
+IPADDR_NODE3="172.31.43.95"
 
 sudo cat >> /etc/hosts << EOF
 $IPADDR_NODE1 node1
@@ -48,7 +48,7 @@ $IPADDR_NODE3 node3
 EOF
 
 # 安装基础软件
-sudo yum install -y java-11-amazon-corretto-devel python3-pip iotop htop
+sudo yum install -y java-11-amazon-corretto-devel snappy snappy-devel python3-pip iotop htop
 sudo pip3 install dool
 
 # 退出root用户
@@ -146,7 +146,7 @@ cat << EOF > $HADOOP_HOME/etc/hadoop/hdfs-site.xml
     </property>
     <property>
         <name>dfs.namenode.secondary.http-address</name>
-        <value>node1:50090</value>
+        <value>node2:50090</value>
     </property>
 </configuration>
 EOF
@@ -429,7 +429,6 @@ ssh node3 "jps"
 $HBASE_HOME/bin/hbase pe --nomapred --oneCon=true --valueSize=100 --rows=150000 --autoFlush=true --presplit=8 randomWrite 8
 
 
-
 ######################################################################################################
 ### Reference
 # https://www.hangge.com/blog/cache/detail_3435.html
@@ -440,3 +439,8 @@ $HBASE_HOME/bin/hbase pe --nomapred --oneCon=true --valueSize=100 --rows=150000 
 # 服务版本：Hadoop 3.3.2 + HBase 2.3.6
 # Intel集群：2 * m5.xlarge Master + 3 * i4i.4xlarge RegionServer + JDK 8
 # ARM集群：2 * m8g.xlarge Master + 3 * i8g.4xlarge RegionServer + JDK 11
+wget https://archive.apache.org/dist/hadoop/common/hadoop-3.3.2/hadoop-3.3.2.tar.gz
+tar zxf hadoop-3.3.2.tar.gz
+mv hadoop-3.3.2 hadoop
+
+wget https://archive.apache.org/dist/hbase/2.3.6/hbase-2.3.6-bin.tar.gz

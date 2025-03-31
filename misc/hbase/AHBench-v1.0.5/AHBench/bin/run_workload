@@ -1,0 +1,96 @@
+#!/usr/bin/env python2.7
+#
+# Copyright Alibaba Group Holding Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+import argparse
+import os
+import time
+from subprocess import call
+from subprocess import check_call
+
+import util
+
+UTIL_ENV = util.UTIL_ENV
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Boot tool for YCSB. This tool start a ycsb workload")
+    parser.add_argument(dest='workload', help='Workload template directory', type=str)
+    parser.add_argument(dest='table_name', help="Table name for test", type=str)
+    parser.add_argument('--threads', dest='threads', help='Thread count for ycsb client',
+                        default=None, type=int)
+    parser.add_argument('-p', dest='properties', help='JVM properties for ycsb client start up. Multiple properties '
+                                                      'could be set',
+                        default=[], action='append')
+    parser.add_argument('-l', '--load', dest='loading_mode', help='Start ycsb in load mode',
+                        default=None, action='store_true')
+    parser.add_argument('-n', '--name', dest='test_name',
+                        help='Test name for this run. Test result will saved to logs/<name>.csv. When this argument '
+                             'not set, used a time based default name',
+                        default=None, type=str)
+
+    input_args = parser.parse_args()
+    workload = input_args.workload
+    temp_props = util.load_properties(os.path.join(workload, 'run.config.template'))
+    cmd_props = util.make_properties(input_args.properties)
+    final_props = util.merge_properties(cmd_props, temp_props)
+    table_name = input_args.table_name
+    threads = util.find_any(input_args.threads, util.chain_map(temp_props['threads'], int), 10)
+    test_name = util.find_any(input_args.test_name,
+                              "%s.%d" % (table_name, int(time.time())))
+    loading_mode = util.find_any(input_args.loading_mode,
+                                 util.chain_map(temp_props.get('load'), int, bool),
+                                 False)
+    ycsb_workload_template_file = os.path.join(workload, 'workload.template')
+
+    # Properties from command is prior to properties in template, so put them in tail
+    ycsb_props_args = ' '.join(
+        ['-p %s=%s' % (k, final_props[k]) for k in final_props if k not in ['threads', 'load']])
+
+    util.green_print("Final parameters: ")
+    print "workload      : %s" % workload
+    print "table_name    : %s" % table_name
+    print "test_name     : %s" % test_name
+    print "threads       : %d" % threads
+    print "load          : %s" % loading_mode
+    print "properties    : %s" % ycsb_props_args
+
+    hbase_xml_file = os.path.join(util.UTIL_ENV['CONF_DIR'], 'hbase-site.xml')
+    ycsb_home = util.UTIL_ENV['YCSB_HOME']
+    ycsb_conf = os.path.join(ycsb_home, 'conf')
+    result_output_file = os.path.join(util.UTIL_ENV['LOG_DIR'], test_name + '_result.out')
+    result_csv_file = os.path.join(util.UTIL_ENV['LOG_DIR'], test_name + '.csv')
+    ycsb_log = os.path.join(util.UTIL_ENV['LOG_DIR'], test_name + '_ycsb.log')
+    cmd_type = 'load' if loading_mode else 'run'
+
+    util.green_print('Copy hbase-site.xml to %s' % ycsb_conf)
+    call('mkdir -p %s' % ycsb_conf, shell=True)
+    check_call('cp %s %s' % (hbase_xml_file, ycsb_conf), shell=True)
+    check_call('echo log4j.rootLogger=INFO > %s/log4j.properties' % ycsb_conf, shell=True)
+
+    cmd = '%s %s hbase10 -P %s -threads %d -p table=%s -p columnfamily=f -p hdrhistogram.percentiles=25,50,75,90,95,' \
+          '99,99.9,99.99 -p exportfile=%s %s -s 2>&1 | tee %s ' % (
+              util.UTIL_ENV['YCSB'], cmd_type, ycsb_workload_template_file, threads, table_name, result_output_file,
+              ycsb_props_args, ycsb_log)
+
+    util.green_print('Run command:')
+    print cmd
+    check_call(cmd, shell=True)
+
+    util.green_print("Saving result csv to %s" % result_csv_file)
+    cmd = '%s/result_to_csv  %s %s > %s' % (util.UTIL_ENV['BIN_DIR'], result_output_file, test_name, result_csv_file)
+    check_call(cmd, shell=True)
+
+    cmd = '%s/check_exists %s' % (util.UTIL_ENV['BIN_DIR'], table_name)
+    check_call(cmd, shell=True)

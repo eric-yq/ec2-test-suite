@@ -36,9 +36,9 @@ sed -i "s/xxxxxx/${HBASE_NODES}/g" conf/hbase-site.xml
 diff conf/hbase-site.xml*
 
 # 将 node1/2/3 和对应的 IP 地址，添加到 /etc/hosts 文件中
-IPADDR_NODE1="172.31.36.18"
-IPADDR_NODE2="172.31.38.32"
-IPADDR_NODE3="172.31.43.55"
+IPADDR_NODE1="172.31.41.204"
+IPADDR_NODE2="172.31.46.82"
+IPADDR_NODE3="172.31.43.95"
 
 sudo cat >> /etc/hosts << EOF
 $IPADDR_NODE1 node1
@@ -58,7 +58,6 @@ screen -R ttt -L
 ### 3 节点集群模式下，可以将线程数调大
 ./fast_test -p ahbench.test.threads=500 
 ./full_test -p ahbench.test.threads=500 
-
 
 # 如果要重新执行测试用例，可以跳过加载数据的阶段
 ./fast_test -p ahbench.test.threads=500 -p ahbench.default_suite.runtime=1800 --skipload

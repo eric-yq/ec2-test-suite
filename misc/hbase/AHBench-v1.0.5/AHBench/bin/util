@@ -1,0 +1,126 @@
+#!/bin/bash
+#
+# Copyright Alibaba Group Holding Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#######
+# DIRS
+#######
+export ALIHB_BENCHMARK_HOME="$(cd $(dirname ${BASH_SOURCE[0]})/../; pwd)"
+export CONF_DIR=${ALIHB_BENCHMARK_HOME}/conf
+export TOOLS_DIR=${ALIHB_BENCHMARK_HOME}/tools
+export BIN_DIR=${ALIHB_BENCHMARK_HOME}/bin
+export TMP_DIR=${ALIHB_BENCHMARK_HOME}/tmp
+export LOG_DIR=${ALIHB_BENCHMARK_HOME}/logs
+export SUITE_DIR=${ALIHB_BENCHMARK_HOME}/suite
+export WORKLOAD_DIR=${ALIHB_BENCHMARK_HOME}/workloads
+export EXEC_WORKLOAD=${BIN_DIR}/run_workload
+export YCSB_HOME=${TOOLS_DIR}/ycsb-hbase10
+export YCSB=${YCSB_HOME}/bin/ycsb
+
+#####
+# Utilities functions
+#####
+
+function red_echo()
+{
+  echo -e  "\033[31m$*\033[0m" >&2
+  return 0
+}
+
+function green_echo()
+{
+  echo -e  "\033[32m$*\033[0m"
+  return 0
+}
+
+function banner()
+{
+  echo "+------------------------------------------+"
+  printf "| %-40s |\n" "`date`"
+  echo "|                                          |"
+  printf "|`tput bold` %-40s `tput sgr0`|\n" "$@"
+  echo "+------------------------------------------+"
+}
+
+function sleep_for() {
+  sleep_time=$1
+  shift 1
+  now=0
+  while [[ "${now}" -lt ${sleep_time} ]]; do
+    sleep 1
+    now=$((now+1))
+    echo -n -e "\r \033[5m Sleep ${now}/${sleep_time} seconds \033[0m | For: $*"
+  done
+  echo ""
+}
+
+function trim() {
+  echo "$*" | awk '{gsub(/^[ \t]+$/,"");print $0}';
+}
+
+function is_comment() {
+  trim "$*" | grep "^#" > /dev/null
+}
+
+function fetch_key() {
+  trim $(echo ${*%%=*})
+}
+
+function fetch_value() {
+  trim $(echo ${*#*=})
+}
+
+mkdir -p ${TMP_DIR} 2>&1  > /dev/null
+mkdir -p ${LOG_DIR} 2>&1  > /dev/null
+
+# Load ahbench-env.properties for environments settings
+AHBENCH_ENV_FILE=${CONF_DIR}/ahbench-env.properties
+
+[[ -f "${AHBENCH_ENV_FILE}" ]] || {
+  red_echo "${AHBENCH_ENV_FILE} not found, exit."; exit 1;
+}
+
+
+while read line; do
+  is_comment ${line} && continue
+  key=$(fetch_key ${line})
+  value=$(fetch_value ${line})
+  case "${key}" in
+    JAVA_HOME)
+      export JAVA_HOME=${value}
+    ;;
+    HBASE_VERSION)
+      export HBASE_VERSION=${value}
+      [[ "$HBASE_VERSION" -eq 1 ]] && export HBASE_HOME=${TOOLS_DIR}/hbase1 && continue
+      [[ "$HBASE_VERSION" -eq 2 ]] && export HBASE_HOME=${TOOLS_DIR}/hbase2 && continue
+      red_err "Invalid configuration: $line , exit"; exit 1
+    ;;
+    COMPRESSION)
+      [[ -n "${value}" ]] && {
+        export COMPRESSION=${value}
+      }
+    ;;
+  esac
+done < ${AHBENCH_ENV_FILE}
+
+export HBASE_SHELL="${HBASE_HOME}/bin/hbase --config ${CONF_DIR} shell "
+
+# Configure JAVA_HOME
+AUTO_JAVA_BIN=$(which java)
+AUTO_JAVA_HOME=${AUTO_JAVA_BIN%/bin/java}
+export JAVA_HOME=${JAVA_HOME:-$AUTO_JAVA_HOME}
+[[ -n "$JAVA_HOME" ]] || {
+  red_echo "JAVA_HOME not set, exit."; exit 1;
+}

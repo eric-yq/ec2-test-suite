@@ -1,0 +1,306 @@
+#!/usr/bin/env python2.7
+#
+# Copyright Alibaba Group Holding Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+import argparse
+import imp
+import os
+import subprocess
+import sys
+
+import util
+
+INTERVAL = 5
+GLOBAL_VERBOSE = False
+GLOBAL_DUMB = False
+UTIL_ENV = util.UTIL_ENV
+
+join = os.path.join
+find_any = util.find_any
+
+
+def do_create(table, compression=None, encoding=None, regions=None, key_length=None):
+    if GLOBAL_VERBOSE:
+        print "do_create: %s" % locals()
+    drop = join(UTIL_ENV['BIN_DIR'], 'drop_table')
+    create = join(UTIL_ENV['BIN_DIR'], 'create_table')
+
+    # Drop table first
+    drop_cmd = '%s %s' % (drop, table)
+    try:
+        _run_cmd(drop_cmd)
+    except subprocess.CalledProcessError:
+        pass
+
+    # Create table
+    create_cmd = '%s %s' % (create, table)
+    if compression:
+        create_cmd += ' --compression %s' % compression
+    if encoding:
+        create_cmd += ' --encoding %s' % encoding
+    if regions:
+        create_cmd += ' --regions %s' % regions
+    if key_length:
+        create_cmd += ' --keylen %s' % key_length
+    _run_cmd(create_cmd)
+
+
+def do_load(table, threads=None, key_length=None, value_length=None, columns=None, records=None, tps=None, test_name=None):
+    if GLOBAL_VERBOSE:
+        print "do_load: %s" % locals()
+
+    check_cmd = '%s/check_exists %s ' % (UTIL_ENV['BIN_DIR'], table)
+    _run_cmd(check_cmd)
+
+    cmd = '%s/run_workload %s/loading %s --load' % (UTIL_ENV['BIN_DIR'], UTIL_ENV['WORKLOAD_DIR'], table)
+    if threads:
+        cmd += ' --threads %s' % threads
+    if test_name:
+        cmd += ' -n %s' % test_name
+    if tps:
+        cmd += _to_jvm_prop(tps, 'target')
+    cmd += _to_jvm_prop(key_length, 'zeropadding')
+    cmd += _to_jvm_prop(value_length, 'fieldlength')
+    cmd += _to_jvm_prop(records, 'recordcount')
+    cmd += _to_jvm_prop(columns, 'fieldcount')
+    _run_cmd(cmd)
+
+
+def do_test(table, test_name, workload, threads=None, target_ops=None, run_time=None, scan_rows=None,
+            batch_rows=None, dist_type=None, records=None, columns=None, key_length=None, value_length=None,
+            operations=None, read_all=None):
+    if GLOBAL_VERBOSE:
+        print 'do_test: %s' % locals()
+
+    check_cmd = '%s/check_exists %s ' % (UTIL_ENV['BIN_DIR'], table)
+    _run_cmd(check_cmd)
+
+    cmd = '%s/run_workload %s/%s %s -n %s' % (UTIL_ENV['BIN_DIR'], UTIL_ENV['WORKLOAD_DIR'], workload, table, test_name)
+    if threads:
+        cmd += ' --threads %s' % threads
+    cmd += _to_jvm_prop(target_ops, 'target')
+    cmd += _to_jvm_prop(run_time, 'maxexecutiontime')
+    cmd += _to_jvm_prop(scan_rows, 'maxscanlength')
+    cmd += _to_jvm_prop(batch_rows, 'batchsize')
+    cmd += _to_jvm_prop(dist_type, 'requestdistribution')
+    cmd += _to_jvm_prop(records, 'recordcount')
+    cmd += _to_jvm_prop(columns, 'fieldcount')
+    cmd += _to_jvm_prop(key_length, 'zeropadding')
+    cmd += _to_jvm_prop(value_length, 'fieldlength')
+    cmd += _to_jvm_prop(operations, 'operationcount')
+    cmd += _to_jvm_prop(read_all, 'readallfields')
+    _run_cmd(cmd)
+
+
+def do_compact(table, flush_wait=None, compact_wait=None):
+    if GLOBAL_VERBOSE:
+        print 'do_compact: %s ' % locals()
+    cmd = '%s/major_compact %s' % (UTIL_ENV['BIN_DIR'], table)
+    if flush_wait:
+        cmd += ' --flush_wait %s ' % flush_wait
+    if compact_wait:
+        cmd += ' --compact_wait %s ' % compact_wait
+    _run_cmd(cmd)
+
+
+def do_aggregate_result(result_name, *test_names):
+    if GLOBAL_VERBOSE:
+        print 'do_aggregate_result: %s ' % locals()
+    cmd = '%s/aggregate_csv  ' % (UTIL_ENV['BIN_DIR'])
+    for f in test_names:
+        cmd += ' %s/%s.csv ' % (UTIL_ENV['LOG_DIR'], f)
+    result_path = '%s.csv' % result_name
+    cmd += ' > %s' % result_path
+    _run_cmd(cmd)
+    print '=' * 40
+    util.green_print('Aggregated result: %s' % result_path)
+    print '=' * 40
+
+
+def _to_jvm_prop(arg, prop_name):
+    if arg:
+        return ' -p %s=%s ' % (prop_name, arg)
+    else:
+        return ''
+
+
+def _create_caller(props, table, *args, **kwargs):
+    do_create(
+        table,
+        compression=find_any(kwargs.get('compression'),
+                             props.get('ahbench.table.compression'),
+                             'NONE'),
+        encoding=find_any(kwargs.get('encoding'),
+                          props.get('ahbench.table.encoding'),
+                          'NONE'),
+        regions=find_any(kwargs.get('regions'),
+                         props.get('ahbench.table.regions')),
+        key_length=find_any(kwargs.get('key_length'),
+                            props.get('ahbench.table.keylen'))
+    )
+
+
+def _load_caller(props, table, *args, **kwargs):
+    do_load(table,
+            threads=find_any(kwargs.get('threads'),
+                             props.get('ahbench.table.load.threads'),
+                             props.get('ahbench.test.threads'),
+                             10),
+            records=find_any(kwargs.get('records'),
+                             props.get('ahbench.table.records')),
+            test_name=find_any(kwargs.get('test_name')),
+            columns=find_any(kwargs.get('columns'),
+                             props.get('ahbench.table.columns')),
+            key_length=find_any(kwargs.get('key_length'),
+                                props.get('ahbench.table.keylen')),
+            value_length=find_any(kwargs.get('value_length'),
+                                  props.get('ahbench.table.valuelen')),
+            tps=find_any(kwargs.get('tps'),
+                         props.get('ahbench.table.load.tps')))
+
+
+def _aggregate_result_caller(prefix, result_name, *args):
+    do_aggregate_result(_decorate_prefix(prefix, result_name), *[_decorate_prefix(prefix, f) for f in args])
+
+
+def _test_caller(props, prefix, table, test_name, workload, *args, **kwargs):
+    do_test(table, _decorate_prefix(prefix, test_name), workload,
+            threads=find_any(kwargs.get('threads'),
+                             props.get('ahbench.test.threads'), ),
+            records=find_any(kwargs.get('records'),
+                             props.get('ahbench.test.records'),
+                             props.get('ahbench.table.records')),
+            columns=find_any(kwargs.get('columns'),
+                             props.get('ahbench.test.columns'),
+                             props.get('ahbench.table.columns')),
+            key_length=find_any(kwargs.get('key_length'),
+                                props.get('ahbench.table.keylen')),
+            value_length=find_any(kwargs.get('value_length'),
+                                  props.get('ahbench.table.valuelen')),
+            target_ops=kwargs.get('target_ops'),
+            run_time=find_any(kwargs.get('run_time'),
+                              props.get('ahbench.test.runtime')),
+            scan_rows=find_any(kwargs.get('scan_rows'),
+                               props.get('ahbench.test.scan.length')),
+            batch_rows=find_any(kwargs.get('batch_rows'),
+                                props.get('ahbench.test.batch.rows')),
+            dist_type=kwargs.get('dist_type'),
+            operations=find_any(kwargs.get('operations'),
+                                props.get('ahbench.test.operations')),
+            read_all=find_any(kwargs.get('read_all'),
+                              props.get('ahbench.test.readall')))
+
+
+def _compact_caller(props, table, *args, **kwargs):
+    do_compact(table,
+               flush_wait=find_any(kwargs.get('flush_wait'),
+                                   props.get('ahbench.test.flush.wait')),
+               compact_wait=find_any(kwargs.get('compact_wait'),
+                                     props.get('ahbench.test.compact.wait')))
+
+
+def _decorate_prefix(prefix, test_name):
+    if prefix:
+        return '%s_%s' % (prefix, test_name)
+    else:
+        return test_name
+
+
+def _run_cmd(cmd):
+    util.green_print('Suite Run Command:')
+    print '  %s' % cmd
+    if not GLOBAL_DUMB:
+        subprocess.check_call('source %s/util; ' % UTIL_ENV['BIN_DIR'] + cmd, shell=True)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Suite Starter")
+    parser.add_argument(dest='suite_file', help='The file define the suite', type=str)
+    parser.add_argument('-p', dest='properties',
+                        help='Properties for framework, has the higheset priorioty. Multiple properties could be set',
+                        default=[],
+                        action='append')
+    parser.add_argument('--dumb', dest='dumb_mode',
+                        help='Dumb mode. Only print commands will be executed',
+                        default=False,
+                        action='store_true')
+    parser.add_argument('-v', dest='verbose',
+                        help='Verbose mode',
+                        default=False,
+                        action='store_true')
+    parser.add_argument('--prefix', dest='prefix',
+                        help='Prefix for all results',
+                        default=None)
+    parser.add_argument('--skipload', dest='skipload',
+                        help='Set ahbench.skipload to 1 for skip loading phase',
+                        action='store_true')
+    parse_args = parser.parse_args()
+
+    GLOBAL_VERBOSE = parse_args.verbose
+    GLOBAL_DUMB = parse_args.dumb_mode
+    if GLOBAL_VERBOSE:
+        print "Input args for %s: " % os.path.basename(sys.argv[0])
+        print parse_args
+
+    # Check environment variables set from
+    if not util.UTIL_ENV.get('HBASE_VERSION'):
+        util.red_print("HBASE_VERSION not set, please check conf/ahbench-env.properties")
+        exit(1)
+    if not util.UTIL_ENV.get('JAVA_HOME'):
+        util.red_print("JAVA_HOME not set, please check conf/ahbench-env.properties")
+        exit(1)
+
+    # Dynamically load suite file from target and hook suite methods:
+    template = imp.load_source('suite_template', join(UTIL_ENV['SUITE_DIR'], 'suite_template.py'))
+    template.prop = lambda name, *args: find_any(final_props.get(name), args[0] if len(args) > 0 else None)
+    template.create = lambda *args, **kwargs: _create_caller(final_props, args[0], args[1:], **kwargs)
+    template.load = lambda *args, **kwargs: _load_caller(final_props, args[0], args[1:], **kwargs)
+    template.test = lambda *args, **kwargs: _test_caller(final_props, parse_args.prefix, args[0], args[1], args[2],
+                                                         args[3:], **kwargs)
+    template.compact = lambda *args, **kwargs: _compact_caller(final_props, args[0], args[1:], **kwargs)
+    template.aggregate_result = lambda *args: _aggregate_result_caller(parse_args.prefix, *args)
+
+    # Load the target suite
+    suite = imp.load_source('suite', parse_args.suite_file)
+
+    # Handling input properties
+    cmd_props = util.make_properties(parse_args.properties)
+    if parse_args.skipload:
+        cmd_props['ahbench.skipload'] = '1'
+    config_props = util.load_properties(join(UTIL_ENV['CONF_DIR'], 'ahbench-settings.properties'))
+    suite_props = suite.DEFAULTS
+    final_props = util.merge_properties(cmd_props, config_props, suite_props)
+    if GLOBAL_VERBOSE:
+        util.green_print("Load properties from command line :")
+        util.print_properties(cmd_props)
+        print
+        util.green_print("Load properties from config files:")
+        util.print_properties(config_props)
+        print
+        util.green_print("Load properties from suite DEFAULTS: ")
+        util.print_properties(suite_props)
+        print
+
+    util.green_print('Test will start in 5 seconds, please check parameters: ')
+    util.green_print("Final properties: ")
+    util.print_properties(final_props)
+    print 'HBASE_VERSION   :    %s' % util.UTIL_ENV['HBASE_VERSION']
+    print 'JAVA_HOME       :    %s' % util.UTIL_ENV['JAVA_HOME']
+    print
+    if not GLOBAL_DUMB:
+        util.sleep_for(5, "check parameters")
+
+    # Run the workflow
+    suite.suite()
