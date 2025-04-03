@@ -131,4 +131,3 @@ echo "export INSTANCE_VCPU_NUM=${INSTANCE_VCPU_NUM}"  >> /tmp/temp-setting
 echo "export INSTANCE_MEM_SIZE=${INSTANCE_MEM_SIZE}"  >> /tmp/temp-setting
 echo "export AMI_ID=${AMI_ID}" >> /tmp/temp-setting
 echo "export AMI_ID_NAME=\"${AMI_ID_NAME}\"" >> /tmp/temp-setting
-
