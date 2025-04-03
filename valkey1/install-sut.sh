@@ -15,8 +15,8 @@ else
 fi
 	
 install_public_tools(){
-	yum install -y python3-pip
-	pip3 install dool
+	yum install -yq python3-pip
+	pip3 -q install dool
 }
 
 os_configure(){
@@ -122,7 +122,7 @@ EOF
 
 ## 单线程配置
 install_valkey1(){
-    yum install -y valkey
+    yum install -yq valkey
     systemctl stop valkey
     systemctl enable valkey
     

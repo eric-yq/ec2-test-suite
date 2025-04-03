@@ -1,5 +1,9 @@
 #!/bin/bash
 
+##################################################################
+# 说明：安装 valkey, 配置3 种 io-threads 模式
+###################################################################
+
 SUT_NAME=${1}
 echo "$0: Install SUT_NAME: ${SUT_NAME}"
 
@@ -15,8 +19,10 @@ else
 fi
 	
 install_public_tools(){
-	yum install -y python3-pip
+	yum install -yq python3-pip docker
 	pip3 install dool
+	systemctl enable docker
+	systemctl start docker
 }
 
 os_configure(){
@@ -122,37 +128,45 @@ EOF
 
 ## 多线程配置
 install_valkey(){
-    yum install -y valkey
-    systemctl stop valkey
-    systemctl enable valkey
-    
-	## 获取 CPU数 和 内存容量
-	CPU_CORES=$(nproc)
-	MEM_TOTAL_GB=$(free -g |grep Mem | awk -F " " '{print $2}')
-
-	## 变量计算
-	let XXX=${MEM_TOTAL_GB}*80/100
-	let YYY=${CPU_CORES}-2
-# 	let YYY=${CPU_CORES}*50/100
-#   let YYY=3
-
-	# 生成配置文件
-	cat > /etc/valkey/valkey.conf << EOF
-port 6379
-bind 0.0.0.0
-protected-mode no
-daemonize yes
-maxmemory ${XXX}gb
-maxmemory-policy allkeys-lru
-io-threads $YYY	
-io-threads-do-reads yes
-EOF
+    docker pull valkey/valkey:8.0.2
 }
 
 start_valkey(){
-    systemctl restart valkey   
-    sleep 5 && valkey-cli info
+    sysctl vm.overcommit_memory=1
     
+	## 计算内存容量
+	MEM_TOTAL_GB=$(free -g |grep Mem | awk -F " " '{print $2}')
+	let XXX=${MEM_TOTAL_GB}*80/100
+
+	## 配置 3 种 io-threads 模式：vCPU数量的40%、65%、90%
+    CPU_CORES=$(nproc)
+    let YYY1=${CPU_CORES}*40/100
+    let YYY2=${CPU_CORES}*65/100
+    let YYY3=${CPU_CORES}*90/100
+
+	# 生成 3个 配置文件，端口号为 8000 +io-threads数
+    for i in $YYY1 $YYY2 $YYY3
+    do
+        let PORT=8000+$i
+        cat > /root/valkey-$PORT.conf << EOF
+bind 0.0.0.0
+port 6379
+protected-mode no
+maxmemory ${XXX}gb
+maxmemory-policy allkeys-lru
+io-threads-do-reads yes
+io-threads $i
+EOF
+	    # 启动 valkey
+        docker run -d --name valkey-$PORT \
+	      -p $PORT:6379 \
+	      -v /root/valkey-$PORT.conf:/etc/valkey/valkey.conf \
+	      valkey/valkey:8.0.2 \
+	      valkey-server /etc/valkey/valkey.conf
+    done
+
+    sleep 3
+    docker ps -a 
 }
 
 ## 主要流程
