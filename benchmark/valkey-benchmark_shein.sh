@@ -18,8 +18,8 @@ RESULT_PATH="/root/ec2-test-suite/benchmark-result-files"
 mkdir -p ${RESULT_PATH}
 
 # 获取valkey服务器配置
-VALKEY_CFG="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${SUT_IP_ADDR}.conf"
-valkey-cli -h ${SUT_IP_ADDR} config get \* > ${VALKEY_CFG}
+VALKEY_CFG="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${SUT_IP_ADDR}_${PORT}.conf"
+valkey-cli -h ${SUT_IP_ADDR} -p ${PORT} config get \* > ${VALKEY_CFG}
 
 # 获取valkey 所在服务器的 cpu 信息
 VCPU=$(ssh -o StrictHostKeyChecking=no -i ~/ericyq-global.pem ec2-user@${SUT_IP_ADDR} "nproc")
