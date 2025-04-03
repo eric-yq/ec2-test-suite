@@ -30,6 +30,12 @@ else
 fi
 echo "OPTS: $OPTS"
 
+## 启动一个后台进程，执行dool命令，获取系统性能信息
+DOOL_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${SUT_IP_ADDR}_${PORT}_dool.txt"
+ssh -o StrictHostKeyChecking=no -i ~/ericyq-global.pem ec2-user@${SUT_IP_ADDR} \
+  "dool --cpu --sys --net --net-packets --disk --io --proc-count --time --bits 60 21" \
+  1> ${DOOL_FILE} 2>&1 &
+
 # 执行benchmark
 RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${SUT_IP_ADDR}_${PORT}_set_shein.txt"
 memtier_benchmark $OPTS -s ${SUT_IP_ADDR} -p $PORT --distinct-client-seed --command="set __key__ __data__" --key-prefix="kv_" --key-minimum=1 --key-maximum=500 --random-data --data-size=128 --test-time=180 --out-file=${RESULT_FILE}  --hide-histogram 
