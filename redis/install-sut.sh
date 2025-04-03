@@ -153,8 +153,7 @@ EOF
 	  redis:6.2.17 \
 	  redis-server /etc/redis/redis.conf
 
-
-	## 配置 3 种 io-threads 模式：vCPU数量的40%、65%、90%
+	## 2. 配置 3 种 io-threads 模式：vCPU数量的40%、65%、90%
     CPU_CORES=$(nproc)
     let YYY1=${CPU_CORES}*40/100
     let YYY2=${CPU_CORES}*65/100
