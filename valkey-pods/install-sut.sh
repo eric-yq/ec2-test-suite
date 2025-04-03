@@ -85,7 +85,7 @@ net.ipv6.conf.all.disable_ipv6 = 1
 net.ipv6.conf.default.disable_ipv6 = 1
 
 # 内存管理优化
-vm.swappiness = 10
+vm.swappiness = 0
 vm.dirty_ratio = 10
 vm.dirty_background_ratio = 5
 vm.min_free_kbytes = 1048576
@@ -124,35 +124,9 @@ EOF
     echo 1 > /proc/sys/vm/overcommit_memory
 }
 
-## 多线程配置
-install_valkey(){
-    docker pull valkey/valkey:8.0.1
-
-	## 获取 CPU数 和 内存容量
-	CPU_CORES=$(nproc)
-	MEM_TOTAL_GB=$(free -g |grep Mem | awk -F " " '{print $2}')
-
-	## 变量计算
-	let XXX=${MEM_TOTAL_GB}*80/100
-# 	let YYY=${CPU_CORES}-2
-# 	let YYY=${CPU_CORES}*50/100
-    let YYY=3
-
-	# 生成配置文件
-	cat > /root/valkey.conf << EOF
-	port 6379
-	bind 0.0.0.0
-	protected-mode no
-	maxmemory ${XXX}gb
-	maxmemory-policy allkeys-lru
-	io-threads $YYY	
-	io-threads-do-reads yes
-EOF
-}
-
 ## 单线程配置
 install_valkey1(){
-    docker pull valkey/valkey:8.0.1
+    docker pull valkey/valkey:8.0.2
     
 	## 获取 CPU数 和 内存容量
 	CPU_CORES=$(nproc)
@@ -172,7 +146,6 @@ EOF
 }
 
 start_valkey(){
-
     sysctl vm.overcommit_memory=1
     
     # 计算启动 pods 的数量，VCPU数的50%，16 核->8 pods
@@ -180,7 +153,7 @@ start_valkey(){
     let PODS_NUMBER=${CPU_CORES}*50/100
     for i in $(seq 1 $PODS_NUMBER)
     do
-        let PORT=${i}+8880
+        let PORT=${i}+8000
 	    docker run -d --name valkey-$PORT \
 	      -p $PORT:6379 \
 	      -v /root/valkey.conf:/etc/valkey/valkey.conf \
@@ -199,7 +172,6 @@ start_dool_monitor(){
 ## 主要流程
 install_public_tools
 os_configure
-# install_valkey
 install_valkey1
 start_valkey
-start_dool_monitor
+

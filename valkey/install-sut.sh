@@ -186,6 +186,6 @@ EOF
 
 ## 主要流程
 install_public_tools
-# os_configure
+os_configure
 install_valkey
 start_valkey

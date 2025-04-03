@@ -25,7 +25,7 @@ do
 		echo "$0: Start to run Valkey benchmark on: ${ins}(${INSTANCE_IP_MASTER})..."
 		for i in $(seq 1 $PODS_NUMBER)
 		do
-		    let PORT=${i}+8880
+		    let PORT=${i}+8000
 		    nohup bash benchmark/valkey-benchmark_shein-pods.sh ${INSTANCE_IP_MASTER} ${PORT} &
 		done
 		
