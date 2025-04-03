@@ -23,7 +23,7 @@ valkey-cli -h ${SUT_IP_ADDR} -p ${PORT} config get \* > ${VALKEY_CFG}
 
 # 获取valkey 所在服务器的 cpu 信息
 VCPU=$(ssh -o StrictHostKeyChecking=no -i ~/ericyq-global.pem ec2-user@${SUT_IP_ADDR} "nproc")
-if [[ "$PPL" == "0" ]]; then
+if [[ "$PPL" == "" || "$PPL" == "0" ]]; then
     OPTS="-t $VCPU -c 50"
 else
     OPTS="-t $VCPU -c 50 --pipeline=$PPL"
@@ -33,7 +33,7 @@ echo "OPTS: $OPTS"
 ## 启动一个后台进程，执行dool命令，获取系统性能信息
 DOOL_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${SUT_IP_ADDR}_${PORT}_dool.txt"
 ssh -o StrictHostKeyChecking=no -i ~/ericyq-global.pem ec2-user@${SUT_IP_ADDR} \
-  "dool --cpu --sys --net --net-packets --disk --io --proc-count --time --bits 60 23" \
+  "dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 23" \
   1> ${DOOL_FILE} 2>&1 &
 
 # 执行benchmark

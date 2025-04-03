@@ -11,8 +11,10 @@
 SUT_IP_ADDR=${1}
 PORT=${2}
 DATASIZE=32
-OPTS="-t 2 -c 5 --pipeline=30"
-# OPTS="-t 2 -c 5"
+OPTS="-t 2 -c 5 --pipeline=30" 
+
+# 16 vCPU，1 Pods，pipeline=50： t=16, c=50, DATASIZE=128
+# 16 vCPU，8 Pods，pipeline=0 ： t=2,  c=5, DATASIZE=32
 
 source /tmp/temp-setting
 RESULT_PATH="/root/ec2-test-suite/benchmark-result-files"
