@@ -33,7 +33,7 @@ echo "OPTS: $OPTS"
 ## 启动一个后台进程，执行dool命令，获取系统性能信息
 DOOL_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${SUT_IP_ADDR}_${PORT}_dool.txt"
 ssh -o StrictHostKeyChecking=no -i ~/ericyq-global.pem ec2-user@${SUT_IP_ADDR} \
-  "dool --cpu --sys --net --net-packets --disk --io --proc-count --time --bits 60 21" \
+  "dool --cpu --sys --net --net-packets --disk --io --proc-count --time --bits 60 23" \
   1> ${DOOL_FILE} 2>&1 &
 
 # 执行benchmark
