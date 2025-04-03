@@ -1,56 +1,28 @@
 #!/bin/bash
 
+##################################################################
+# 说明：安装 redis, 配置3 种 io-threads 模式
+###################################################################
+
 SUT_NAME=${1}
 echo "$0: Install SUT_NAME: ${SUT_NAME}"
 
 ## 获取OS 、CPU 架构信息。
 OS_NAME=$(egrep ^NAME /etc/os-release | awk -F "\"" '{print $2}')
-# OS_ID=$(egrep "^ID=" /etc/os-release | awk -F "\"" '{print $2}') 
 OS_VERSION=$(egrep ^VERSION_ID /etc/os-release | awk -F "\"" '{print $2}') 
-ARCH=$(lscpu | grep Architecture | awk -F " " '{print $NF}') 
-PN=$(dmidecode -s system-product-name | tr ' ' '_')
 
-if   [[ "$OS_NAME" == "Amazon Linux" ]] && [[ "$OS_VERSION" == "2" ]]; then
-	PKGCMD=yum
-	PKGCMD1=amazon-linux-extras
-	
-	# redis conf
-	REDIS_PKG_NAME="redis6"
-	REDIS_SERVICE="redis"
-	REDIS_CONF="/etc/redis/redis"
-	
-elif [[ "$OS_NAME" == "Amazon Linux" ]] && [[ "$OS_VERSION" == "2023" ]]; then
-	PKGCMD=dnf
-	PKGCMD1=dnf
-	
-	# redis conf
-	REDIS_PKG_NAME="redis6"
-	REDIS_SERVICE="redis6"
-	REDIS_CONF="/etc/redis6/redis6"
-
-elif [[ "$OS_NAME" == "Ubuntu" ]] || [[ "$OS_NAME" == "Debian GNU/Linux" ]]; then
-	PKGCMD=apt
-	PKGCMD1=apt
-	
-	# redis conf
-	REDIS_PKG_NAME="redis-server=6:6.2.11-1rl1~$(lsb_release -cs)1 redis-tools=6:6.2.11-1rl1~$(lsb_release -cs)1"
-	REDIS_SERVICE="redis-server"
-	REDIS_CONF="/etc/redis/redis"
-	# add redis repository for ubuntu/debian
-	apt update
-	apt install -y gpg
-	curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
-	echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
-	apt update
-
+if  [[ "$OS_NAME" == "Amazon Linux" ]] && [[ "$OS_VERSION" == "2023" ]]; then
+	echo "$0: OS is $OS_NAME $OS_VERSION . "
 else
 	echo "$0: $OS_NAME not supported"
 	exit 1
 fi
 	
 install_public_tools(){
-	$PKGCMD update -y
-	$PKGCMD install -y dmidecode net-tools dstat htop nload git
+	yum install -yq python3-pip docker
+	pip3 install dool
+	systemctl enable docker
+	systemctl start docker
 }
 
 os_configure(){
@@ -115,7 +87,7 @@ net.ipv6.conf.all.disable_ipv6 = 1
 net.ipv6.conf.default.disable_ipv6 = 1
 
 # 内存管理优化
-vm.swappiness = 10
+vm.swappiness = 0
 vm.dirty_ratio = 10
 vm.dirty_background_ratio = 5
 vm.min_free_kbytes = 1048576
@@ -154,28 +126,67 @@ EOF
     echo 1 > /proc/sys/vm/overcommit_memory
 }
 
-# Redis 6.x: 
+## 多线程配置
 install_redis(){
-    $PKGCMD1 install -y ${REDIS_PKG_NAME}
-    cp ${REDIS_CONF}.conf ${REDIS_CONF}.conf.bak
-    IPADDR=$(ifconfig | grep "inet " | grep -v "127.0.0.1" | awk -F " " '{print $2}')
-    sed -i "s/bind 127.0.0.1/bind ${IPADDR}/g" ${REDIS_CONF}.conf
-    sed -i "s/daemonize no/daemonize yes/g" ${REDIS_CONF}.conf
-    sed -i "s/protected-mode yes/protected-mode no/g" ${REDIS_CONF}.conf
-    echo "io-threads-do-reads yes" >> ${REDIS_CONF}.conf
-    let IO_THREADS=$(nproc)-1
-    echo "io-threads ${IO_THREADS}"  >> ${REDIS_CONF}.conf
+    docker pull redis:6.2.17
 }
 
 start_redis(){
-    ## 启动 redis
-    systemctl enable  ${REDIS_SERVICE}
-    systemctl restart ${REDIS_SERVICE}
-    systemctl status  ${REDIS_SERVICE}
+    sysctl vm.overcommit_memory=1
+    
+	## 计算内存容量
+	MEM_TOTAL_GB=$(free -g |grep Mem | awk -F " " '{print $2}')
+	let XXX=${MEM_TOTAL_GB}*80/100
+
+    ## 1. 配置一个单线程 redis, 不使用 io-threads
+    cat > /root/redis-6379.conf << EOF
+port 6379
+bind 0.0.0.0
+protected-mode no
+maxmemory ${XXX}gb
+maxmemory-policy allkeys-lru
+EOF
+
+    docker run -d --name redis-6379 \
+	  -p 6379:6379 \
+	  -v /root/redis-6379.conf:/etc/redis/redis.conf \
+	  redis:6.2.17 \
+	  redis-server /etc/redis/redis.conf
+
+
+	## 配置 3 种 io-threads 模式：vCPU数量的40%、65%、90%
+    CPU_CORES=$(nproc)
+    let YYY1=${CPU_CORES}*40/100
+    let YYY2=${CPU_CORES}*65/100
+    let YYY3=${CPU_CORES}*90/100
+
+	# 生成 3个 配置文件，端口号为 8000 + io-threads数
+    for i in $YYY1 $YYY2 $YYY3
+    do
+        let PORT=8000+$i
+        cat > /root/redis-$PORT.conf << EOF
+bind 0.0.0.0
+port 6379
+protected-mode no
+maxmemory ${XXX}gb
+maxmemory-policy allkeys-lru
+io-threads-do-reads yes
+io-threads $i
+EOF
+	    # 启动 redis
+        docker run -d --name redis-$PORT \
+	      -p $PORT:6379 \
+	      -v /root/redis-$PORT.conf:/etc/redis/redis.conf \
+	      redis:6.2.17 \
+	      redis-server /etc/redis/redis.conf
+    done
+
+    sleep 3
+    docker ps -a 
 }
 
 ## 主要流程
 install_public_tools
-os_configure
+# os_configure
 install_redis
 start_redis

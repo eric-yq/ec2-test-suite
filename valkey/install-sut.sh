@@ -138,13 +138,28 @@ start_valkey(){
 	MEM_TOTAL_GB=$(free -g |grep Mem | awk -F " " '{print $2}')
 	let XXX=${MEM_TOTAL_GB}*80/100
 
-	## 配置 3 种 io-threads 模式：vCPU数量的40%、65%、90%
+    ## 1. 配置一个单线程 valkey, 不使用 io-threads
+    cat > /root/valkey-6379.conf << EOF
+port 6379
+bind 0.0.0.0
+protected-mode no
+maxmemory ${XXX}gb
+maxmemory-policy allkeys-lru
+EOF
+
+    docker run -d --name valkey-6379 \
+	  -p 6379:6379 \
+	  -v /root/valkey-6379.conf:/etc/valkey/valkey.conf \
+	  valkey/valkey:8.0.2 \
+	  valkey-server /etc/valkey/valkey.conf
+
+	## 2. 配置 3 种 io-threads 模式：vCPU数量的40%、65%、90%
     CPU_CORES=$(nproc)
     let YYY1=${CPU_CORES}*40/100
     let YYY2=${CPU_CORES}*65/100
     let YYY3=${CPU_CORES}*90/100
 
-	# 生成 3个 配置文件，端口号为 8000 +io-threads数
+	# 生成 3个 配置文件，端口号为 8000 + io-threads 数
     for i in $YYY1 $YYY2 $YYY3
     do
         let PORT=8000+$i
