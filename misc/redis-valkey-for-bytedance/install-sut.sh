@@ -9,7 +9,7 @@ systemctl enable docker
 systemctl start docker
 
 # 删除所有Exited 的容器
-docker container prune
+echo "y" | docker container prune
 
 ## 获取 CPU数 和 内存数量（KB）
 CPU_CORES=$(nproc)
