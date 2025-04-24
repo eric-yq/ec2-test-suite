@@ -45,3 +45,14 @@ docker run -d --name valkey-16379 \
   valkey-server /etc/valkey/valkey.conf
 
 docker ps -a
+
+
+################################################
+# 安装 Redis 7.0.15
+wget https://github.com/redis/redis/archive/refs/tags/7.0.15.tar.gz
+tar xvf 7.0.15.tar.gz
+cd redis-7.0.15
+yum install -y gcc make
+#make -j CFLAGS="-O3 -mcpu=neoverse-n1 -fsigned-char" && make install
+make -j CFLAGS="-O3 -fsigned-char" && make install
+redis-server /root/test.conf --daemonize yes
