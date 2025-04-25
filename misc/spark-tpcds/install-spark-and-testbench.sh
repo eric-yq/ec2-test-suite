@@ -38,7 +38,7 @@ source  ~/.bashrc
 wget https://dlcdn.apache.org/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz
 tar zxf apache-maven-3.9.6-bin.tar.gz
 ln -s ~/apache-maven-3.9.6 maven
-MAVEN_HOME="/home/ec2-user/maven"
+MAVEN_HOME="$HOME/maven"
 echo "export MAVEN_HOME=${MAVEN_HOME}" >> ~/.bashrc
 echo "export PATH=${PATH}:${MAVEN_HOME}/bin" >> ~/.bashrc
 source ~/.bashrc
@@ -117,7 +117,7 @@ cat << EOF > $HADOOP_HOME/etc/hadoop/core-site.xml
     </property>
     <property>
         <name>hadoop.tmp.dir</name>
-        <value>/home/ec2-user/hadoop/tmp</value>
+        <value>$HOME/hadoop/tmp</value>
     </property>
     <property>
         <name>hadoop.proxyuser.hive.hosts</name>
@@ -178,15 +178,15 @@ cat << EOF > $HADOOP_HOME/etc/hadoop/mapred-site.xml
     </property>
     <property>
         <name>yarn.app.mapreduce.am.env</name>
-        <value>HADOOP_MAPRED_HOME=/home/ec2-user/hadoop</value>
+        <value>HADOOP_MAPRED_HOME=$HOME/hadoop</value>
     </property>
     <property>
         <name>mapreduce.map.env</name>
-        <value>HADOOP_MAPRED_HOME=/home/ec2-user/hadoop</value>
+        <value>HADOOP_MAPRED_HOME=$HOME/hadoop</value>
     </property>
     <property>
         <name>mapreduce.reduce.env</name>
-        <value>HADOOP_MAPRED_HOME=/home/ec2-user/hadoop</value>
+        <value>HADOOP_MAPRED_HOME=/$HOME/hadoop</value>
     </property>
 </configuration>
 EOF

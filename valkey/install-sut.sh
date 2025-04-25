@@ -78,9 +78,9 @@ net.core.netdev_budget_usecs = 10000
 net.core.dev_weight = 600
 
 # 连接跟踪优化
-net.netfilter.nf_conntrack_max = 2097152
-net.netfilter.nf_conntrack_tcp_timeout_established = 86400
-net.netfilter.nf_conntrack_tcp_timeout_time_wait = 30
+# net.netfilter.nf_conntrack_max = 2097152
+# net.netfilter.nf_conntrack_tcp_timeout_established = 86400
+# net.netfilter.nf_conntrack_tcp_timeout_time_wait = 30
 
 # 禁用IPv6（如果不需要）
 net.ipv6.conf.all.disable_ipv6 = 1
@@ -103,14 +103,14 @@ EOF
     sudo sysctl -p /etc/sysctl.d/99-network-performance.conf
 	#####################################################################
     # 中断亲和性设置    
-    systemctl stop irqbalance
-    IFACE=$(ip route | grep default | awk '{print $5}')
-    irqs=$(grep "${IFACE}-Tx-Rx" /proc/interrupts | awk -F':' '{print $1}')
-    cpu=0
-    for i in $irqs; do
-      echo $cpu > /proc/irq/$i/smp_affinity_list
-      let cpu=${cpu}+1
-    done
+    # systemctl stop irqbalance
+    # IFACE=$(ip route | grep default | awk '{print $5}')
+    # irqs=$(grep "${IFACE}-Tx-Rx" /proc/interrupts | awk -F':' '{print $1}')
+    # cpu=0
+    # for i in $irqs; do
+    #   echo $cpu > /proc/irq/$i/smp_affinity_list
+    #   let cpu=${cpu}+1
+    # done
     #####################################################################
     # 其他
     cat >> /etc/security/limits.conf << EOF
@@ -128,7 +128,7 @@ EOF
 
 ## 多线程配置
 install_valkey(){
-    docker pull valkey/valkey:8.0.2
+    docker pull valkey/valkey:8.1.0
 }
 
 start_valkey(){

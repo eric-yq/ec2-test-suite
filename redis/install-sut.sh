@@ -78,9 +78,9 @@ net.core.netdev_budget_usecs = 10000
 net.core.dev_weight = 600
 
 # 连接跟踪优化
-net.netfilter.nf_conntrack_max = 2097152
-net.netfilter.nf_conntrack_tcp_timeout_established = 86400
-net.netfilter.nf_conntrack_tcp_timeout_time_wait = 30
+# net.netfilter.nf_conntrack_max = 2097152
+# net.netfilter.nf_conntrack_tcp_timeout_established = 86400
+# net.netfilter.nf_conntrack_tcp_timeout_time_wait = 30
 
 # 禁用IPv6（如果不需要）
 net.ipv6.conf.all.disable_ipv6 = 1
@@ -102,15 +102,15 @@ fs.inotify.max_user_watches = 524288
 EOF
     sudo sysctl -p /etc/sysctl.d/99-network-performance.conf
 	#####################################################################
-    # 中断亲和性设置    
-    systemctl stop irqbalance
-    IFACE=$(ip route | grep default | awk '{print $5}')
-    irqs=$(grep "${IFACE}-Tx-Rx" /proc/interrupts | awk -F':' '{print $1}')
-    cpu=0
-    for i in $irqs; do
-      echo $cpu > /proc/irq/$i/smp_affinity_list
-      let cpu=${cpu}+1
-    done
+    # # 中断亲和性设置    
+    # systemctl stop irqbalance
+    # IFACE=$(ip route | grep default | awk '{print $5}')
+    # irqs=$(grep "${IFACE}-Tx-Rx" /proc/interrupts | awk -F':' '{print $1}')
+    # cpu=0
+    # for i in $irqs; do
+    #   echo $cpu > /proc/irq/$i/smp_affinity_list
+    #   let cpu=${cpu}+1
+    # done
     #####################################################################
     # 其他
     cat >> /etc/security/limits.conf << EOF
@@ -128,7 +128,7 @@ EOF
 
 ## 多线程配置
 install_redis(){
-    docker pull redis:6.2.17
+    docker pull redis:7.0.15
 }
 
 start_redis(){
@@ -150,7 +150,7 @@ EOF
     docker run -d --name redis-6379 \
 	  -p 6379:6379 \
 	  -v /root/redis-6379.conf:/etc/redis/redis.conf \
-	  redis:6.2.17 \
+	  redis:7.0.15 \
 	  redis-server /etc/redis/redis.conf
 
 	## 2. 配置 3 种 io-threads 模式：vCPU数量的40%、65%、90%
@@ -176,7 +176,7 @@ EOF
         docker run -d --name redis-$PORT \
 	      -p $PORT:6379 \
 	      -v /root/redis-$PORT.conf:/etc/redis/redis.conf \
-	      redis:6.2.17 \
+	      redis:7.0.15 \
 	      redis-server /etc/redis/redis.conf
     done
 

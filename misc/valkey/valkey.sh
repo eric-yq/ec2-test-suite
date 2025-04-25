@@ -42,8 +42,6 @@ cluster-config-file cluster-nodes.conf
 cluster-node-timeout 5000
 EOF
 
-
-
 # 运行 Valkey 容器
 docker run -d --name valkey \
   -p 6379:6379 \
