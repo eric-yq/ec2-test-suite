@@ -134,11 +134,12 @@ install_valkey(){
 start_valkey(){
     sysctl vm.overcommit_memory=1
     
-	## 计算内存容量
-	MEM_TOTAL_GB=$(free -g |grep Mem | awk -F " " '{print $2}')
-	let XXX=${MEM_TOTAL_GB}*80/100
+	
 
     ## 1. 配置一个单线程 valkey, 不使用 io-threads
+    ## 计算内存容量
+	MEM_TOTAL_GB=$(free -g |grep Mem | awk -F " " '{print $2}')
+	let XXX=${MEM_TOTAL_GB}*80/100
     cat > /root/valkey-6379.conf << EOF
 port 6379
 bind 0.0.0.0
@@ -150,10 +151,12 @@ EOF
     docker run -d --name valkey-6379 \
 	  -p 6379:6379 \
 	  -v /root/valkey-6379.conf:/etc/valkey/valkey.conf \
-	  valkey/valkey:8.0.2 \
+	  valkey/valkey:8.1.0 \
 	  valkey-server /etc/valkey/valkey.conf
 
 	## 2. 配置 3 种 io-threads 模式：vCPU数量的40%、65%、90%
+    MEM_TOTAL_GB=$(free -g |grep Mem | awk -F " " '{print $2}')
+    let XXX=${MEM_TOTAL_GB}*80/100
     CPU_CORES=$(nproc)
     let YYY1=${CPU_CORES}*40/100
     let YYY2=${CPU_CORES}*65/100
@@ -176,7 +179,7 @@ EOF
         docker run -d --name valkey-$PORT \
 	      -p $PORT:6379 \
 	      -v /root/valkey-$PORT.conf:/etc/valkey/valkey.conf \
-	      valkey/valkey:8.0.2 \
+	      valkey/valkey:8.1.0 \
 	      valkey-server /etc/valkey/valkey.conf
     done
 
