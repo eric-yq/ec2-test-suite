@@ -58,6 +58,11 @@ socket=/var/lib/mysql/mysql.sock
 log-error=/var/log/mysqld.log
 pid-file=/var/run/mysqld/mysqld.pid
 
+#############################################
+## yuanquan:performance related configrations
+performance_schema=OFF
+skip_log_bin=1
+#############################################
 # general
 max_connections=4000
 table_open_cache=8000
@@ -65,9 +70,7 @@ table_open_cache_instances=16
 back_log=1500
 default_password_lifetime=0
 ssl=0
-performance_schema=ON
 max_prepared_stmt_count=128000
-skip_log_bin=0
 binlog_expire_logs_seconds=3600
 character_set_server=latin1
 collation_server=latin1_swedish_ci
