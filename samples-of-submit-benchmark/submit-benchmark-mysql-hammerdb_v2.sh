@@ -20,10 +20,17 @@ do
 		source /tmp/temp-setting
 		
 		## 准备数据
-		bash benchmark/mysql-benchmark_v2_prepare.sh ${INSTANCE_IP_MASTER} 100
+		bash benchmark/mysql-benchmark_v2_prepare.sh ${INSTANCE_IP_MASTER} 100 ${ins} 
 		
 		## 使用不同的vuser执行benchmark
-		bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 60 1 100
+		bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 60 1 100 ${ins} 
+		bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 60 2 100 ${ins} 
+		bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 60 4 100 ${ins} 
+		bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 60 6 100 ${ins} 
+		bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 60 8 100 ${ins} 
+		bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 60 10 100 ${ins} 
+		bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 60 12 100 ${ins} 
+		bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 60 16 100 ${ins} 
 
 		## 停止实例
 		# aws ec2 stop-instances --instance-ids ${INSTANCE_ID} 
