@@ -40,9 +40,9 @@ net.core.dev_weight = 600
 #####  到这里
 
 # 连接跟踪优化
-net.netfilter.nf_conntrack_max = 2097152
-net.netfilter.nf_conntrack_tcp_timeout_established = 86400
-net.netfilter.nf_conntrack_tcp_timeout_time_wait = 30
+# net.netfilter.nf_conntrack_max = 2097152
+# net.netfilter.nf_conntrack_tcp_timeout_established = 86400
+# net.netfilter.nf_conntrack_tcp_timeout_time_wait = 30
 
 # 禁用IPv6（如果不需要）
 net.ipv6.conf.all.disable_ipv6 = 1
