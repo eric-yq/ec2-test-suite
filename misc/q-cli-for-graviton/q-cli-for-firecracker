@@ -1,0 +1,9 @@
+## 在本地电脑操作
+
+## Test-1: nok
+1. 我已经在本地电脑配置了 AWS CLI，请在 us-east-1 区域启动一个 c7g.metal 实例，EBS 80G gp3, 操作系统 Ubuntu 24.04，使用默认 VPC、默认安全组、key-pair 使用 ericyq-global，实例启动成功后，我们再进行后续步骤。 
+2. 请在这台 c7g.metal 上使用 root 用户安装 Firecracker v1.12.0，安装完成后请验证 firecracker 是否安装成功；
+3. Firecracker 在Github提供了一个 demo（https://github.com/firecracker-microvm/firecracker-demo），但是这个 demo 是基于 x86 架构的，能否在 c7g.metal 上运行？如果不能，请给出解决方案；如果可以，请在 c7g.metal 上运行这个 demo，并验证是否可以正常使用（以启动 100 个 vm 为例。）
+
+## Test-2
+我有一台 c7g.metal 实例，操作系统是 Ubuntu 24.04，请提供一个安装脚本，使用 root 安装 Firecracker 1.12.0 ；

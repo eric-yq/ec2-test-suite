@@ -1,0 +1,8 @@
+## 在本地电脑操作
+
+1. 我有一个Java 应用（源代码保存在 java 目录下）目前是在 x86 架构的 EC2 实例通过容器进行部署，请评估该应用的 Java 代码，给出迁移到 AWS Graviton3 实例需要修改的地方；在我确认后可以修改代码，修改的文件请做好备份。
+2. 我已经在本地电脑配置了 AWS CLI，请在 us-east-1 区域启动一个 c7g.xlarge 实例，EBS 80G gp3, 操作系统 Ubuntu 22.04，使用默认 VPC、默认安全组、key-pair 使用 ericyq-global，实例启动成功后，我们再进行后续步骤。 
+3. 接下来请在这台实例上编译 libchatbot-arm64.so 库文件， libchatbot 源代码是本地目录 gdd-chatbot-main下的 chatbot.cpp, 请不要修改这个文件，你可以参考源代码目录下的 commands.txt，在刚才启动的 c7g 实例上构建 libchatbot-arm64.so； 并将这个库文件下载到本地的 java/chatbot-libs  目录下，该目录下已经有 amd64 架构 so 文件。
+4. 请将 java 目录下的应用，以容器的方式部署到这个 c7g 实例，并验证基本功能；
+
+## 在 EC2 上使用 Q CLI 

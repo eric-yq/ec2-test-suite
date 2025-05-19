@@ -1,0 +1,154 @@
+#!/bin/bash
+
+######################################################################################################
+## 在 x86 实例使用 buildx 构建多架构镜像
+# c6i.4xlarge(spot), Amazon Linux 2
+
+# 更新系统
+sudo yum update -y
+
+# 安装 QEMU 支持（用于多架构构建）
+sudo amazon-linux-extras install epel -y
+sudo yum install -y qemu qemu-user qemu-user-static
+
+# 安装 Docker
+sudo yum install -y docker
+sudo systemctl start docker
+sudo systemctl enable docker
+docker --version
+docker buildx version
+
+# 设置 binfmt 支持
+docker run --privileged --rm tonistiigi/binfmt --install all
+
+# 将客户提供的 download.zip 上传到 /root/
+unzip download.zip
+ls jemalloc-test
+
+# 在 /root/jemalloc-test 目录中创建一个多阶段构建的 Dockerfile：
+cat > /root/jemalloc-test/Dockerfile << 'EOF'
+# 构建阶段
+FROM --platform=$TARGETPLATFORM amazonlinux:2 AS builder
+
+# 安装构建依赖
+RUN yum update -y && \
+    yum install -y gcc gcc-c++ make git curl tar gzip \
+                   autoconf automake libtool pkg-config && \
+    yum clean all
+
+# 安装 Rust
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+# 设置工作目录
+WORKDIR /app
+
+# 复制源代码
+COPY . .
+
+# 构建应用（release模式）
+RUN cargo build --release
+
+# 运行阶段
+FROM --platform=$TARGETPLATFORM amazonlinux:2
+
+# 安装运行时依赖
+RUN yum update -y && \
+    yum install -y glibc libgcc shadow-utils && \
+    yum clean all
+
+# 创建非特权用户
+RUN useradd -r -s /bin/false appuser
+
+# 创建应用目录
+WORKDIR /app
+
+# 复制编译好的二进制文件 (根据您的项目调整二进制文件名)
+COPY --from=builder /app/target/release/jemalloc-test /app/
+
+# 设置权限
+RUN chown -R appuser:appuser /app && \
+    chmod +x /app/jemalloc-test
+
+# 切换到非特权用户
+USER appuser
+
+# 设置入口点
+ENTRYPOINT ["/app/jemalloc-test"]
+EOF
+
+# 使用 Docker Buildx 构建 ARM64 Rust 应用
+echo "===== 使用 Docker Buildx 构建 ARM64 Rust 应用 ====="
+
+cd /root/jemalloc-test/
+
+# 创建并使用新的 buildx 构建器
+docker buildx create --name arm64-builder --platform linux/arm64,linux/amd64
+docker buildx use arm64-builder
+docker buildx inspect --bootstrap
+
+# 配置 AWS CLI
+aws_ak_value="xxx"
+aws_sk_value="xxx"
+aws_region_name=$(cloud-init query region)
+aws configure set aws_access_key_id ${aws_ak_value}
+aws configure set aws_secret_access_key ${aws_sk_value}
+aws configure set default.region ${aws_region_name}
+
+# 设置 ECR 信息
+ACCOUNT_ID=$(cloud-init query ds.dynamic.instance_identity.document.accountId)
+AWS_REGION=$(cloud-init query region)
+ECR_URL="${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+
+# 登录 ECR Repository 
+aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin $ECR_URL
+
+# 创建 ECR Repository 
+aws ecr create-repository --repository-name jemalloc-test
+
+# 构建 ARM64 镜像
+echo "===== 开始构建 ARM64 Docker 镜像 ====="
+docker buildx build \
+  --platform=linux/arm64,linux/amd64 \
+  --tag ${ECR_URL}/jemalloc-test:latest \
+  --push \
+  .
+  
+echo "===== 完成! ====="
+echo "ARM64 Docker 镜像已创建: jemalloc-test-arm64:latest"
+
+######################################################################################################
+## 在Graviton实例进行验证
+# 安装 Docker
+sudo yum install -y docker
+sudo systemctl start docker
+sudo systemctl enable docker
+docker --version
+
+# 配置 AWS CLI
+aws_ak_value="xxx"
+aws_sk_value="xxx"
+aws_region_name=$(cloud-init query region)
+aws configure set aws_access_key_id ${aws_ak_value}
+aws configure set aws_secret_access_key ${aws_sk_value}
+aws configure set default.region ${aws_region_name}
+
+# 设置 ECR 信息
+ACCOUNT_ID=$(cloud-init query ds.dynamic.instance_identity.document.accountId)
+AWS_REGION=$(cloud-init query region)
+ECR_URL="${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+
+# 登录 ECR Repository 
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_URL
+
+# 启动容器
+INS_TYPE=$(cloud-init query ds.meta_data.instance_type)
+docker run -d --name jemalloc-test-${INS_TYPE} ${ECR_URL}/jemalloc-test:latest
+
+docker ps -a
+
+# 登录到容器内，执行命令
+docker exec -it jemalloc-test-${INS_TYPE} /bin/bash
+#### ls 
+
+
