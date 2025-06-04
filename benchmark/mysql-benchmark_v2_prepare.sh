@@ -54,13 +54,12 @@ ssh -o StrictHostKeyChecking=no -i ~/ericyq-global.pem ec2-user@${SUT_IP_ADDR} \
   1> ${DOOL_FILE} 2>&1 &
 
 echo "Test Detail on $(date)====================================================================================" >> ${RESULT_FILE}
-echo "Start to prepare data. SUT_IP_ADDR=${SUT_IP_ADDR}, Data size: ${DATA_SIZE}, Warehouse: ${WARES},, FLAG1=${5}" >> ${RESULT_FILE}
-
 ## 远程输出 /etc/my.cnf 内容
-echo "Start to prepare data. SUT_IP_ADDR=${SUT_IP_ADDR}, Data size: ${DATA_SIZE}, Warehouse: ${WARES},, FLAG1=${5}" >> ${RESULT_FILE}
+echo "Export MySQL configuration /etc/my.cnf first... " >> ${RESULT_FILE}
 ssh -o StrictHostKeyChecking=no -i ~/ericyq-global.pem ec2-user@${SUT_IP_ADDR} "sudo cat /etc/my.cnf" >> ${RESULT_FILE}
 
 ## 准备数据
+echo "Start to prepare data. SUT_IP_ADDR=${SUT_IP_ADDR}, Data size: ${DATA_SIZE}, Warehouse: ${WARES},, FLAG1=${5}" >> ${RESULT_FILE}
 mysql -h ${SUT_IP_ADDR} -p'gv2mysql' -e "drop database tpcc;"
 ./hammerdbcli auto tpcc_buildschema.tcl
 
