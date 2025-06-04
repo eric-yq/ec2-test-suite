@@ -59,7 +59,7 @@ log-error=/var/log/mysqld.log
 pid-file=/var/run/mysqld/mysqld.pid
 
 ######################################################
-## yuanquan :performance related configrations
+## yuanquan : performance related configrations
 ## if on EBS: suggest disable them all;
 ## if on instance store: suggest enable them all;
 performance_schema=on
