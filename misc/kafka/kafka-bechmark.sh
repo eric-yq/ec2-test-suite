@@ -39,6 +39,7 @@ cd kafka_2.13-3.9.0
 # 修改配置文件
 AAA="log.dirs=\/tmp\/kraft-combined-logs"
 BBB="log.dirs=\/mnt\/$disk\/kraft-combined-logs"
+# BBB="log.dirs=\/root\/kafka-data\/kraft-combined-logs"
 sed -i.bak "s/$AAA/$BBB/g" config/kraft/reconfig-server.properties
 sed -i "s/num.partitions=1/num.partitions=3/g" config/kraft/reconfig-server.properties
 sed -i "s/localhost/$(hostname -i)/g" config/kraft/reconfig-server.properties
@@ -61,7 +62,7 @@ bin/kafka-topics.sh --describe --topic quickstart-events --bootstrap-server loca
 
 ########################################################################################################
 ## Benchmark ， Producer
-BROKER_IPADDR="172.31.47.75"  # i3.2xlarge，
+="172.31.47.75"  # i3.2xlarge，
 BROKER_IPADDR="172.31.41.71"  # i4i.2xlarge，
 BROKER_IPADDR="172.31.45.2"   # i7ie.2xlarge，
 BROKER_IPADDR="172.31.44.179" # i4g.2xlarge，
@@ -88,3 +89,6 @@ do
 	sleep 5
 done
 
+########################################################################################################
+# 删除 topics
+.bin/kafka-topics.sh --bootstrap-server $BROKER_IPADDR:9092 --delete --topic kafka-test

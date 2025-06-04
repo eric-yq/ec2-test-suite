@@ -58,11 +58,15 @@ socket=/var/lib/mysql/mysql.sock
 log-error=/var/log/mysqld.log
 pid-file=/var/run/mysqld/mysqld.pid
 
-#############################################
-## yuanquan:performance related configrations
-performance_schema=OFF
-skip_log_bin=1
-#############################################
+######################################################
+## yuanquan :performance related configrations
+## if on EBS： suggest disable them all;
+## if on instance store: suggest enable them all;
+performance_schema=on
+skip_log_bin=0
+binlog_expire_logs_seconds=3600
+innodb_flush_log_at_trx_commit=1
+######################################################
 # general
 max_connections=4000
 table_open_cache=8000
@@ -71,7 +75,6 @@ back_log=1500
 default_password_lifetime=0
 ssl=0
 max_prepared_stmt_count=128000
-binlog_expire_logs_seconds=3600
 character_set_server=latin1
 collation_server=latin1_swedish_ci
 transaction_isolation=REPEATABLE-READ
@@ -88,7 +91,6 @@ innodb_log_buffer_size=64M
 # innodb_page_size=8192
 innodb_doublewrite=0
 innodb_thread_concurrency=0
-innodb_flush_log_at_trx_commit=0
 innodb_max_dirty_pages_pct=90
 innodb_max_dirty_pages_pct_lwm=10
 join_buffer_size=32K
