@@ -38,14 +38,14 @@ install:
 		@echo "Terraform installation complete!"
 
 		@echo "Installing HammerDB 4.12 for MySQL benchmark..."
-		cd ~
+		cd $HOME
 		wget https://github.com/TPC-Council/HammerDB/releases/download/v4.4/HammerDB-4.4-Linux.tar.gz
 		tar zxf HammerDB-4.4-Linux.tar.gz
 		rm -rf HammerDB-4.4-Linux.tar.gz
 		@echo "HammerDB installation complete!"
 
 		@echo "Installing memtier_benchmark for Redis/Valky benchmark..."
-		cd ~
+		cd $HOME
 		git clone https://github.com/RedisLabs/memtier_benchmark.git
 		cd memtier_benchmark
 		git checkout tags/2.0.0
@@ -57,7 +57,7 @@ install:
 		@echo "memtier_benchmark installation complete!"
 
 		@echo "Installing sysbench ..."
-		cd ~
+		cd $HOME
 		wget https://github.com/akopytov/sysbench/archive/refs/tags/1.0.20.tar.gz
 		tar zxf 1.0.20.tar.gz && rm -rf 1.0.20.tar.gz
 		cd sysbench-1.0.20
@@ -69,7 +69,7 @@ install:
 		@echo "sysbench installation complete!"
 
 		@echo "Installing wrk-4.2.0 for nginx/apisix benchmark ..."
-		cd ~
+		cd $HOME
 		wget https://github.com/wg/wrk/archive/refs/tags/4.2.0.tar.gz
 		tar zxf 4.2.0.tar.gz && rm -rf 4.2.0.tar.gz
 		cd wrk-4.2.0
@@ -77,7 +77,7 @@ install:
 		@echo "wrk installation complete!"
 
 		@echo "Installing YCSB-0.17.0 for MongoDB benchmark ..."
-		cd ~
+		cd $HOME
 		wget https://github.com/brianfrankcooper/YCSB/releases/download/0.17.0/ycsb-0.17.0.tar.gz
 		tar zxf ycsb-0.17.0.tar.gz && rm -rf ycsb-0.17.0.tar.gz
 		cd ycsb-0.17.0
