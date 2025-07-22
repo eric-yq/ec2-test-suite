@@ -154,7 +154,7 @@ start_valkey(){
     for i in $(seq 1 $PODS_NUMBER)
     do
         let PORT=${i}+8000
-	    docker run -d --name valkey-$PORT \
+	    docker run -d --name valkey-$PORT --restart=always \
 	      -p $PORT:6379 \
 	      -v /root/valkey.conf:/etc/valkey/valkey.conf \
 	      valkey/valkey:8.0.2 \
