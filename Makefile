@@ -32,7 +32,7 @@ install:
 		@echo "Installing Terraform..."
 		sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
 		sudo yum install -yq terraform
-        terraform --version
+	    terraform --version
 		@echo "Terraform installation complete!"
 
 		@echo "Installing HammerDB 4.12 for MySQL benchmark..."
@@ -60,9 +60,9 @@ install:
 		tar zxf 1.0.20.tar.gz && rm -rf 1.0.20.tar.gz
 		cd sysbench-1.0.20
 		./autogen.sh
-        ./configure
-        make -j
-        make install
+	    ./configure
+	    make -j
+	    make install
 		sysbench --version
 		@echo "sysbench installation complete!"
 
@@ -84,17 +84,16 @@ install:
 # Clean yum cache
 .PHONY: clean
 clean:
-        @echo "Cleaning yum cache..."
-        sudo yum clean all
-        @echo "Cache cleaned!"
+	@echo "Cleaning yum cache..."
+	sudo yum clean all
+	@echo "Cache cleaned!"
 
 # Show help
 .PHONY: help
 help:
-        @echo "Usage: make [target]"
-        @echo ""
-        @echo "Targets:"
-        @echo "  all        Install all packages (default)"
-        @echo "  dev-tools  Install only development tools group"
-        @echo "  clean      Clean yum cache"
-        @echo "  help       Show this help message"
+	@echo "Usage: make [target]"
+	@echo ""
+	@echo "Targets:"
+	@echo "  all        Install all packages (default)"
+	@echo "  clean      Clean yum cache"
+	@echo "  help       Show this help message"
