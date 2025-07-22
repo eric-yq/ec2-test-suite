@@ -147,13 +147,11 @@ maxmemory ${XXX}gb
 maxmemory-policy allkeys-lru
 EOF
 
-    docker run -d --name redis-6379 \
+    docker run -d --name redis-6379 --restart=always \
 	  -p 6379:6379 \
 	  -v /root/redis-6379.conf:/etc/redis/redis.conf \
 	  redis:7.0.15 \
 	  redis-server /etc/redis/redis.conf
-
-    docker update --restart=always redis-6379
 
 	## 2. 配置 3 种 io-threads 模式：vCPU数量的40%、65%、90%
     CPU_CORES=$(nproc)
@@ -175,13 +173,11 @@ io-threads-do-reads yes
 io-threads $i
 EOF
 	    # 启动 redis
-        docker run -d --name redis-$PORT \
+        docker run -d --name redis-$PORT --restart=always \
 	      -p $PORT:6379 \
 	      -v /root/redis-$PORT.conf:/etc/redis/redis.conf \
 	      redis:7.0.15 \
 	      redis-server /etc/redis/redis.conf
-
-        docker update --restart=always redis-$PORT
     done
 
     sleep 3
