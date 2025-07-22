@@ -19,6 +19,7 @@ else
 fi
 	
 install_public_tools(){
+    yum update -y 
 	yum install -yq python3-pip docker
 	pip3 install dool
 	systemctl enable docker
