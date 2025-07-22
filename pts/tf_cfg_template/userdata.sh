@@ -60,6 +60,8 @@ install_al2023_dependencies () {
   yum install -y -q perf kernel-devel-$(uname -r) bcc
 
   echo "------ INSTALL ANALYSIS TOOLS AND DEPENDENCIES ------"
+  curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+  python3 get-pip.py
   python3 -m pip install pandas numpy scipy matplotlib sh seaborn plotext
   git clone https://github.com/brendangregg/FlameGraph.git FlameGraph
   

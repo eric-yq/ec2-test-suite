@@ -1,0 +1,131 @@
+,AMD EPYC 9005 Turin vs. NVIDIA GH200 Grace CPU Performance Benchmarks,
+
+ ,,"NVIDIA GH200 Grace CPU","EPYC 9575F","EPYC 9655","EPYC 9755","r8gd.metal-24xl"
+Processor,,ARMv8 Neoverse-V2 @ 3.47GHz (72 Cores),AMD EPYC 9575F 64-Core @ 3.30GHz (64 Cores / 128 Threads),AMD EPYC 9655 96-Core @ 2.60GHz (96 Cores / 192 Threads),AMD EPYC 9755 128-Core @ 2.70GHz (128 Cores / 256 Threads),ARMv8 Neoverse-V2 (96 Cores)
+Motherboard,,Pegatron JIMBO P4352 (00022432 BIOS),AMD VOLCANO (RVOT1000D BIOS),AMD VOLCANO (RVOT1000D BIOS),AMD VOLCANO (RVOT1000D BIOS),Amazon EC2 r8gd.metal-24xl (1.0 BIOS)
+Memory,,1 x 480GB LPDDR5-6400MT/s NVIDIA 699-2G530-0236-RC1,12 x 64GB DDR5-6000MT/s Samsung M321R8GA0PB1-CCPKC,12 x 64GB DDR5-6000MT/s Samsung M321R8GA0PB1-CCPKC,12 x 64GB DDR5-6000MT/s Samsung M321R8GA0PB1-CCPKC,12 x 64 GB DDR5-5600MT/s
+Disk,,1000GB CT1000T700SSD3,2 x 1920GB KIOXIA KCD8XPUG1T92,2 x 1920GB KIOXIA KCD8XPUG1T92,2 x 1920GB KIOXIA KCD8XPUG1T92,86GB Amazon Elastic Block Store + 3 x 1900GB Amazon EC2 NVMe Instance Storage
+Graphics,,NVIDIA GH200 144G HBM3e 143GB,ASPEED,ASPEED,ASPEED,
+Network,,2 x Intel X550,Broadcom NetXtreme BCM5720 PCIe,Broadcom NetXtreme BCM5720 PCIe,Broadcom NetXtreme BCM5720 PCIe,Amazon Elastic
+Chipset,,,AMD Device 153a,AMD Device 153a,AMD Device 153a,
+OS,,Ubuntu 24.04,Ubuntu 24.04,Ubuntu 24.04,Ubuntu 24.04,Ubuntu 24.04
+Kernel,,6.8.0-47-generic-64k (aarch64),6.10.0-phx (x86_64),6.10.0-phx (x86_64),6.10.0-phx (x86_64),6.8.0-1031-aws (aarch64)
+Display Driver,,NVIDIA,,,,
+OpenCL,,OpenCL 3.0 CUDA 12.6.65,,,,
+Compiler,,GCC 13.2.0 + CUDA 11.8,GCC 13.2.0,GCC 13.2.0,GCC 13.2.0,GCC 13.3.0
+File-System,,ext4,ext4,ext4,ext4,xfs
+Screen Resolution,,1920x1200,1920x1200,1920x1200,1920x1200,
+
+ ,,"NVIDIA GH200 Grace CPU","EPYC 9575F","EPYC 9655","EPYC 9755","r8gd.metal-24xl"
+"Timed Node.js Compilation - Time To Compile (sec)",LIB,202.937,133.857,118.698,109.561,279.456
+"Timed Node.js Compilation - CPU Power Consumption Monitor (Watts)",LIB,181.01,313.86,265.76,304.19,
+"Timed Gem5 Compilation - Time To Compile (sec)",LIB,166.097,130.799,126.333,128.132,165.248
+"Timed Gem5 Compilation - CPU Power Consumption Monitor (Watts)",LIB,118.84,211.78,176.53,195.45,
+"OpenSSL - Algorithm: AES-256-GCM (byte/s)",HIB,515680506310,1193699244990,1344599403087,1837765850747,458634849120
+"OpenSSL - Algorithm: AES-256-GCM (byte/s/Watt)",HIB,1809281985.063,3325699800.96,4358545440.699,4339501704.862,
+"OpenSSL - CPU Power Consumption Monitor (Watts)",LIB,285.02,358.93,308.5,423.5,
+"OpenSSL - Algorithm: ChaCha20 (byte/s)",HIB,149255169543,733060286053,905409634213,1186359294450,165496698747
+"OpenSSL - Algorithm: ChaCha20 (byte/s/Watt)",HIB,768573496.678,1908650939.88,2590512735.181,2532659749.387,
+"OpenSSL - CPU Power Consumption Monitor (Watts)",LIB,194.2,384.07,349.51,468.42,
+"John The Ripper - Test: Blowfish (Real C/S)",HIB,74756,198954,237823,323010,
+"John The Ripper - Test: Blowfish (Real C/S/Watt)",HIB,508.724,562.771,792.83,778.215,
+"John The Ripper - CPU Power Consumption Monitor (Watts)",LIB,146.95,353.53,299.97,415.07,
+"John The Ripper - Test: bcrypt (Real C/S)",HIB,74749,199078,237739,323000,
+"John The Ripper - Test: bcrypt (Real C/S/Watt)",HIB,517.441,561.706,789.705,782.321,
+"ClickHouse - 100M Rows Hits Dataset, First Run / Cold Cache (Queries/min, Geo Mean)",HIB,581.59,779.31,740.48,698.12,509.66
+"ClickHouse - 100M Rows Hits Dataset, Second Run (Queries/min, Geo Mean)",HIB,594.01,809.27,755.69,729.56,533.53
+"ClickHouse - 100M Rows Hits Dataset, Third Run (Queries/min, Geo Mean)",HIB,596.49,809.87,763.39,724.64,556.60
+"ClickHouse - 100M Rows Hits Dataset, Third Run (Queries/min, Geo Mean/Watt)",HIB,7.98,4.181,4.615,4.431,
+"ClickHouse - CPU Power Consumption Monitor (Watts)",LIB,74.75,193.7,165.4,163.53,
+"Memcached - Set To Get Ratio: 1:100 (Ops/sec)",HIB,3049705.54,13808558.42,12513777.69,13316660.10,4985255.90
+"Memcached - Set To Get Ratio: 1:100 (Ops/sec/Watt)",HIB,27521.067,39869.265,47921.237,37790.619,
+"Memcached - CPU Power Consumption Monitor (Watts)",LIB,110.81,346.35,261.13,352.38,
+"RocksDB - Test: Random Read (Op/s)",HIB,568339463,505733525,577215374,786896580,535659592
+"RocksDB - Test: Random Read (Op/s/Watt)",HIB,2103254.003,1462898.91,1918650.379,1894471.542,
+"RocksDB - CPU Power Consumption Monitor (Watts)",LIB,270.22,345.71,300.84,415.36,
+"Speedb - Test: Random Read (Op/s)",HIB,569021111,526671792,607769650,822102828,650448915
+"Speedb - Test: Random Read (Op/s/Watt)",HIB,2132224.777,1520207.332,1998985.068,1969975.349,
+"Speedb - CPU Power Consumption Monitor (Watts)",LIB,266.87,346.45,304.04,417.32,
+"Speedb - Test: Read While Writing (Op/s)",HIB,10241042,10783281,15003965,18687897,11082968
+"Speedb - Test: Read While Writing (Op/s/Watt)",HIB,56303.844,28692.821,47929.334,46936.435,
+"Speedb - CPU Power Consumption Monitor (Watts)",LIB,181.89,375.82,313.04,398.15,
+"Coremark - CoreMark Size 666 - Iterations Per Second (Iterations/Sec)",HIB,2396678.996252,3884226.128497,4550652.098964,6042366.343047,2695568.641965
+"Coremark - CoreMark Size 666 - Iterations Per Second (Iterations/Sec/Watt)",HIB,20070.835,12356.077,14303.034,14585.735,
+"Coremark - CPU Power Consumption Monitor (Watts)",LIB,119.41,314.36,318.16,414.27,
+"Algebraic Multi-Grid Benchmark -  (Figure Of Merit)",HIB,2256454667,3197611250,3076739667,3177082000,2975080667
+"Algebraic Multi-Grid Benchmark -  (Figure Of Merit/Watt)",HIB,15435851.482,10869334.826,11562385.397,9501967.546,
+"Algebraic Multi-Grid Benchmark - CPU Power Consumption Monitor (Watts)",LIB,146.18,294.19,266.1,334.36,
+"miniBUDE - Implementation: OpenMP - Input Deck: BM2 (GFInst/s)",HIB,1366.395,6101.793,6705.147,9654.576,1576.846
+"miniBUDE - Implementation: OpenMP - Input Deck: BM2 (Billion Interactions/s)",HIB,54.656,244.072,268.206,386.183,63.074
+"miniBUDE - Implementation: OpenMP - Input Deck: BM2 (Billion Interactions/s/Watt)",HIB,0.255,0.763,0.948,1.087,
+"miniBUDE - CPU Power Consumption Monitor (Watts)",LIB,213.96,319.75,282.8,355.42,
+"LAMMPS Molecular Dynamics Simulator - Model: Rhodopsin Protein (ns/day)",HIB,59.841,42.850,45.222,55.791,64.444
+"LAMMPS Molecular Dynamics Simulator - Model: Rhodopsin Protein (ns/day/Watt)",HIB,0.967,0.462,0.444,0.446,
+"LAMMPS Molecular Dynamics Simulator - CPU Power Consumption Monitor (Watts)",LIB,61.9,92.85,101.77,125.04,
+"LAMMPS Molecular Dynamics Simulator - Model: 20k Atoms (ns/day)",HIB,58.143,54.786,56.103,67.776,62.601
+"LAMMPS Molecular Dynamics Simulator - Model: 20k Atoms (ns/day/Watt)",HIB,0.212,0.141,0.168,0.147,
+"LAMMPS Molecular Dynamics Simulator - CPU Power Consumption Monitor (Watts)",LIB,274.68,388.85,334.89,461.94,
+"GROMACS - Implementation: MPI CPU - Input: water_GMX50_bare (Ns/Day)",HIB,6.002,14.651,17.632,22.729,6.928
+"GROMACS - Implementation: MPI CPU - Input: water_GMX50_bare (Ns/Day/Watt)",HIB,0.028,0.046,0.066,0.065,
+"GROMACS - CPU Power Consumption Monitor (Watts)",LIB,212.07,315.19,266.41,349.18,
+"QuantLib - Configuration: Multi-Threaded (MFLOPS)",HIB,261141.5,297665.1,341991.7,465436.8,285779.0
+"QuantLib - Configuration: Multi-Threaded (MFLOPS/Watt)",HIB,1209.795,897.435,1136.471,1146.37,
+"QuantLib - CPU Power Consumption Monitor (Watts)",LIB,215.86,331.68,300.92,406.01,
+"QMCPACK - Input: Li2_STO_ae (Execution Time - sec)",LIB,69.609,72.933,82.211,79.020,80.659
+"QMCPACK - CPU Power Consumption Monitor (Watts)",LIB,268.27,376.42,322.06,441.83,
+"Pennant - Test: leblancbig (Hydro Cycle Time - sec)",LIB,4.473779,3.238866,3.136517,2.761260,2.528917
+"Pennant - CPU Power Consumption Monitor (Watts)",LIB,140.43,195.52,171.37,210.49,
+"Pennant - Test: sedovbig (Hydro Cycle Time - sec)",LIB,6.430304,6.221108,5.478708,4.393606,3.823740
+"Pennant - CPU Power Consumption Monitor (Watts)",LIB,150.9,248.27,209.04,248.94,
+"NWChem - Input: C240 Buckyball (sec)",LIB,1214.7,1225.7,1334.1,1326.2,1367.7
+"NWChem - CPU Power Consumption Monitor (Watts)",LIB,226.74,392.8,346.39,477.37,
+"Xcompact3d Incompact3d - Input: X3D-benchmarking input.i3d (sec)",LIB,240.285802,217.383423,201.847422,199.844589,181.291901
+"Xcompact3d Incompact3d - CPU Power Consumption Monitor (Watts)",LIB,172.91,389.84,324.17,401.65,
+"OpenFOAM - Input: drivaerFastback, Small Mesh Size - Execution Time (sec)",LIB,37.373806,25.60424,24.071752,20.597089,
+"OpenFOAM - CPU Power Consumption Monitor (Watts)",LIB,199.97,346.41,304.03,396.35,
+"OpenFOAM - Input: drivaerFastback, Medium Mesh Size - Execution Time (sec)",LIB,362.26712,233.1151,195.14756,160.37378,
+"OpenFOAM - CPU Power Consumption Monitor (Watts)",LIB,200.87,388.28,331.19,450.18,
+"7-Zip Compression - Test: Compression Rating (MIPS)",HIB,436600,655241,762891,908159,478872
+"7-Zip Compression - Test: Decompression Rating (MIPS)",HIB,424643,527037,626600,846736,493187
+"7-Zip Compression - Test: Decompression Rating (MIPS/Watt)",HIB,2612.523,1634.376,2211.879,2269.155,
+"7-Zip Compression - CPU Power Consumption Monitor (Watts)",LIB,162.54,322.47,283.29,373.15,
+"Parallel BZIP2 Compression - FreeBSD-13.0-RELEASE-amd64-memstick.img Compression (sec)",LIB,1.682797,1.263408,1.131325,0.934896,1.756849
+"Parallel BZIP2 Compression - CPU Power Consumption Monitor (Watts)",LIB,68.71,104.29,89.62,97.48,
+"Numpy Benchmark -  (Score)",HIB,699.30,962.28,870.03,795.83,522.82
+"Numpy Benchmark -  (Score/Watt)",HIB,16.277,10.291,9.739,8.603,
+"Numpy Benchmark - CPU Power Consumption Monitor (Watts)",LIB,42.96,93.51,89.34,92.5,
+"ASTC Encoder - Preset: Thorough (MT/s)",HIB,46.4120,72.3773,81.6844,110.0383,50.5834
+"ASTC Encoder - Preset: Thorough (MT/s/Watt)",HIB,0.286,0.329,0.458,0.541,
+"ASTC Encoder - CPU Power Consumption Monitor (Watts)",LIB,162.29,219.93,178.31,203.27,
+"ASTC Encoder - Preset: Very Thorough (MT/s)",HIB,6.5885,10.1197,11.5757,15.7195,7.2959
+"ASTC Encoder - Preset: Very Thorough (MT/s/Watt)",HIB,0.03,0.032,0.045,0.05,
+"ASTC Encoder - CPU Power Consumption Monitor (Watts)",LIB,218.73,314.16,254.74,317.5,
+"ASTC Encoder - Preset: Exhaustive (MT/s)",HIB,4.0660,6.2035,7.1053,9.6576,4.5069
+"ASTC Encoder - Preset: Exhaustive (MT/s/Watt)",HIB,0.018,0.02,0.028,0.03,
+"ASTC Encoder - CPU Power Consumption Monitor (Watts)",LIB,223.22,312.36,256.32,318.58,
+"GraphicsMagick - Operation: Noise-Gaussian (Iterations/min)",HIB,397,291,284,313,231
+"GraphicsMagick - Operation: Noise-Gaussian (Iterations/min/Watt)",HIB,2.385,1.295,1.564,1.505,
+"GraphicsMagick - CPU Power Consumption Monitor (Watts)",LIB,166.44,224.7,181.64,207.96,
+"GraphicsMagick - Operation: Enhanced (Iterations/min)",HIB,369,336,364,455,306
+"GraphicsMagick - Operation: Enhanced (Iterations/min/Watt)",HIB,1.542,0.986,1.421,1.405,
+"GraphicsMagick - CPU Power Consumption Monitor (Watts)",LIB,239.26,340.77,256.1,323.89,
+"GraphicsMagick - Operation: Sharpen (Iterations/min)",HIB,428,301,320,403,342
+"GraphicsMagick - Operation: Sharpen (Iterations/min/Watt)",HIB,1.6,0.904,1.188,1.17,
+"GraphicsMagick - CPU Power Consumption Monitor (Watts)",LIB,267.51,333.12,269.34,344.34,
+"Liquid-DSP - Threads: 256 - Buffer Length: 256 - Filter Length: 32 (samples/s)",HIB,4502400000,5265866667,6327600000,8494733333,4933333333
+"Liquid-DSP - Threads: 256 - Buffer Length: 256 - Filter Length: 32 (samples/s/Watt)",HIB,17535441.658,14781256.877,20685459.047,20115931.632,
+"Liquid-DSP - CPU Power Consumption Monitor (Watts)",LIB,256.76,356.25,305.9,422.29,
+"Xmrig - Variant: GhostRider - Hash Count: 1M (H/s)",HIB,4015.5,11601.9,14312.3,19873.0,12304.1
+"Xmrig - Variant: GhostRider - Hash Count: 1M (H/s/Watt)",HIB,28.691,30.515,44.5,46.765,
+"Xmrig - CPU Power Consumption Monitor (Watts)",LIB,139.96,380.2,321.63,424.95,
+"Helsing - Digit Range: 14 digit (sec)",LIB,56.972,61.827,59.286,43.057,50.845
+"Helsing - CPU Power Consumption Monitor (Watts)",LIB,266.68,346.73,287.02,388.84,
+"Stockfish - Chess Benchmark (Nodes/s)",HIB,98146858,182135967,219189543,307343923,123751964
+"Stockfish - Chess Benchmark (Nodes/s/Watt)",HIB,375426.89,490782.754,668223.51,697627.074,
+"Stockfish - CPU Power Consumption Monitor (Watts)",LIB,261.43,371.11,328.02,440.56,
+"Primesieve - Length: 1e12 (sec)",LIB,2.667,2.123,2.042,1.553,2.390
+"Primesieve - CPU Power Consumption Monitor (Watts)",LIB,111.42,146.31,130.22,147.17,
+"Primesieve - Length: 1e13 (sec)",LIB,31.464,25.397,24.215,17.968,28.196
+"Primesieve - CPU Power Consumption Monitor (Watts)",LIB,233.02,321.04,267.77,342.49,
+"CPU Power Consumption Monitor - Phoronix Test Suite System Monitoring (Watts)",,170.19,313.09,253.26,324.1,
+

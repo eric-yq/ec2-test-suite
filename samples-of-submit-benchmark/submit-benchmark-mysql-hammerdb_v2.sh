@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 ## 待测 EC2 规格和 OS
 os_types="al2023"
 instance_types="i8g.2xlarge"

@@ -153,6 +153,8 @@ EOF
 	  redis:7.0.15 \
 	  redis-server /etc/redis/redis.conf
 
+    docker update --restart=always redis-6379
+
 	## 2. 配置 3 种 io-threads 模式：vCPU数量的40%、65%、90%
     CPU_CORES=$(nproc)
     let YYY1=${CPU_CORES}*40/100
@@ -178,6 +180,8 @@ EOF
 	      -v /root/redis-$PORT.conf:/etc/redis/redis.conf \
 	      redis:7.0.15 \
 	      redis-server /etc/redis/redis.conf
+
+        docker update --restart=always redis-$PORT
     done
 
     sleep 3
