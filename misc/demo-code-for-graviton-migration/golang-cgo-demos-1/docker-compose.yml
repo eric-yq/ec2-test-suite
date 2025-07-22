@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  cgo-demo-x86:
+    build:
+      context: ./x86
+      dockerfile: Dockerfile
+    image: golang-cgo-demo-x86
+    platform: linux/amd64
+
+  cgo-demo-arm64:
+    build:
+      context: ./arm64
+      dockerfile: Dockerfile
+    image: golang-cgo-demo-arm64
+    platform: linux/arm64

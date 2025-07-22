@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  java-native-demo:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: java-native-demo:latest
+    container_name: java-native-demo-container
+    environment:
+      - JAVA_OPTS=-Xmx512m -Xms256m
+    # 如果需要持久化存储
+    # volumes:
+    #   - ./data:/app/data
+    # 如果需要网络端口
+    # ports:
+    #   - "8080:8080"
+    restart: unless-stopped
+    
+    # 资源限制
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 256M
+          cpus: '0.5'
