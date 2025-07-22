@@ -20,7 +20,9 @@ LIBRARIES = \
 		libaio-devel \
 		mariadb105-devel
 
-# Install only development tools
+# Install the required packages, libraries, and tools
+# This target will be executed when you run 'make install'
+# It will install development tools, Terraform, HammerDB, memtier_benchmark, sysbench
 .PHONY: install
 install:
 		@echo "Installing some tools..."
