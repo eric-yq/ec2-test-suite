@@ -3,7 +3,6 @@
 SUT_NAME="SUT_XXX"
 
 yum install -y git awscli
-apt update -y && apt install -y git awscli
 
 ## 获取代码
 cd /root/

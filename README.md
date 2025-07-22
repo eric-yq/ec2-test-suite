@@ -19,7 +19,7 @@ yum update
 yum install -yq make git
 git clone https://github.com/eric-yq/ec2-test-suite
 cd ec2-test-suite
-make install
+make all
 ```
 
 ### 4. Submit benchmark tests
