@@ -1,5 +1,5 @@
 ## Java with JNI/JNA demo
-帮我构建一个 Java 工程:
+> 帮我构建一个 Java 工程:
 1.Java 代码用于演示作用，除了包含普通的 java 语言源代码之外，还要包含 navive library 的调用，例如 snappy, commons-crypto, leveldbjni 等, 在 pom.xml 文件中进行引入; 
 2.使用 C/C++ 构建一个 *.so 文件,在 java 源代码中进行调用. 
 3.构建一个 Dockerfile 文件. 
@@ -21,18 +21,15 @@ Golang 代码用于演示作用，不需要包含任何的 C/C++ 语言的 CGO �
 > 接下来，将这个代码工程 golang-cgo-demos/x86 复制一份到 golang-cgo-demos/arm64, 并将 golang-cgo-demos/arm64 路径下所有源文件适配到 Arm64 平台，目标是可以在 Graviton3 实例上运行。
 
 ## C/C++ SIMD demo
-帮我构建一个 C/C++ 工程: 使用目录 simd-demo/x86 保存全部源代码和相关文件。
+> 帮我构建一个 C/C++ 工程: 使用目录 simd-demo/x86 保存全部源代码和相关文件。
 1. C/C++ 代码用于演示作用，除了包含普通的 C/C++ 语言源代码之外，还要包含 SSE/AVX/AVX2/AVX512 等主要指令的使用 
 2. 包含 SIMD 指令的使用场景：矩阵乘法和卷积操作
 3. 程序的编译构建通过 Makefile 来个管理，暂时只考虑该 C/C++ 工程在 x86 架构运行；
 4. 提供一个 Dockerfile 文件，里面包含程序编译、构建容器镜像的内容，同样先只考虑在 x86 上运行；
-5. 启动一个 c6i.xlarge，使用 us-east-1 区域的 default VPC，default 安全组，keypair 采用 ericyq-global;
-6. 将代码工程simd-demo-x86 上传到 c6i.xlarge 实例，并启动容器运行；
-7. 将工程 simd-demo-x86 复制一份到目录simd-demo-arm64，将 simd-demo-arm64 目录下的 C/C++ 源代码移植到 Arm Neon，SVE和 SVE2 指令集上，同时将 Makefile/Dockerfile 等文件也进行 Arm64适配。
-8. 启动一个 c8g.xlarge，使用 us-east-1 区域的 default VPC，default 安全组，keypair 采用 ericyq-global;
-9. 在 c8g.xlarge 实例上进行编译构建和打包容器镜像，然后启动容器运行。
-
-
+> 迁移到 Graviton
+5. 将工程 simd-demo/x86 复制一份到目录simd-demo/arm64，将 simd-demo/arm64 目录下的 C/C++ 源代码移植到 Arm Neon，SVE和 SVE2 指令集上，同时将 Makefile/Dockerfile 等文件也进行 Arm64适配。
+> 迁移到 Graviton，使用 simde
+6. 请将工程 simd-demo/x86 复制一份到目录simd-demo/arm64-with-simde，请使用 SIMDe，将simd-demo/arm64-with-simde 中的源代码适配为在 Graviton4 实例上可以编译构建和运行。
 
 ## 数值计算密集型应用
 • **科学计算**：矩阵运算、线性代数计算、数值求解

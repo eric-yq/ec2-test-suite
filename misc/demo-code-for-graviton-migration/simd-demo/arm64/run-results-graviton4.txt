@@ -1,0 +1,124 @@
+ARM SIMD Instruction Set Demo
+-----------------------------
+NEON support: Yes
+SVE support: Yes
+SVE2 support: Yes
+
+===== Testing Matrix Multiplication (4x4) =====
+Matrix A (4x4):
+0.0335 0.3300 0.6906 0.4225 
+0.2063 0.2501 0.6366 0.8636 
+0.3017 0.0249 0.3650 0.7654 
+0.3179 0.1357 0.1067 0.7607 
+
+Matrix B (4x4):
+0.0817 0.5510 0.5647 0.7433 
+0.9818 0.2188 0.4544 0.5187 
+0.5738 0.5552 0.7285 0.6289 
+0.7961 0.5837 0.2748 0.8296 
+
+Scalar implementation: 0.000001 seconds
+NEON implementation: 0.000001 seconds (1.00x speedup)
+SVE implementation: 0.000000 seconds (infx speedup)
+SVE2 implementation: 0.000000 seconds (infx speedup)
+Result (Scalar) (4x4):
+1.0593 0.7207 0.7881 0.9808 
+1.3153 1.0259 0.9312 1.3998 
+0.8679 0.8211 0.6579 1.1016 
+0.8261 0.7081 0.5279 1.0048 
+
+Result (NEON) (4x4):
+1.0593 0.7207 0.7881 0.9808 
+1.3153 1.0259 0.9312 1.3998 
+0.8679 0.8211 0.6579 1.1016 
+0.8261 0.7081 0.5279 1.0048 
+
+Result (SVE) (4x4):
+1.0593 0.7207 0.7881 0.9808 
+1.3153 1.0259 0.9312 1.3998 
+0.8679 0.8211 0.6579 1.1016 
+0.8261 0.7081 0.5279 1.0048 
+
+Result (SVE2) (4x4):
+1.0593 0.7207 0.7881 0.9808 
+1.3153 1.0259 0.9312 1.3998 
+0.8679 0.8211 0.6579 1.1016 
+0.8261 0.7081 0.5279 1.0048 
+
+
+===== Testing Matrix Multiplication (128x128) =====
+Scalar implementation: 0.001169 seconds
+NEON implementation: 0.000352 seconds (3.32x speedup)
+SVE implementation: 0.000295 seconds (3.96x speedup)
+SVE2 implementation: 0.000311 seconds (3.76x speedup)
+
+===== Testing Matrix Multiplication (512x512) =====
+Scalar implementation: 0.105508 seconds
+NEON implementation: 0.030893 seconds (3.42x speedup)
+SVE implementation: 0.029244 seconds (3.61x speedup)
+SVE2 implementation: 0.029298 seconds (3.60x speedup)
+
+===== Testing Convolution (Input: 8x8, Kernel: 3x3) =====
+Input (8x8):
+0.0335 0.3300 0.6906 0.4225 0.2063 0.2501 0.6366 0.8636 
+0.3017 0.0249 0.3650 0.7654 0.3179 0.1357 0.1067 0.7607 
+0.0817 0.5510 0.5647 0.7433 0.9818 0.2188 0.4544 0.5187 
+0.5738 0.5552 0.7285 0.6289 0.7961 0.5837 0.2748 0.8296 
+0.9137 0.9654 0.2521 0.1199 0.2155 0.8886 0.9836 0.5172 
+0.9136 0.3486 0.2826 0.2314 0.4843 0.3893 0.9921 0.5660 
+0.9403 0.5568 0.3092 0.9220 0.7756 0.7636 0.4407 0.3494 
+0.3189 0.1692 0.9783 0.1150 0.7529 0.2531 0.9446 0.6666 
+
+Kernel (3x3):
+0.2185 0.1967 0.7866 
+0.4340 0.0853 0.7701 
+0.9512 0.9989 0.1187 
+
+Scalar implementation: 0.000000 seconds
+NEON implementation: 0.000000 seconds (nanx speedup)
+SVE implementation: 0.000001 seconds (0.00x speedup)
+SVE2 implementation: 0.000001 seconds (0.00x speedup)
+Output (Scalar) (6x6):
+1.7246 2.3480 2.2608 2.5071 2.0331 2.2366 
+2.0621 2.8695 2.9605 2.3741 2.3478 2.1103 
+3.2912 2.7878 2.4099 1.7529 2.4313 3.3500 
+2.7314 1.9334 1.7521 2.2580 2.3990 3.1305 
+2.7188 1.6564 2.0707 2.9516 3.5558 2.6919 
+1.7726 2.4437 2.4332 2.3980 2.7850 2.6269 
+
+Output (NEON) (6x6):
+1.7246 2.3480 2.2608 2.5071 2.0331 2.2366 
+2.0621 2.8695 2.9605 2.3741 2.3478 2.1103 
+3.2912 2.7878 2.4099 1.7529 2.4313 3.3500 
+2.7314 1.9334 1.7521 2.2580 2.3990 3.1305 
+2.7188 1.6564 2.0707 2.9516 3.5558 2.6919 
+1.7726 2.4437 2.4332 2.3980 2.7850 2.6269 
+
+Output (SVE) (6x6):
+1.7246 2.3480 2.2608 2.5071 2.0331 2.2366 
+2.0621 2.8695 2.9605 2.3741 2.3478 2.1103 
+3.2912 2.7878 2.4099 1.7529 2.4313 3.3500 
+2.7314 1.9334 1.7521 2.2580 2.3990 3.1305 
+2.7188 1.6564 2.0707 2.9516 3.5558 2.6919 
+1.7726 2.4437 2.4332 2.3980 2.7850 2.6269 
+
+Output (SVE2) (6x6):
+1.7246 2.3480 2.2608 2.5071 2.0331 2.2366 
+2.0621 2.8695 2.9605 2.3741 2.3478 2.1103 
+3.2912 2.7878 2.4099 1.7529 2.4313 3.3500 
+2.7314 1.9334 1.7521 2.2580 2.3990 3.1305 
+2.7188 1.6564 2.0707 2.9516 3.5558 2.6919 
+1.7726 2.4437 2.4332 2.3980 2.7850 2.6269 
+
+
+===== Testing Convolution (Input: 128x128, Kernel: 3x3) =====
+Scalar implementation: 0.000102 seconds
+NEON implementation: 0.000043 seconds (2.38x speedup)
+SVE implementation: 0.000209 seconds (0.49x speedup)
+SVE2 implementation: 0.000206 seconds (0.50x speedup)
+
+===== Testing Convolution (Input: 512x512, Kernel: 5x5) =====
+Scalar implementation: 0.005766 seconds
+NEON implementation: 0.001452 seconds (3.97x speedup)
+SVE implementation: 0.008838 seconds (0.65x speedup)
+SVE2 implementation: 0.008827 seconds (0.65x speedup)
