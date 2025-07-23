@@ -5,6 +5,11 @@
 3.构建一个 Dockerfile 文件. 
 4.构建时只考虑该 Java 工程仅在 x86 架构运行.
 
+## Golang demo
+> 帮我构建一个 Golang 工程: 保存在 golang-demos/ 目录下
+Golang 代码用于演示作用，不需要包含任何的 C/C++ 语言的 CGO 调用。
+代码工程包含 3 个文件，每个文件一个功能：(1)字符串使用 base64 进行编码；(2)字符串反转；(3)统计字符串中每个字符出现的次数。 通过 Makefile 管理应用的编译构建，再提供一个 Dockerfile 用于构建容器镜像。
+
 ## Golang with CGO demo
 > 帮我构建一个 Golang 工程: 保存在 golang-cgo-demos/x86 目录下。
 1.Golang 代码用于演示作用，除了包含普通的 GOLANG 语言源代码之外，要包含 3 个 CGO 的调用：第一个 CGO 调用通过 inline 的方式在 *.go 源代码文件中加入注释来嵌入 C/C++ 代码；第二个 CGO 调用将 C/C++ 代码放在单独的文件中，然后在 Go 文件中引用；第三个 CGO 调用使用预编译的共享库（.so 文件），在go 程序执行时，通过动态加载和调用 so 文件中的方法。
@@ -16,7 +21,7 @@
 > 接下来，将这个代码工程 golang-cgo-demos/x86 复制一份到 golang-cgo-demos/arm64, 并将 golang-cgo-demos/arm64 路径下所有源文件适配到 Arm64 平台，目标是可以在 Graviton3 实例上运行。
 
 ## C/C++ SIMD demo
-帮我构建一个 C/C++ 工程: 使用目录 simd-demo-x86 保存全部源代码和相关文件。
+帮我构建一个 C/C++ 工程: 使用目录 simd-demo/x86 保存全部源代码和相关文件。
 1. C/C++ 代码用于演示作用，除了包含普通的 C/C++ 语言源代码之外，还要包含 SSE/AVX/AVX2/AVX512 等主要指令的使用 
 2. 包含 SIMD 指令的使用场景：矩阵乘法和卷积操作
 3. 程序的编译构建通过 Makefile 来个管理，暂时只考虑该 C/C++ 工程在 x86 架构运行；
