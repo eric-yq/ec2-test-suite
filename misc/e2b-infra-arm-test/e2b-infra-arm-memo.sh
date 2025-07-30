@@ -1,25 +1,25 @@
-# more ../infra-iac/db/config.json
+# more infra-iac/db/config.json
 {
     "email": "e2b@example.com",
-    "teamId": "165cfe83-1d9a-4d59-b825-8dfd728fae16",
-    "accessToken": "sk_e2b_lk56363q20l95hz8j9bf732g8y27x0je",
-    "teamApiKey": "e2b_kqdg5v9l6l3rvurv0zptr9efjffq4o2c",
+    "teamId": "458ff0aa-cc78-4e3c-b145-d56ecf8a613c",
+    "accessToken": "sk_e2b_n51qjq3blea8jcxkfdilqc5j6ovewrfs",
+    "teamApiKey": "e2b_mnnvx25h33es13fu7t7js44uoksxy4p5",
     "cloud": "aws",
     "region": "us-east-1"
 }
 
 # 模板 ID
-## template-id（base-arm64）              a9ygil690s9brjwtc3ce
-## template-id（code-interpreter-arm64）  0izz7ahevdd55t1k4jzd
-## template-id（desktop-arm64）           y6b2yl4cz2eabh1891l1
+## template-id（base-arm64）              hx2mpdts05mkl53hjw9f
+## template-id（code-interpreter-arm64）  xxx
+## template-id（desktop-arm64）           xxx
 
 # 创建sandbox
 curl -X POST \
  https://api.e2b-arm.daworld.shop/sandboxes \
- -H "X-API-Key: e2b_kqdg5v9l6l3rvurv0zptr9efjffq4o2c" \
+ -H "X-API-Key: e2b_mnnvx25h33es13fu7t7js44uoksxy4p5" \
  -H 'Content-Type: application/json' \
  -d '{
-        "templateID": "e2zgbdra4h1trzdgcqk7",
+        "templateID": "hx2mpdts05mkl53hjw9f",
         "timeout": 3600,
         "autoPause": true,
         "envVars": {
@@ -40,8 +40,8 @@ curl -X POST \
 # npm i -g @e2b/cli
 
 # Export environment variables
-export E2B_API_KEY=e2b_kqdg5v9l6l3rvurv0zptr9efjffq4o2c
-export E2B_ACCESS_TOKEN=sk_e2b_lk56363q20l95hz8j9bf732g8y27x0je
+export E2B_API_KEY=e2b_mnnvx25h33es13fu7t7js44uoksxy4p5
+export E2B_ACCESS_TOKEN=sk_e2b_n51qjq3blea8jcxkfdilqc5j6ovewrfs
 export E2B_DOMAIN="e2b-arm.daworld.shop"
 
 # Common E2B CLI commands
