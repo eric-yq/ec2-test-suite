@@ -5,6 +5,13 @@
 3.构建一个 Dockerfile 文件. 
 4.构建时只考虑该 Java 工程仅在 x86 架构运行.
 
+## Java with JNI/JNA demo ， 在 X86 实例上构建 Arm64 可以使用的 jar 包
+> 帮我构建一个 Java 工程: 源代码保存在 java-native-demo-multiarch 目录下。
+1.Java 代码用于演示作用，除了包含普通的 java 语言源代码之外，还要引用第三方组件和 native library 的调用，例如 snappy, commons-crypto 等（只是举例）, 这些组件要分成两类，一类是提供了字节码的，另一类是 *.so 文件的，在 pom.xml 文件中进行引入，不管是哪一类，都使用仅支持 x86_64 架构的旧版本（隐含含义为不支持 aarch64/arm64 架构）; 
+2.使用 C/C++ 语言构建 3 个 *.so 文件，在 java 源代码中进行调用. 
+3.构建一个 Dockerfile 文件. 
+4.构建时先只考虑该 Java 工程仅在 x86 架构运行.
+
 ## Golang demo
 > 帮我构建一个 Golang 工程: 保存在 golang-demos/ 目录下
 Golang 代码用于演示作用，不需要包含任何的 C/C++ 语言的 CGO 调用。
