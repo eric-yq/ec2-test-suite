@@ -17,7 +17,7 @@ import gc
 import os
 
 class Qwen3Benchmark:
-    def __init__(self, model_name="Qwen/Qwen2.5-0.5B", device="auto"):
+    def __init__(self, model_name="Qwen/Qwen3-0.6B-BF16", device="auto"):
         self.model_name = model_name
         self.device = self._get_device(device)
         self.model = None
