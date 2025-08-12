@@ -23,7 +23,9 @@ if [ ! -d "venv" ]; then
 fi
 
 # 激活虚拟环境
-source venv/bin/activate
+cd ~
+apt install -python3.10-venv
+source ~/venv/bin/activate
 
 # 升级pip
 pip install --upgrade pip
