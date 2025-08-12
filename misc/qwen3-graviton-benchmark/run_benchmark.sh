@@ -47,7 +47,7 @@ export OMP_NUM_THREADS=$(nproc)
 
 # 运行benchmark
 echo "Starting benchmark..."
-python3 qwen3_benchmark.py --model "Qwen/Qwen2.5-0.5B" --device cpu
+python3 qwen3_benchmark.py --model "Qwen/Qwen3-0.6B-BF16" --device cpu
 
 echo "Benchmark completed!"
 echo "Results saved in qwen3_benchmark_${INSTANCE_TYPE}_*.json"
