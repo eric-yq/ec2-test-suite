@@ -160,7 +160,9 @@ export CXX=aarch64-linux-gnu-g++
 ```
 
 ### 构建多架构容器镜像
-介绍如果通过 `Docker buildx` 在 x86 环境下构建 `x86 和 arm64` 架构的容器镜像，并通过 `Manifest` 机制管理多架构镜像。
+介绍如何通过 `Docker buildx` 在 x86 环境下构建 `x86 和 arm64` 架构的容器镜像，并通过 `Manifest` 机制管理多架构镜像。
+
+***但是，推荐您在 Graviton 环境下对编译构建 Arm64 架构的容器镜像。***
 
 #### 前置条件：准备 Docker buildx 运行环境
 ```bash
