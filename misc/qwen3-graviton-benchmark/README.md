@@ -31,6 +31,7 @@
 # 克隆或上传文件到 EC2 实例
 # 运行自动化脚本
 apt install -python3.10-venv
+cp /usr/lib/python3.10/venv/scripts/common/activate ~/venv/bin/
 ./run_benchmark.sh
 ```
 
