@@ -20,6 +20,7 @@ echo "Architecture: $ARCH"
 if [ ! -d "venv" ]; then
     echo "Creating virtual environment..."
     python3 -m venv venv
+    cp /usr/lib/python3.10/venv/scripts/common/activate venv/bin/
 fi
 
 # 激活虚拟环境
