@@ -1,0 +1,86 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'com.example'
+version = '1.0.0'
+sourceCompatibility = '11'
+targetCompatibility = '11'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // 第一类：提供字节码的第三方组件（使用仅支持 x86_64 的旧版本）
+    implementation 'org.xerial.snappy:snappy-java:1.1.7.3'  // 旧版本，不支持 aarch64
+    implementation 'org.apache.commons:commons-crypto:1.1.0'  // 兼容 OpenSSL 3.0 的版本
+    implementation 'net.java.dev.jna:jna:5.5.0'  // 旧版本，用于 native 调用
+    implementation 'net.java.dev.jna:jna-platform:5.5.0'
+    
+    // 第二类：*.so 文件依赖（通过 JNA 或 JNI 调用）
+    implementation 'org.rocksdb:rocksdbjni:6.15.5'  // 旧版本，包含 x86_64 的 .so 文件
+    
+    // 日志和工具类
+    implementation 'org.slf4j:slf4j-api:1.7.30'
+    implementation 'ch.qos.logback:logback-classic:1.2.3'
+    
+    // 测试依赖
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.mockito:mockito-core:3.12.4'
+}
+
+// 设置主类
+mainClassName = 'com.example.demo.NativeDemoApplication'
+
+// 自定义任务：编译 native libraries
+task compileNativeLibs(type: Exec) {
+    description = 'Compile native C/C++ libraries'
+    workingDir = file('native')
+    commandLine 'make', 'clean', 'all'
+}
+
+// 自定义任务：复制 native libraries 到 resources
+task copyNativeLibs(type: Copy, dependsOn: compileNativeLibs) {
+    description = 'Copy compiled native libraries to resources'
+    from 'native/build'
+    into 'src/main/resources/native'
+    include '*.so'
+}
+
+// 确保在编译 Java 代码前先编译 native libraries
+compileJava.dependsOn copyNativeLibs
+
+// 打包时包含 native libraries
+jar {
+    from('src/main/resources/native') {
+        into 'native'
+    }
+    
+    manifest {
+        attributes(
+            'Main-Class': 'com.example.demo.NativeDemoApplication',
+            'Implementation-Title': project.name,
+            'Implementation-Version': project.version
+        )
+    }
+}
+
+// 创建 fat jar
+task fatJar(type: Jar) {
+    classifier = 'all'
+    duplicatesStrategy = 'exclude'
+    
+    manifest {
+        attributes 'Main-Class': 'com.example.demo.NativeDemoApplication'
+    }
+    
+    from {
+        configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    
+    with jar
+}
+
+build.dependsOn fatJar

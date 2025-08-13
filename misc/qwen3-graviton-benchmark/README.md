@@ -45,6 +45,7 @@ export TOKENIZERS_PARALLELISM=false
 
 # 运行 benchmark
 python3 qwen3_benchmark.py --model "Qwen/Qwen2.5-0.5B" --device cpu
+python3 qwen3_benchmark.py --model "prithivMLmods/Qwen3-0.6B-ft-bf16" --device cpu
 ```
 
 ### 2. 分析和比较结果
