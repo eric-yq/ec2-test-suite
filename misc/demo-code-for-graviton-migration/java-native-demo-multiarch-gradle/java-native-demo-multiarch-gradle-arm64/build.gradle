@@ -1,7 +1,13 @@
 plugins {
     id 'java'
     id 'application'
+    id 'maven'
 }
+// add id 'maven' in plugins, then perform `gradle install`, 
+// in build/poms folder, there will be a `pom-default.xml` file generated
+// copy it as pom.xml to root directory of the project.
+
+
 
 group = 'com.example'
 version = '1.0.0'
