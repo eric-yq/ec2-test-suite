@@ -8,7 +8,6 @@ plugins {
 // copy it as pom.xml to root directory of the project.
 
 
-
 group = 'com.example'
 version = '1.0.0'
 sourceCompatibility = '11'
