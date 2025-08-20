@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Reference：https://aws.amazon.com/cn/blogs/china/aws-graviton3-accelerates-spark-job-execution-benchmark/
-# Amazon Linux 2, 使用 ec2-user 账号登录.
+# Amazon Linux 2023, 使用 ec2-user 账号登录.
 
 # 设置软件栈版本：
 echo "export HADOOP_VERSION=3.3.1" >> ~/.bashrc
@@ -17,8 +17,8 @@ ssh localhost
 exit
 
 # 安装 OpenJDK
-sudo amazon-linux-extras install -y epel
-sudo yum install -y java-1.8.0-openjdk java-1.8.0-openjdk-devel git gcc gcc-c++ patch htop dstat nload
+sudo yum install -y java-1.8.0-openjdk java-1.8.0-openjdk-devel git gcc gcc-c++ patch htop python3 python3-pip
+sudo pip3 install dool
 JAVA_HOME="/usr/lib/jvm/jre"
 echo "export JAVA_HOME=${JAVA_HOME}" >> ~/.bashrc
 echo "export PATH=${JAVA_HOME}/bin/:${PATH}" >> ~/.bashrc
@@ -35,7 +35,7 @@ echo "export PATH=$PATH:$HOME/scala/bin" >> ~/.bashrc
 source  ~/.bashrc
 
 # 安装 Maven
-wget https://dlcdn.apache.org/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz
+wget https://archive.apache.org/dist/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz
 tar zxf apache-maven-3.9.6-bin.tar.gz
 ln -s ~/apache-maven-3.9.6 maven
 MAVEN_HOME="$HOME/maven"
@@ -45,8 +45,7 @@ source ~/.bashrc
 mvn -v
 
 #安装 mysql 客户端，主要用于 Hive 组件：
-wget https://repo.mysql.com/mysql80-community-release-el7-7.noarch.rpm
-sudo rpm -Uvh mysql80-community-release-el7-7.noarch.rpm
+sudo yum install -y https://dev.mysql.com/get/mysql80-community-release-el9-1.noarch.rpm
 sudo yum install -y mysql-community-client mysql-community-server --nogpgcheck
 sudo systemctl start mysqld
 sudo systemctl status mysqld
@@ -257,8 +256,6 @@ spark-submit --class org.apache.spark.examples.SparkPi \
 cd ~
 git clone https://github.com/hortonworks/hive-testbench.git
 cd $HOME/hive-testbench
-## 方法 1：
-./tpcds-build.sh
 
 ## 方法 2： 如果上述方法有问题，可能是  tpcds_kit.zip 下载失败导致的，可以尝试下面的方法
 cd $HOME/hive-testbench/tpcds-gen
@@ -268,39 +265,44 @@ cd $HOME/hive-testbench/tpcds-gen
 #       curl --output tpcds_kit.zip https://public-repo-1.hortonworks.com/hive-testbench/tpcds/TPCDS_Tools.zip
 # （2）手动下载 tpcds_kit.zip
 wget https://github.com/eric-yq/ec2-test-suite/raw/refs/heads/main/misc/spark-tpcds/tpcds_kit.zip
-# （3）编译：默认使用 AL2 的 gcc-7.3
-make 
 
-## 如果gcc 10 以上版本，需要做如下修改
-sudo mv /usr/bin/gcc /usr/bin/gcc-impl
+## gcc 10 以上版本，需要做如下修改
+sudo su - root
+mv /usr/bin/gcc /usr/bin/gcc-impl
 ARCH=$(arch)
 if [[ "$ARCH" == "aarch64" ]]; then
-    sudo cat > /usr/bin/gcc  << EOF
+    cat > /usr/bin/gcc  << EOF
 #! /bin/sh  
-/usr/bin/gcc-impl -fsigned-char -fcommon "$@"
+/usr/bin/gcc-impl -fsigned-char -fcommon \$@
 EOF
 elif [[ "$ARCH" == "x86_64" ]]; then
-    sudo cat > /usr/bin/gcc  << EOF
+    cat > /usr/bin/gcc  << EOF
 #! /bin/sh  
-/usr/bin/gcc-impl -fcommon "$@"
+/usr/bin/gcc-impl -fcommon \$@
 EOF
 else
     echo "$ARCH not supported"
     exit 1
 fi
-sudo chmod +x /usr/bin/gcc
+chmod +x /usr/bin/gcc
+## 退出root 用户
+exit
+
+## 回到 ec2-user 用户操作
+cd $HOME/hive-testbench/
+./tpcds-build.sh
 
 # 配置 benchmark 工具：
 IPADDR=localhost
-sed -i "s/localhost:2181\/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2?tez.queue.name=default/${IPADDR}:10000\//" $HOME/hive-testbench/tpcds-setup.sh
-sed -i "s/hive.optimize.sort.dynamic.partition.threshold=0/hive.optimize.sort.dynamic.partition=true/" $HOME/hive-testbench/settings/*.sql
+sed -i.bak "s/localhost:2181\/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2?tez.queue.name=default/${IPADDR}:10000\//" $HOME/hive-testbench/tpcds-setup.sh
+sed -i.bak "s/hive.optimize.sort.dynamic.partition.threshold=0/hive.optimize.sort.dynamic.partition=true/" $HOME/hive-testbench/settings/*.sql
 
 ################################################################################################
 # 生成测试数据集
 # 通过指定 SF 的值，设置程序需要生成的数据量，本文中 SF=100 表示生成 100GB 的数据量。
 # 根据生成的数据量大小差异，此过程可能会持续数分钟到数小时不等。
 cd $HOME/hive-testbench
-SF=100
+SF=600
 ./tpcds-setup.sh $SF
 
 ################################################################################################
@@ -308,7 +310,7 @@ SF=100
 # 待数据全部完成之后，预先准备 Benchmark 过程中需要的一些结果目录：
 cd ~
 SUT_NAME="spark-tpcds"
-PN=$(sudo dmidecode -s system-product-name | tr ' ' '_')
+PN=$(sudo cloud-init query ds.meta_data.instance_type)
 DATA_DIR=~/${PN}_${SUT_NAME}
 CFG_DIR=$DATA_DIR/system-infomation
 TPCDS_RESULT_DIR=$DATA_DIR/spark-tpcds-result
