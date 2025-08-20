@@ -1,3 +1,10 @@
+## Node.js demo ，
+> 帮我构建一个 Node.js 工程: 源代码保存在 nodejs-demo/x86 目录下。
+1.nodejs 代码用于演示作用，除了包含普通的 nodejs 语言源代码之外，还要引用第三方组件和 native library 的调用, 不管是哪一类，都使用仅支持 x86_64 架构的旧版本（隐含含义为不支持 aarch64/arm64 架构）; 
+2.使用 C/C++ 语言构建 2 个 *.so 文件，在 nodejs 源代码中进行调用. 
+3.构建一个 Dockerfile 文件. 
+4.构建时先只考虑该 nodejs 工程仅在 x86 架构运行.
+
 ## Java with JNI/JNA demo
 > 帮我构建一个 Java 工程:
 1.Java 代码用于演示作用，除了包含普通的 java 语言源代码之外，还要包含 navive library 的调用，例如 snappy, commons-crypto, leveldbjni 等, 在 pom.xml 文件中进行引入; 
