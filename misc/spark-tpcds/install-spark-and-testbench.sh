@@ -332,3 +332,9 @@ for i in $LIST; do
     execution_time=$(grep "Time taken" $RESULT_LOG)
     echo "[$(date +%Y%m%d-%H%M%S)] $i : $execution_time " >> $RESULT_SUMMARY
 done
+
+################################################################################################
+# 查看 Benchmark 执行结果
+## 当每一个 SQL 文件在执行时，可以通过下面步骤查看执行进程
+cd $RESULT_PATH
+tail -f result_summary_spark_tpc-ds.txt
