@@ -228,8 +228,10 @@ done
 
 ##############################################################################################
 ## PTS（Phoronix-Test-Suite）基准测试
-## 安装依赖包
-git clone https://github.com/phoronix-test-suite/phoronix-test-suite.git ~/phoronix-test-suite
+## 安装依赖包,master 分支的代码需要修改才能正常运行，使用 10.8.4 的稳定版本。
+# git clone https://github.com/phoronix-test-suite/phoronix-test-suite.git ~/phoronix-test-suite
+wget https://github.com/phoronix-test-suite/phoronix-test-suite/releases/download/v10.8.4/phoronix-test-suite-10.8.4.tar.gz
+tar zxf phoronix-test-suite-10.8.4.tar.gz
 cd ~/phoronix-test-suite/pts-core/commands/
 cp ./batch_setup.php ./batch_setup.php.original.bak
 sed s:"test identifier', true":"test identifier', false":g ./batch_setup.php > ./batch_setup.php.1
