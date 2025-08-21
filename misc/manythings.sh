@@ -1,4 +1,10 @@
 
+# disable 服务
+systemctl list-units --type=service --state=running
+systemctl disable --now prometheus.service  
+systemctl disable --now grafana-server.service 
+
+
 ## 安装docker
 yum install -y docker python3-pip htop iotop
 pip3 install dool
