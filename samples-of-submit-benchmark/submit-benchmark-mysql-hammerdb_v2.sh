@@ -4,7 +4,8 @@ set -e
 
 ## 待测 EC2 规格和 OS
 os_types="al2023"
-instance_types="i8g.2xlarge"
+instance_types="r8i.2xlarge r8g.2xlarge r7a.2xlarge r7g.2xlarge r7i.2xlarge r6a.2xlarge r6g.2xlarge r6i.2xlarge r5.2xlarge" 
+# instance_types="i8g.2xlarge"
 
 for os in ${os_types} 
 do
@@ -30,9 +31,9 @@ do
 		bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 60 4 100 ${ins} 
 		bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 60 6 100 ${ins} 
 		bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 60 8 100 ${ins} 
-		bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 60 10 100 ${ins} 
-		bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 60 12 100 ${ins} 
-		bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 60 16 100 ${ins} 
+		bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 30 10 100 ${ins} 
+		bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 30 12 100 ${ins} 
+		bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 30 16 100 ${ins} 
 
 		## 停止实例
 		# aws ec2 stop-instances --instance-ids ${INSTANCE_ID} 

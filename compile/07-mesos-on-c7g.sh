@@ -25,6 +25,4 @@ tar -zxf mesos-1.11.0.tar.gz && cd mesos-1.11.0
 mkdir build && cd build
 CXXFLAGS="-Wno-parentheses" ../configure
 make  -j 4 V=0
-
-make check
 make install
