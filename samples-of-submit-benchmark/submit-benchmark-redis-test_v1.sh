@@ -20,9 +20,9 @@ do
 		echo "$0: Star to run benchmark"
 		source /tmp/temp-setting
 		bash benchmark/redis-benchmark_v1.sh ${INSTANCE_IP_MASTER} 6379 180
-		bash benchmark/redis-benchmark_v1.sh ${INSTANCE_IP_MASTER} 8006 180
-		bash benchmark/redis-benchmark_v1.sh ${INSTANCE_IP_MASTER} 8010 180
-		bash benchmark/redis-benchmark_v1.sh ${INSTANCE_IP_MASTER} 8014 180
+		bash benchmark/redis-benchmark_v1.sh ${INSTANCE_IP_MASTER} 8003 180
+		bash benchmark/redis-benchmark_v1.sh ${INSTANCE_IP_MASTER} 8005 180
+		bash benchmark/redis-benchmark_v1.sh ${INSTANCE_IP_MASTER} 8007 180
 		
 		## 停止实例
 		aws ec2 terminate-instances --instance-ids ${INSTANCE_ID}
