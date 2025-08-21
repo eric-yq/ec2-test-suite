@@ -26,8 +26,8 @@ fi
 
 if [[ -z ${OS_TYPE} ]]
 then
-    echo "$0: You do not specify OS Type with option -o, So we will use OS(Amazon Linux 2) by default. "
-    OS_TYPE=al2
+    echo "$0: You do not specify OS Type with option -o, So we will use OS(Amazon Linux 2023) by default. "
+    OS_TYPE=al2023
 fi
 
 REGION_NAME=$(cloud-init query region)
@@ -56,7 +56,7 @@ SG_ID_XXX=$(cloud-init query ds.meta_data.network.interfaces.macs.$MAC.security_
 # 获取 placement group name
 ins_id=$(cloud-init query ds.meta_data.instance_id)
 PG_NAME_XXX=$(aws ec2 describe-instances \
-  --instance-ids $ins_id \
+  --instance-ids $ins_id --region $REGION_NAME \
   --query "Reservations[0].Instances[0].Placement.GroupName" \
   --output text)
   
