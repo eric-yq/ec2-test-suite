@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# r7g.2xlarge(Graviton3,8C64G), Rocky Linux 8.10， 40G gp3
+# r7g.2xlarge(Graviton3, 8C 64G), Rocky Linux 8.10, 40G gp3
+# Rocky Linux 8.10 AMI ID 从 https://rockylinux.org/zh-CN/download 查找
+# AMI 特殊说明：上面 URL 找到的 AMI 中通过 lvs 管理分区，需要提前将 rocky-root 扩展为 EBS 的大小。
 
 sudo su - root
 
@@ -17,8 +19,7 @@ yum install -y -q tar wget git maven python2 python2-devel python2-six python2-v
   java-1.8.0-openjdk-devel zlib-devel libcurl-devel openssl-devel cyrus-sasl-devel \
   cyrus-sasl-md5 apr-devel subversion-devel apr-util-devel
 
-# 源码安装 mesos
-# 参考 https://mesos.apache.org/documentation/latest/building/
+# 源码安装 mesos, 参考 https://mesos.apache.org/documentation/latest/building/
 wget https://downloads.apache.org/mesos/1.11.0/mesos-1.11.0.tar.gz
 tar -zxf mesos-1.11.0.tar.gz && cd mesos-1.11.0
 ./bootstrap
@@ -26,3 +27,4 @@ mkdir build && cd build
 CXXFLAGS="-Wno-parentheses" ../configure
 make  -j 4 V=0
 make install
+
