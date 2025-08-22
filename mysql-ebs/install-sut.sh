@@ -48,8 +48,8 @@ pid-file=/var/run/mysqld/mysqld.pid
 ## if on instance store: suggest enable them all;
 performance_schema=off
 skip_log_bin=1
+innodb_flush_log_at_trx_commit=0
 binlog_expire_logs_seconds=3600
-innodb_flush_log_at_trx_commit=1
 ######################################################
 # general
 max_connections=4000
