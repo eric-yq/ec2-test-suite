@@ -62,7 +62,7 @@ SG_ID_XXX=$(cloud-init query ds.meta_data.network.interfaces.macs.$MAC.security_
 # 获取placement group name
 ins_id=$(cloud-init query ds.meta_data.instance_id)
 PG_NAME_XXX=$(aws ec2 describe-instances \
-  --instance-ids $ins_id \
+  --instance-ids $ins_id --region $REGION_NAME \
   --query "Reservations[0].Instances[0].Placement.GroupName" \
   --output text)
 
