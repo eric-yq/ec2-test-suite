@@ -19,7 +19,7 @@ do
 		bash benchmark/nginx-benchmark.sh ${INSTANCE_IP_LOADBALANCE}
 		
 		## 停止实例
-		aws ec2 terminate-instances --region $REGION_NAME --instance-ids \
-		  ${INSTANCE_ID_LOADBALANCE} ${INSTANCE_ID_WEB1} ${INSTANCE_ID_WEB2} &
+		aws ec2 terminate-instances --region $(cloud-init query region) \
+		--instance-ids ${INSTANCE_ID_LOADBALANCE} ${INSTANCE_ID_WEB1} ${INSTANCE_ID_WEB2} &
 	done
 done

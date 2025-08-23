@@ -43,7 +43,7 @@ do
 #  		bash benchmark/mysql-benchmark_sysbench.sh ${INSTANCE_IP_MASTER} 3  10 1000000 32
 
 		## 停止实例
-		aws ec2 stop-instances --instance-ids ${INSTANCE_ID} 
+		aws ec2 stop-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region)
 	done
 done
 

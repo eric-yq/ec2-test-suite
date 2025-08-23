@@ -25,7 +25,7 @@ do
 		bash benchmark/redis-benchmark_v1.sh ${INSTANCE_IP_MASTER} 8007 180
 		
 		## 停止实例
-		aws ec2 terminate-instances --instance-ids ${INSTANCE_ID}
+		aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region) &
 	done
 done
 
