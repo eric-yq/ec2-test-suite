@@ -23,6 +23,9 @@ resource "aws_instance" "sut_server" {
   key_name 					= var.ami_key_pair_name
   user_data 				= file(var.userdata_file)
 
+  # 设置实例租户为 dedicated
+  tenancy                = "dedicated"
+
   root_block_device {
     volume_type           	= var.root_block_volume_type
     volume_size           	= var.root_block_volume_size

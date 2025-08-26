@@ -23,14 +23,14 @@ java -version
 cd /root/
 wget https://archive.apache.org/dist/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz
 tar zxf apache-maven-3.9.6-bin.tar.gz
-echo "export PATH=$PATH:/root/apache-maven-3.9.5/bin" >> ~/.bashrc
+echo "export PATH=$PATH:/root/apache-maven-3.9.6/bin" >> ~/.bashrc
 source /root/.bashrc
 mvn -v
 
 ## 将 下列 3 个 IPADDR_xxx 变量设置为 3 台 EC2 实例的 VPC IP 地址，并保存在 /etc/hosts 文件中
-IPADDR_MASTER="172.31.11.248"
-IPADDR_WORKER1="172.31.3.25"
-IPADDR_WORKER2="172.31.9.120"
+IPADDR_MASTER="172.31.37.225"
+IPADDR_WORKER1="172.31.39.81"
+IPADDR_WORKER2="172.31.43.57"
 cat << EOF >> /etc/hosts
 $IPADDR_MASTER  master
 $IPADDR_WORKER1 worker1
@@ -101,7 +101,7 @@ bash ~/flink-benchmark/nexmark-flink/bin/setup_cluster.sh
 #####################################################################
 ## 方法 1: 运行 benchmark 的所有 SQL
 cd ~
-screen -R nexmark -L
+screen -R ttt -L
 bash ~/flink-benchmark/nexmark-flink/bin/run_query.sh all
 
 ## 方法 2: 执行单独的 SQL， q6 有问题无法执行
