@@ -18,7 +18,7 @@ do
 		echo "$0: OS_TYPE=${os}, INSTANCE_TYPE=${ins}"
 		bash launch-instances-single.sh -s mysql-sysbench -t ${ins} -o ${os}
 		
-		echo "$0: Sleep 180 seconds..."
+		echo "$0: [$(date +%Y%m%d.%H%M%S)]  Sleep 180 seconds..."
 		sleep 180
 		
 		## 执行 Benchmark 测试

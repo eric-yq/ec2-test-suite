@@ -13,7 +13,7 @@ do
 		echo "$0: OS_TYPE=${os}, INSTANCE_TYPE=${ins}"
 		bash launch-instances-single.sh -s qdrant -t ${ins} -o ${os}
 		
-		echo "$0: Sleep 300 seconds..."
+		echo "$0: [$(date +%Y%m%d.%H%M%S)] Sleep 300 seconds..."
 		sleep 120
 		
 		## 执行 Benchmark 测试

@@ -1,52 +1,32 @@
 #!/bin/bash
 
+# OS: CentOS Stream 9
 # 作为 cloud-init 脚本时，使用 root 用户执行
 
 install_al2023_dependencies () {
   echo "------ INSTALLING UTILITIES ------"
   yum clean metadata
   yum -y update
-  yum install -y -q dmidecode vim unzip git screen wget p7zip
-  yum -y -q groupinstall "Development Tools"
-  yum install -y -q glibc blas blas-devel openssl-devel libXext-devel libX11-devel libXaw libXaw-devel mesa-libGL-devel 
-  yum install -y -q python3 python3-pip python3-devel cargo
-  yum install -y -q php php-cli php-json php-xml perl-IPC-Cmd
+  yum install -y epel-realease
+  yum install -y dmidecode vim unzip git screen wget p7zip
+  yum -y groupinstall "Development Tools"
+  yum install -y glibc blas openssl-devel libXext-devel libX11-devel libXaw libXaw-devel mesa-libGL-devel 
+  yum install -y python3 python3-pip python3-devel cargo
+  yum install -y php php-cli php-json php-xml perl-IPC-Cmd
 
   echo "------ INSTALLING HIGH LEVEL PERFORMANCE TOOLS ------"
-  yum install -y -q sysstat  hwloc hwloc-gui util-linux numactl tcpdump htop iotop iftop 
+  yum install -y sysstat  hwloc hwloc-gui util-linux numactl tcpdump htop iotop iftop 
 
   echo "------ INSTALLING LOW LEVEL PERFORAMANCE TOOLS ------"
-  yum install -y -q perf kernel-devel-$(uname -r) bcc
+  yum install -y perf kernel-devel-$(uname -r) bcc
 
   echo "------ INSTALL ANALYSIS TOOLS AND DEPENDENCIES ------"
-  curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-  python3 get-pip.py
   python3 -m pip install pandas numpy scipy matplotlib sh seaborn plotext
   git clone https://github.com/brendangregg/FlameGraph.git FlameGraph
-  
+
   echo "------ DONE ------"
 }
 
-# 配置 AWSCLI
-cd /root/
-yum remove -y awscli
-ARCH=$(arch)
-curl "https://awscli.amazonaws.com/awscli-exe-linux-${ARCH}.zip" -o "awscliv2.zip"
-unzip awscliv2.zip
-./aws/install
-cp -rf /usr/local/bin/aws /usr/bin/aws
-aws --version
-
-aws_ak_value="akxxx"
-aws_sk_value="skxxx"
-aws_region_name="us-west-2"
-aws_s3_bucket_name="s3://ec2-core-benchmark-ericyq"
-aws configure set aws_access_key_id ${aws_ak_value}
-aws configure set aws_secret_access_key ${aws_sk_value}
-aws configure set default.region ${aws_region_name}
-aws s3 ls
-
-# 主要流程
 OS_NAME=$(egrep ^NAME /etc/os-release | awk -F "\"" '{print $2}')
 OS_VERSION=$(egrep ^VERSION_ID /etc/os-release | awk -F "\"" '{print $2}')
 ARCH=$(arch)
@@ -54,15 +34,18 @@ ARCH=$(arch)
 install_al2023_dependencies
 
 ## 更新 cmake
-ARCH=$(arch) 
-VER=3.29.6
-wget https://github.com/Kitware/CMake/releases/download/v${VER}/cmake-${VER}-linux-${ARCH}.sh
-sh cmake-${VER}-linux-${ARCH}.sh --skip-license --prefix=/usr
+ARCH=$(lscpu | grep Architecture | awk -F " " '{print $NF}')   ## aarch64, x86_64
+mkdir /root/cmake-3.25.2-linux-${ARCH}
+cd    /root/cmake-3.25.2-linux-${ARCH}
+wget https://github.com/Kitware/CMake/releases/download/v3.25.2/cmake-3.25.2-linux-${ARCH}.sh
+sh cmake-3.25.2-linux-${ARCH}.sh --skip-license 
+mv /usr/bin/cmake /usr/bin/cmake.bak
+ln -s /root/cmake-3.25.2-linux-${ARCH}/bin/cmake /usr/bin/cmake
 cmake -version
 
 ## 获取机型规格、kernel 版本，创建保存输出文件的目录。
 cd /root/
-PN=$(cloud-init query ds.meta_data.instance_type)
+PN="c4a-highmem-16"
 KERNEL_RELEASE=$(uname -r)
 DATA_DIR=~/${PN}_hwinfo_${KERNEL_RELEASE}
 CFG_DIR=${DATA_DIR}/system-infomation
@@ -70,15 +53,15 @@ PTS_RESULT_DIR=${DATA_DIR}/pts-result
 LOG_DIR=${DATA_DIR}/logs
 mkdir -p ${DATA_DIR}  ${CFG_DIR} ${PTS_RESULT_DIR} ${LOG_DIR} 
 
-echo "export DATA_DIR=${DATA_DIR}" >> /root/.bashrc
-echo "export CFG_DIR=${CFG_DIR}" >> /root/.bashrc
-echo "export PTS_RESULT_DIR=${PTS_RESULT_DIR}" >> /root/.bashrc
-echo "export LOG_DIR=${LOG_DIR}" >> /root/.bashrc
-echo "export PN=${PN}" >> /root/.bashrc
-echo "export TEST_RESULTS_IDENTIFIER=${PN}" >> /root/.bashrc
-echo "export TEST_RESULTS_DESCRIPTION=${PN}" >> /root/.bashrc
-echo "export TEST_RESULTS_NAME=${PN}" >> /root/.bashrc
-source /root/.bashrc
+echo "DATA_DIR=${DATA_DIR}" >> /root/.bash_profile
+echo "CFG_DIR=${CFG_DIR}" >> /root/.bash_profile
+echo "PTS_RESULT_DIR=${PTS_RESULT_DIR}" >> /root/.bash_profile
+echo "LOG_DIR=${LOG_DIR}" >> /root/.bash_profile
+echo "PN=${PN}" >> /root/.bash_profile
+echo "TEST_RESULTS_IDENTIFIER=${PN}" >> /root/.bash_profile
+echo "TEST_RESULTS_DESCRIPTION=${PN}" >> /root/.bash_profile
+echo "TEST_RESULTS_NAME=${PN}" >> /root/.bash_profile
+source /root/.bash_profile
 
 ## 收集系统信息
 dmidecode > ${CFG_DIR}/cfg_dmidecode.txt
@@ -174,7 +157,7 @@ done
 
 ##############################################################################################
 ## PTS（Phoronix-Test-Suite）基准测试
-## 安装依赖包,master 分支的代码需要修改才能正常运行，使用 10.8.4 的稳定版本。
+## 安装依赖包
 # git clone https://github.com/phoronix-test-suite/phoronix-test-suite.git ~/phoronix-test-suite
 wget https://github.com/phoronix-test-suite/phoronix-test-suite/releases/download/v10.8.4/phoronix-test-suite-10.8.4.tar.gz
 tar zxf phoronix-test-suite-10.8.4.tar.gz
@@ -194,17 +177,9 @@ export TEST_RESULTS_NAME=${PN}
 
 ## 执行基准测试(标准)
 echo "[INFO] Step1: Start to perform standard PTS tests related to CPU/Memory/Cache and some simple workloads..."
-tests="\
-byte sysbench gmpbench primesieve \
-stream intel-mlc cachebench ramspeed \
-compress-zstd compress-lz4 blosc \
-openssl botan john-the-ripper \
-x264 x265 \
-pyperformance cython-bench cpp-perf-bench \
-graphics-magick smallpt c-ray draco \
-renaissance dacapobench java-scimark2 \
-scimark2 arrayfire quantlib stockfish lczero \
-"
+tests="stream cachebench gmpbench compress-zstd compress-lz4 botan x264 \
+      pyperformance cpp-perf-bench graphics-magick smallpt stockfish c-ray scimark2 dacapobench"
+# tests="sample-program"
 for testname in ${tests} 
 do
     phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
@@ -216,17 +191,7 @@ echo "[INFO] Step1: Complete STANDARD PTS TESTS."
 
 ## 执行基准测试(更多)
 echo "[INFO] Step2: Start to perform more PTS tests related to complex workload..."
-tests="\
-blogbench nginx rabbitmq \
-memtier-benchmark cassandra scylladb \
-spark rocksdb clickhouse influxdb \
-tjbench vvenc libxsmm \
-ncnn opencv llama-cpp llamafile \
-"
-# 下面这些需要再研究下如何运行
-# cpuminer-opt scikit-learn  
-# 有价值但是目前只在 x86 支持的 test：  embree
-
+tests="blogbench memtier-benchmark tjbench vvenc ncnn spark rocksdb clickhouse influxdb"
 for testname in ${tests} 
 do
     phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
@@ -241,13 +206,7 @@ phoronix-test-suite list-installed-tests > ${DATA_DIR}/pts-list-installed-tests.
 ls -ltr ${PTS_RESULT_DIR} >> ${DATA_DIR}/pts-list-installed-tests.txt
 df -h  >> ${DATA_DIR}/pts-list-installed-tests.txt
 rm -rf ${LOG_DIR}/*
-cp -r /var/log/messages /var/log/cloud-init*.log /var/log/phoronix-test-suite-*.log /var/lib/cloud ${LOG_DIR}
+cp -r /var/log/messages /var/log/cloud-init*.log /var/log/phoronix-test-suite-*.log ${LOG_DIR}
 tar czfP ${DATA_DIR}-all.tar.gz ${DATA_DIR}
-aws s3 cp ${DATA_DIR}-all.tar.gz ${aws_s3_bucket_name}/result_pts/ && \
 echo "[INFO] Step3: Result files have been uploaded to s3 bucket. BYE BYE."
-
-## 停止实例
-INSTANCE_ID=$(ls /var/lib/cloud/instances/)
-aws ec2 stop-instances --instance-ids "${INSTANCE_ID}"
-
 
