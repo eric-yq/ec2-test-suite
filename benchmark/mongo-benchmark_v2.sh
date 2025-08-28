@@ -79,37 +79,7 @@ mkdir -p ${RESULT_PATH}
 submit_task ${1}
 
 # ### 查看结果
-# # Load 结果数据：吞吐
-# grep Throughput *load* ｜ awk -F"," '{print $3}'
-# grep INSERT *load* | grep AverageLatency ｜ awk -F"," '{print $3}'
-# grep INSERT *load* | grep 99thPercentileLatency ｜ awk -F"," '{print $3}'
-# # Run 结果数据：时延
-# ## readonly 平均和P99时延，打印1/4/7......行(每隔3行)
-# grep AverageLatency mongo_*-run.txt | grep READ  | sed -n '1~3p' | awk -F", " '{print $3}'
-# grep 99thPercentileLatency mongo_*-run.txt | grep READ  | sed -n '1~3p' | awk -F", " '{print $3}'
-# ## updateonly 平均和P99时延，打印1/3/5......行(每隔2行)
-# grep AverageLatency mongo_*-run.txt | grep UPDATE  | sed -n '1~2p' | awk -F", " '{print $3}'
-# grep 99thPercentileLatency mongo_*-run.txt | grep UPDATE  | sed -n '1~2p' | awk -F", " '{print $3}'
-# ## read-modify-write 平均和P99时延
-# grep AverageLatency mongo_*-run.txt | grep MODIFY | awk -F", " '{print $3}'
-# grep 99thPercentileLatency mongo_*-run.txt | grep MODIFY | awk -F", " '{print $3}'
+# Load 结果数据：吞吐
+# grep Throughput *load* | awk -F '[_ ]' '{print $2,$NF}'
 
-
-
-# ## 计算平均值: 3 副本：5 个机型，每个机型测试 3 次。
-# ### load 吞吐
-# instance_type_array=($(grep Throughput *load* | awk -F "_" '{print $2}' | uniq))
-# ops_array=($(grep Throughput *load* | awk -F "," '{print $NF}' | awk -F "." '{print $1}'))
-# latency_array_avg=($(grep AverageLatency *load* | grep INSERT  | awk -F "," '{print $NF}' | awk -F "." '{print $1}'))
-# latency_array_p95=($(grep 95thPercentileLatency *load* | grep INSERT  | awk -F "," '{print $NF}' | awk -F "." '{print $1}'))
-# latency_array_p99=($(grep 99thPercentileLatency *load* | grep INSERT  | awk -F "," '{print $NF}' | awk -F "." '{print $1}'))
-# for i in {1..5}
-# do
-#     let base=3*(i-1)
-#     let ops_avg=(${ops_array[base]}+${ops_array[base+1]}+${ops_array[base+2]})/3
-#     let latency_avg=(${latency_array_avg[base]}+${latency_array_avg[base+1]}+${latency_array_avg[base+2]})/3
-#     let p95_avg=(${latency_array_p95[base]}+${latency_array_p95[base+1]}+${latency_array_p95[base+2]})/3
-#     let p99_avg=(${latency_array_p99[base]}+${latency_array_p99[base+1]}+${latency_array_p99[base+2]})/3
-#     echo "${instance_type_array[i-1]},${ops_avg},${latency_avg},${p95_avg},${p99_avg}"
-# done
-
+# Run 结果数据：吞吐

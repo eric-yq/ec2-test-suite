@@ -13,6 +13,7 @@ install_al2023_dependencies () {
   yum install -y glibc blas openssl-devel libXext-devel libX11-devel libXaw libXaw-devel mesa-libGL-devel 
   yum install -y python3 python3-pip python3-devel cargo
   yum install -y php php-cli php-json php-xml perl-IPC-Cmd
+  yum install -y -q java-17-amazon-corretto*
 
   echo "------ INSTALLING HIGH LEVEL PERFORMANCE TOOLS ------"
   yum install -y sysstat  hwloc hwloc-gui util-linux numactl tcpdump htop iotop iftop 
@@ -177,8 +178,14 @@ export TEST_RESULTS_NAME=${PN}
 
 ## 执行基准测试(标准)
 echo "[INFO] Step1: Start to perform standard PTS tests related to CPU/Memory/Cache and some simple workloads..."
-tests="stream cachebench gmpbench compress-zstd compress-lz4 botan x264 \
-      pyperformance cpp-perf-bench graphics-magick smallpt stockfish c-ray scimark2 dacapobench"
+tests="\
+byte sysbench gmpbench primesieve stream intel-mlc cachebench ramspeed \
+compress-zstd compress-lz4 blosc openssl botan john-the-ripper \
+pyperformance cython-bench cpp-perf-bench \
+x264 x265 graphics-magick smallpt c-ray draco \
+renaissance dacapobench java-scimark2 \
+scimark2 arrayfire quantlib stockfish lczero \
+"
 # tests="sample-program"
 for testname in ${tests} 
 do
@@ -191,7 +198,10 @@ echo "[INFO] Step1: Complete STANDARD PTS TESTS."
 
 ## 执行基准测试(更多)
 echo "[INFO] Step2: Start to perform more PTS tests related to complex workload..."
-tests="blogbench memtier-benchmark tjbench vvenc ncnn spark rocksdb clickhouse influxdb"
+tests="\
+blogbench nginx rabbitmq memtier-benchmark mariadb cassandra scylladb \
+spark rocksdb clickhouse influxdb tjbench vvenc libxsmm opencv \
+"
 for testname in ${tests} 
 do
     phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
