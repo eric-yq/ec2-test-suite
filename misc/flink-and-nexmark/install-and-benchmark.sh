@@ -15,8 +15,8 @@ chmod 0600 ~/.ssh/authorized_keys
 ## 安装 JDK
 yum install -y java-1.8.0-amazon-corretto java-1.8.0-amazon-corretto-devel git htop screen 
 echo "export JAVA_HOME=$(ls -d /usr/lib/jvm/java)" >> ~/.bashrc
-echo "export FLINK_HOME=/root/flink-benchmark/flink-1.17.2" >> ~/.bashrc
-source /root/.bashrc
+echo "export FLINK_HOME=/root/flink-benchmark/flink-1.17.2" >> ~/.bash_profile
+source ~/.bash_profile
 java -version
 
 ## 安装 maven

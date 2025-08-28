@@ -1,9 +1,10 @@
 #!/bin/bash
 
+# OS: Ubuntu 24.04 LTS
+
 sudo su - root
-yum install -y epel-realease
-yum update 
-yum install -y screen wget zip unzip
+apt update 
+apt install -y screen wget zip unzip
 
 #####################
 screen -R ttt -L
@@ -13,7 +14,7 @@ screen -R ttt -L
 cd /root/
 ARCH=$(arch)
 curl "https://awscli.amazonaws.com/awscli-exe-linux-${ARCH}.zip" -o "awscliv2.zip"
-unzip awscliv2.zip
+unzip -q awscliv2.zip
 ./aws/install
 cp -rf /usr/local/bin/aws /usr/bin/aws
 aws --version
@@ -27,16 +28,17 @@ aws configure set default.region ${aws_region_name}
 aws_s3_bucket_name="s3://ec2-core-benchmark-ericyq"
 
 ## 安装 Java
-
 # ## Corretto 11 --default
-sudo rpm --import https://yum.corretto.aws/corretto.key 
-sudo curl -L -o /etc/yum.repos.d/corretto.repo https://yum.corretto.aws/corretto.repo
-sudo yum install -y java-11-amazon-corretto-devel
+wget -O- https://apt.corretto.aws/corretto.key | sudo apt-key add - 
+add-apt-repository 'deb https://apt.corretto.aws stable main' -y
+apt update -y
+apt install -y java-11-amazon-corretto-jdk
 JDK_VERSION='corretto11'
 java -version
 
 ## 系统配置
 PN="gcp-c4a-highmem-16"
+# PN=$(cloud-init query ds.meta_data.instance_type)
 cat << EOF >> /etc/sysctl.conf
 dev.raid.speed_limit_min = 4000
 kernel.sched_rt_runtime_us = 990000
@@ -61,9 +63,7 @@ vm.dirty_ratio = 8
 vm.dirty_writeback_centisecs = 1500
 vm.swappiness = 0
 vm.zone_reclaim_mode = 1
-
 EOF
-
 sysctl -p
 echo always > /sys/kernel/mm/transparent_hugepage/enabled
 
@@ -83,14 +83,15 @@ let XMN=${MEM_TOTAL_MB}*80/100
 let GC_THREADS=${CPU_CORES}
 let WORKERS_TIER1=${CPU_CORES}
 let WORKERS_TIER3=${CPU_CORES}/4
-
 THREADS_PROBE=64
 
 
+
 ## 执行 Benchmark
+OS_VERSION=$(source /etc/os-release && echo "$NAME-$VERSION_ID")
 RESULT_SUMMARY_FILE="/root/specjbb/specjbb_results.txt"
 mkdir -p /root/specjbb
-echo "Star to run specjbb15 benchmark on ${PN}." >> ${RESULT_SUMMARY_FILE}
+echo "Star to run specjbb15 benchmark on ${PN}, ${OS_VERSION}." >> ${RESULT_SUMMARY_FILE}
 echo "JAVA VERSION is: ${JDK_VERSION}." >> ${RESULT_SUMMARY_FILE}
 echo "Instance Type: ${PN}, ${CPU_CORES} vCPU, Memory ${MEM_TOTAL_MB} MB." >> ${RESULT_SUMMARY_FILE}
 echo "XMS=${XMS}, XMX=${XMX}, XMN=${XMN}, ParallelGCThreads=${GC_THREADS}, workers.Tier1=${WORKERS_TIER1}, workers.Tier3=${WORKERS_TIER3}" >> ${RESULT_SUMMARY_FILE}
@@ -138,10 +139,10 @@ java -showversion -server \
 cd /root/
 grep "RUN RESULT: hbIR" ~/specjbb/composite.out >> ${RESULT_SUMMARY_FILE}
 cp -r result specjbb/
-tar czf specjbb15-${JDK_VERSION}-${PN}.tar.gz specjbb/
-aws s3 cp specjbb15-${JDK_VERSION}-${PN}.tar.gz ${aws_s3_bucket_name}/result_specjbb15/
+tar czf specjbb15-${OS_VERSION}-${JDK_VERSION}-${PN}.tar.gz specjbb/
+aws s3 cp specjbb15-${OS_VERSION}-${JDK_VERSION}-${PN}.tar.gz ${aws_s3_bucket_name}/result_specjbb15/
 aws s3 ls ${aws_s3_bucket_name}
-echo "Upload specjbb15-${JDK_VERSION}-${PN}.tar.gz to ${aws_s3_bucket_name} ."
+echo "Upload specjbb15-${OS_VERSION}-${JDK_VERSION}-${PN}.tar.gz to ${aws_s3_bucket_name} ."
 
 # sleep 30
 # 

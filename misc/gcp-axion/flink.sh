@@ -2,23 +2,55 @@
 
 # Reference: https://aws.amazon.com/cn/blogs/china/aws-graviton3-accelerates-flink-job-execution-benchmark/
 
-# for CentOS Stream 9
+# Ubuntu 24.04 LTS
 
 # 部署 Flink Standalone 集群环境
-#####################################################################
-## 通过 SSH 登录到 3 台 EC2 实例，分别执行下面命令，安装必要的基础软件
-#####################################################################
-## 生成密钥
+############################################################################
+## 通过 SSH 登录到 3 台 EC2 实例，分别执行下面命令：配置免密登录，和，安装必要的基础软件
+############################################################################
+## 配置免密登录
 sudo su - root
+sed -i.bak "s/PermitRootLogin no/PermitRootLogin yes/g" /etc/ssh/sshd_config 
+systemctl restart sshd.service
+
+## 生成密钥
 ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
+cat ~/.ssh/id_rsa.pub 
+
+### 将 master 和 worker1,2 节点的【cat ~/.ssh/id_rsa.pub】 的输出结果
+### 添加到所有节点的 authorized_keys 文件
+vim ~/.ssh/authorized_keys
+### 保存退出
+chmod 0600 ~/.ssh/authorized_keys
+
+## 将 下列 3 个 IPADDR_xxx 变量设置为 3 台 EC2 实例的 VPC IP 地址，并保存在 /etc/hosts 文件中
+IPADDR_MASTER="172.31.37.164"
+IPADDR_WORKER1="172.31.43.3"
+IPADDR_WORKER2="172.31.36.64"
+cat << EOF >> /etc/hosts
+$IPADDR_MASTER  master
+$IPADDR_WORKER1 worker1
+$IPADDR_WORKER2 worker2
+EOF
 
 ## 安装 JDK
-yum install -y epel-release
-yum update -y
-yum install -y wget zip unzip screen htop 
-rpm --import https://yum.corretto.aws/corretto.key 
-curl -L -o /etc/yum.repos.d/corretto.repo https://yum.corretto.aws/corretto.repo
-sudo yum install -y java-1.8.0-amazon-corretto-devel
+# for centos stream 9
+# yum install -y epel-release
+# yum update -y
+# yum install -y wget zip unzip screen htop git
+# rpm --import https://yum.corretto.aws/corretto.key 
+# curl -L -o /etc/yum.repos.d/corretto.repo https://yum.corretto.aws/corretto.repo
+# yum install -y java-1.8.0-amazon-corretto-devel
+
+# for ubuntu 24.04
+apt update -y
+apt install -y wget zip unzip screen htop git
+wget -O- https://apt.corretto.aws/corretto.key | sudo apt-key add - 
+add-apt-repository 'deb https://apt.corretto.aws stable main'
+apt update -y
+apt install -y java-1.8.0-amazon-corretto-jdk
+
+## 查看 jdk 版本
 java -version
 
 ## 安装 maven
@@ -29,22 +61,10 @@ echo "export PATH=$PATH:/root/apache-maven-3.9.6/bin" >> ~/.bashrc
 source /root/.bashrc
 mvn -v
 
-## 将 下列 3 个 IPADDR_xxx 变量设置为 3 台 EC2 实例的 VPC IP 地址，并保存在 /etc/hosts 文件中
-IPADDR_MASTER="10.138.0.4"
-IPADDR_WORKER1="10.138.0.5"
-IPADDR_WORKER2="10.138.0.6"
-cat << EOF >> /etc/hosts
-$IPADDR_MASTER  master
-$IPADDR_WORKER1 worker1
-$IPADDR_WORKER2 worker2
-EOF
-cd .ssh
-cat id_rsa.pub 
-### 将 master 和 worker1,2 节点的【cat ~/.ssh/id_rsa.pub】 的输出结果
-### 添加到所有节点的 authorized_keys 文件
-vim authorized_keys
-### 保存退出
-chmod 0600 ~/.ssh/authorized_keys
+## 设置环境变量
+echo "export FLINK_HOME=/root/flink-benchmark/flink-1.17.2" >> ~/.profile
+source /root/.profile
+
 
 #####################################################################
 ## 在 Master 节点继续执行下面操作：完成 Flink 和 Nexmark 安装。
@@ -61,18 +81,14 @@ echo worker1 >> flink-1.17.2/conf/workers
 echo worker2 >> flink-1.17.2/conf/workers
 
 ## 下载 Nexmark 源码并完成构建, 使用 nexmark 在 20240415 之前的那个 commit
-cd /root/flink-benchmark
-git clone https://github.com/nexmark/nexmark.git
-cd nexmark
-git checkout b5e45d762f38f1c67e59bd73c02f15933a750d70
-cd ..
-mv nexmark nexmark-src
-cd nexmark-src/nexmark-flink
-./build.sh
+cd /root/flink-benchmark && git clone https://github.com/nexmark/nexmark.git
+cd nexmark && git checkout b5e45d762f38f1c67e59bd73c02f15933a750d70
+cd .. && mv nexmark nexmark-src
+cd nexmark-src/nexmark-flink && ./build.sh
 mv nexmark-flink.tgz /root/flink-benchmark
-cd /root/flink-benchmark
-tar xzf nexmark-flink.tgz
-cp /root/flink-benchmark/nexmark-flink/lib/*.jar /root/flink-benchmark/flink-1.17.2/lib
+cd /root/flink-benchmark && tar xzf nexmark-flink.tgz
+cp -f /root/flink-benchmark/nexmark-flink/lib/*.jar /root/flink-benchmark/flink-1.17.2/lib/
+# cp -f /root/flink-benchmark/flink-1.17.2/lib/* /root/flink-benchmark/nexmark-flink/lib/
 
 ## 编辑 Nexmark 配置文件 nexmark-flink/conf/flink-conf.yaml
 sed -i "s/jobmanager.rpc.address: localhost/jobmanager.rpc.address: master/g" nexmark-flink/conf/flink-conf.yaml
@@ -81,6 +97,8 @@ sed -i "s/taskmanager.memory.process.size: 8G/taskmanager.memory.process.size: 4
 sed -i "s/parallelism.default: 8/parallelism.default: 24/g" nexmark-flink/conf/flink-conf.yaml
 sed -i "s/file:\/\/\/path\/to\/checkpoint/file:\/\/\/root\/checkpoint/g" nexmark-flink/conf/flink-conf.yaml
 sed -i "s/-XX:ParallelGCThreads=4/-XX:ParallelGCThreads=4 -XX:+IgnoreUnrecognizedVMOptions/g" nexmark-flink/conf/flink-conf.yaml
+ll flink-1.17.2/conf/flink-conf.yaml
+mv flink-1.17.2/conf/flink-conf.yaml flink-1.17.2/conf/flink-conf.yaml.bak
 cp -f nexmark-flink/conf/flink-conf.yaml flink-1.17.2/conf/
 cp -f nexmark-flink/conf/sql-client-defaults.yaml flink-1.17.2/conf/
 
@@ -128,33 +146,38 @@ bash ~/flink-benchmark/flink-1.17.2/bin/stop-cluster.sh
 
 
 ########################################################################################
-# Result Summary: r8i.4xlarge 
-# -------------------------------- Nexmark Results --------------------------------
+# Result Summary: 
+# flink-master	us-central1-a	8月 27, 2025, 6:28:46 下午	c4a-highmem-8	Spot（抢占）	10.128.0.11 (nic0)	34.68.181.202 (nic0) 	
+# flink-worker1	us-central1-a	8月 27, 2025, 6:29:17 下午	c4a-highmem-8	Spot（抢占）	10.128.0.12 (nic0)	34.56.13.176 (nic0) 	
+# flink-worker2	us-central1-a	8月 27, 2025, 6:29:49 下午	c4a-highmem-8	Spot（抢占）	10.128.0.13 (nic0)	34.70.108.247 (nic0) 
 
-# +-------------------+-------------------+-------------------+-------------------+-------------------+-------------------+
-# | Nexmark Query     | Events Num        | Cores             | Time(s)           | Cores * Time(s)   | Throughput/Cores  |
-# +-------------------+-------------------+-------------------+-------------------+-------------------+-------------------+
-# |q0                 |100,000,000        |23.83              |11.467             |273.222            |366 K/s            |
-# |q1                 |100,000,000        |23.58              |12.059             |284.370            |351.65 K/s         |
-# |q2                 |100,000,000        |23.78              |11.234             |267.189            |374.27 K/s         |
-# |q3                 |100,000,000        |23.54              |17.197             |404.846            |247.01 K/s         |
-# |q4                 |100,000,000        |21.3               |80.563             |1716.327           |58.26 K/s          |
-# |q5                 |100,000,000        |14.52              |64.491             |936.672            |106.76 K/s         |
-# |q7                 |100,000,000        |21.19              |114.857            |2433.897           |41.09 K/s          |
-# |q8                 |100,000,000        |21.63              |17.924             |387.779            |257.88 K/s         |
-# |q9                 |100,000,000        |20.97              |152.657            |3201.324           |31.24 K/s          |
-# |q10                |100,000,000        |15.59              |47.862             |746.334            |133.99 K/s         |
-# |q11                |100,000,000        |22                 |80.787             |1777.057           |56.27 K/s          |
-# |q12                |100,000,000        |23.51              |24.875             |584.736            |171.02 K/s         |
-# |q13                |100,000,000        |23.37              |19.006             |444.146            |225.15 K/s         |
-# |q14                |100,000,000        |23.5               |15.392             |361.719            |276.46 K/s         |
-# |q15                |100,000,000        |23.46              |39.210             |919.776            |108.72 K/s         |
-# |q16                |100,000,000        |19.71              |186.952            |3684.513           |27.14 K/s          |
-# |q17                |100,000,000        |22.18              |24.010             |532.442            |187.81 K/s         |
-# |q18                |100,000,000        |19.95              |52.419             |1045.910           |95.61 K/s          |
-# |q19                |100,000,000        |22.22              |51.434             |1143.075           |87.48 K/s          |
-# |q20                |100,000,000        |20.12              |120.864            |2431.374           |41.13 K/s          |
-# |q21                |100,000,000        |22.89              |27.300             |624.831            |160.04 K/s         |
-# |q22                |100,000,000        |22.32              |21.647             |483.162            |206.97 K/s         |
-# |Total              |2,200,000,000      |475.168            |1194.207           |24684.702          |3.61 M/s           |
-# +-------------------+-------------------+-------------------+-------------------+-------------------+-------------------+
+## centos stream 9
+# -------------------------------- Nexmark Results --------------------------------
+| Nexmark Query     | Events Num        | Cores             | Time(s)           | Cores * Time(s)   | Throughput/Cores  |
++-------------------+-------------------+-------------------+-------------------+-------------------+-------------------+
+|q0                 |100,000,000        |22.17              |14.343             |318.048            |314.42 K/s  
+|q1                 |100,000,000        |23.8               |14.442             |343.748            |290.91 K/s  
+|q2                 |100,000,000        |23.49              |13.303             |312.429            |320.07 K/s   
+|q3                 |100,000,000        |�                  |24.870             |NaN                |0/s 
+|q4                 |100,000,000        |19.4               |142.691            |2768.265           |36.12 K/s   
+|q5                 |100,000,000        |13.99              |113.633            |1590.097           |62.89 K/s    
+|q7                 |100,000,000        |21.05              |198.270            |4173.096           |23.96 K/s          |
+|q8                 |100,000,000        |�                  |24.447             |NaN                |0/s                |
+|q9                 |100,000,000        |17.52              |190.602            |3339.378           |29.95 K/s          |
+|q10                |100,000,000        |15.23              |107.614            |1638.864           |61.02 K/s          |
+|q11                |100,000,000        |22.47              |123.062            |2765.745           |36.16 K/s          |
+|q12                |100,000,000        |22.44              |36.428             |817.364            |122.34 K/s         |
+|q13                |100,000,000        |�                  |24.545             |NaN                |0/s                |
+|q14                |100,000,000        |�                  |18.457             |NaN                |0/s                |
+|q15                |100,000,000        |23.05              |57.569             |1326.806           |75.37 K/s          |
+|q16                |100,000,000        |20.17              |291.834            |5887.562           |16.98 K/s          |
+|q17                |100,000,000        |21.11              |37.062             |782.421            |127.81 K/s         |
+|q18                |100,000,000        |18.7               |83.175             |1555.522           |64.29 K/s          |
+|q19                |100,000,000        |19.4               |109.832            |2130.754           |46.93 K/s          |
+|q20                |100,000,000        |20.33              |228.474            |4645.488           |21.53 K/s          |
+|q21                |100,000,000        |22.04              |43.072             |949.376            |105.33 K/s         |
+|q22                |100,000,000        |�                  |32.460             |NaN                |0/s                |
+
+## ubuntu 24.04
+# -------------------------------- Nexmark Results --------------------------------
+| Nexmark Query     | Events Num        | Cores             | Time(s)           |
