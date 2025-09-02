@@ -14,7 +14,7 @@ ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
 chmod 0600 ~/.ssh/authorized_keys
 ## 安装 JDK
 yum install -y java-1.8.0-amazon-corretto java-1.8.0-amazon-corretto-devel git htop screen 
-echo "export JAVA_HOME=$(ls -d /usr/lib/jvm/java)" >> ~/.bashrc
+echo "export JAVA_HOME=$(ls -d /usr/lib/jvm/java)" >> ~/.bash_profile
 echo "export FLINK_HOME=/root/flink-benchmark/flink-1.17.2" >> ~/.bash_profile
 source ~/.bash_profile
 java -version
@@ -28,16 +28,15 @@ source /root/.bashrc
 mvn -v
 
 ## 将 下列 3 个 IPADDR_xxx 变量设置为 3 台 EC2 实例的 VPC IP 地址，并保存在 /etc/hosts 文件中
-IPADDR_MASTER="172.31.37.225"
-IPADDR_WORKER1="172.31.39.81"
-IPADDR_WORKER2="172.31.43.57"
+IPADDR_MASTER="172.31.40.95"
+IPADDR_WORKER1="172.31.46.37"
+IPADDR_WORKER2="172.31.41.52"
 cat << EOF >> /etc/hosts
 $IPADDR_MASTER  master
 $IPADDR_WORKER1 worker1
 $IPADDR_WORKER2 worker2
 EOF
-cd .ssh
-cat id_rsa.pub 
+cd ~/.ssh && cat id_rsa.pub 
 ### 将 master 和 worker1,2 节点的【cat ~/.ssh/id_rsa.pub】 的输出结果
 ### 添加到所有节点的 authorized_keys 文件
 vim authorized_keys
@@ -58,17 +57,12 @@ echo worker1 >> flink-1.17.2/conf/workers
 echo worker2 >> flink-1.17.2/conf/workers
 
 ## 下载 Nexmark 源码并完成构建, 使用 nexmark 在 20240415 之前的那个 commit
-cd /root/flink-benchmark
-git clone https://github.com/nexmark/nexmark.git
-cd nexmark
-git checkout b5e45d762f38f1c67e59bd73c02f15933a750d70
-cd ..
-mv nexmark nexmark-src
-cd nexmark-src/nexmark-flink
+cd /root/flink-benchmark && git clone https://github.com/nexmark/nexmark.git
+cd nexmark && git checkout b5e45d762f38f1c67e59bd73c02f15933a750d70
+cd .. && mv nexmark nexmark-src && cd nexmark-src/nexmark-flink
 ./build.sh
 mv nexmark-flink.tgz /root/flink-benchmark
-cd /root/flink-benchmark
-tar xzf nexmark-flink.tgz
+cd /root/flink-benchmark && tar xzf nexmark-flink.tgz
 cp /root/flink-benchmark/nexmark-flink/lib/*.jar /root/flink-benchmark/flink-1.17.2/lib
 
 ## 编辑 Nexmark 配置文件 nexmark-flink/conf/flink-conf.yaml
@@ -78,6 +72,7 @@ sed -i "s/taskmanager.memory.process.size: 8G/taskmanager.memory.process.size: 4
 sed -i "s/parallelism.default: 8/parallelism.default: 24/g" nexmark-flink/conf/flink-conf.yaml
 sed -i "s/file:\/\/\/path\/to\/checkpoint/file:\/\/\/root\/checkpoint/g" nexmark-flink/conf/flink-conf.yaml
 sed -i "s/-XX:ParallelGCThreads=4/-XX:ParallelGCThreads=4 -XX:+IgnoreUnrecognizedVMOptions/g" nexmark-flink/conf/flink-conf.yaml
+mv /root/flink-benchmark/flink-1.17.2/conf/flink-conf.yaml /root/flink-benchmark/flink-1.17.2/conf/flink-conf.yaml.bak
 cp -f nexmark-flink/conf/flink-conf.yaml flink-1.17.2/conf/
 cp -f nexmark-flink/conf/sql-client-defaults.yaml flink-1.17.2/conf/
 

@@ -204,12 +204,12 @@ export TEST_RESULTS_NAME=${PN}
 ## 执行基准测试(标准)
 echo "[INFO] Step1: Start to perform standard PTS tests related to CPU/Memory/Cache and some simple workloads..."
 tests="\
-byte sysbench gmpbench primesieve stream intel-mlc cachebench ramspeed \
+byte sysbench gmpbench primesieve stream cachebench ramspeed \
 compress-zstd compress-lz4 blosc openssl botan john-the-ripper \
 pyperformance cython-bench cpp-perf-bench \
 x264 x265 graphics-magick smallpt c-ray draco \
 renaissance dacapobench java-scimark2 \
-scimark2 arrayfire quantlib stockfish lczero \
+scimark2 arrayfire stockfish lczero \
 "
 # tests="sample-program"
 for testname in ${tests} 
@@ -224,8 +224,8 @@ echo "[INFO] Step1: Complete STANDARD PTS TESTS."
 ## 执行基准测试(更多)
 echo "[INFO] Step2: Start to perform more PTS tests related to complex workload..."
 tests="\
-blogbench nginx rabbitmq memtier-benchmark mariadb cassandra scylladb \
-spark rocksdb clickhouse influxdb tjbench vvenc libxsmm opencv \
+blogbench nginx memtier-benchmark cassandra scylladb \
+spark rocksdb clickhouse influxdb tjbench vvenc opencv \
 "
 for testname in ${tests} 
 do
