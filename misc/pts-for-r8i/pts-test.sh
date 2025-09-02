@@ -58,6 +58,7 @@ aws configure set aws_access_key_id ${aws_ak_value}
 aws configure set aws_secret_access_key ${aws_sk_value}
 aws configure set default.region ${aws_region_name}
 aws_s3_bucket_name="s3://ec2-core-benchmark-ericyq"
+
 ## 更新 cmake
 ARCH=$(lscpu | grep Architecture | awk -F " " '{print $NF}')   ## aarch64, x86_64
 mkdir /root/cmake-3.25.2-linux-${ARCH}
