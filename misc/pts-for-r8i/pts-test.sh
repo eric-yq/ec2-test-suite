@@ -1,5 +1,13 @@
 #!/bin/bash
 
+## 创建多个实例的Prompt：
+# 帮我在 us-east-1 启动下面实例：
+# r8g.4xlarge,r8i.4xlarge,r7a.4xlarge,r7g.4xlarge,r7i.4xlarge,r6a.4xlarge,r6g.4xlarge,r6i.4xlarge;
+# 采用 Shared Instance 类型，AMI采用 Amazon Linux 2023 最新版本；
+# 使用默认安全组、默认 VPC、key-pair 使用 ericyq-global；
+# EBS 为 200G gp3；实例名称设置为 pts-test-“EC2 实例类型”；
+# 实例创建成功后，列举实例的名称和公网 IP 地址。
+
 # 作为 cloud-init 脚本时，使用 root 用户执行
 
 install_al2023_dependencies () {
