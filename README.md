@@ -1,6 +1,6 @@
 # AWS EC2 Benchmark Test Suite
 
-In this repo, there are some benchmark test suites for AWS EC2 instance.
+In this repository there are some benchmark test suites for AWS EC2 instance.
 
 ## Prepare the EC2 instance
 
