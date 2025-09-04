@@ -255,7 +255,6 @@ tar czfP ${DATA_DIR}-all.tar.gz ${DATA_DIR}
 aws s3 cp ${DATA_DIR}-all.tar.gz ${aws_s3_bucket_name}/pts/ && \
 echo "[INFO] Step3: Result files have been uploaded to s3 bucket. BYE BYE."
 
-
 ## 终止实例
 INSTANCE_ID=$(cloud-init query ds.meta_data.instance_id)
 aws ec2 stop-instances --instance-ids "${INSTANCE_ID}"
