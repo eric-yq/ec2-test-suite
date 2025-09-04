@@ -257,5 +257,5 @@ echo "[INFO] Step3: Result files have been uploaded to s3 bucket. BYE BYE."
 
 
 ## 终止实例
-INSTANCE_ID=$(ls /var/lib/cloud/instances/)
+INSTANCE_ID=$(cloud-init query ds.meta_data.instance_id)
 aws ec2 stop-instances --instance-ids "${INSTANCE_ID}"
