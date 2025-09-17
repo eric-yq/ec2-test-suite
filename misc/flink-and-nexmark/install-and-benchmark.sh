@@ -27,6 +27,10 @@ echo "export PATH=$PATH:/root/apache-maven-3.9.6/bin" >> ~/.bashrc
 source /root/.bashrc
 mvn -v
 
+# for 阿里云国内：
+# wget https://mirrors.aliyun.com/apache/maven/maven-3/3.9.11/binaries/apache-maven-3.9.11-bin.tar.gz
+# wget https://mirrors.aliyun.com/apache/flink/flink-1.17.2/flink-1.17.2-bin-scala_2.12.tgz
+
 ## 将 下列 3 个 IPADDR_xxx 变量设置为 3 台 EC2 实例的 VPC IP 地址，并保存在 /etc/hosts 文件中
 IPADDR_MASTER="172.31.40.95"
 IPADDR_WORKER1="172.31.46.37"

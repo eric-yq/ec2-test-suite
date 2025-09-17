@@ -37,7 +37,7 @@ install:
 	terraform --version
 	@echo "Terraform installation complete!"
 	
-	@echo "Installing HammerDB 4.12 for MySQL benchmark..."
+	@echo "Installing HammerDB 4.4 for MySQL benchmark..."
 	cd /root/ && \
 	wget https://github.com/TPC-Council/HammerDB/releases/download/v4.4/HammerDB-4.4-Linux.tar.gz && \
 	tar zxf HammerDB-4.4-Linux.tar.gz && \
