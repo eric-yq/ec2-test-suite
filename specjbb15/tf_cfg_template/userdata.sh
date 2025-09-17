@@ -28,7 +28,7 @@ aws_s3_bucket_name="s3://ec2-core-benchmark-ericyq"
 yum update -y
 
 # ## Corretto 11 --default
-# yum install -y java-11-amazon-corretto dmidecode
+# yum install -y java-11-amazon-corretto
 # JDK_VERSION='corretto11'
 
 ## Corretto 17
@@ -54,7 +54,7 @@ JDK_VERSION='openjdk8'
 # JDK_VERSION='dragonwell11'
 
 java -version
-yum install -y htop dstat dmidecode
+yum install -y htop dmidecode
 
 ## 系统配置
 PN=$(cloud-init query ds.meta_data.instance_type)

@@ -45,6 +45,17 @@ Golang 代码用于演示作用，不需要包含任何的 C/C++ 语言的 CGO �
 
 > 接下来，将这个代码工程 golang-cgo-demos/x86 复制一份到 golang-cgo-demos/arm64, 并将 golang-cgo-demos/arm64 路径下所有源文件适配到 Arm64 平台，目标是可以在 Graviton3 实例上运行。
 
+## C/C++ demo, 多依赖库，bazel
+> 帮我构建一个 C/C++ 工程: 使用目录 cpp-demo-bazel/x86 保存全部源代码和相关文件。
+1. C/C++ 代码用于演示作用，除了包含普通的 C/C++ 语言源代码之外，不需要包含 SIMD 等架构相关指令。
+2. 程序的编译构建通过 Bazel 来个管理，暂时只考虑该 C/C++ 工程在 x86 架构运行；
+3. 主程序中源代码依赖多个 C/C++ 动态库的功能，依赖：bRPC 1.4.0，cryptopp-CRYPTOPP_8_3_0 和 oneTBB 2021.5.0，这三个依赖组件在 bazel 工程中通过源代码编译的方式进行构建。
+> 迁移到 Graviton
+5. 将工程 simd-demo/x86 复制一份到目录simd-demo/arm64，将 simd-demo/arm64 目录下的 C/C++ 源代码移植到 Arm Neon，SVE和 SVE2 指令集上，同时将 Makefile/Dockerfile 等文件也进行 Arm64适配。
+> 迁移到 Graviton，使用 simde
+6. 请将工程 simd-demo/x86 复制一份到目录simd-demo/arm64-with-simde，请使用 SIMDe，将simd-demo/arm64-with-simde 中的源代码适配为在 Graviton4 实例上可以编译构建和运行。
+
+
 ## C/C++ SIMD demo
 > 帮我构建一个 C/C++ 工程: 使用目录 simd-demo/x86 保存全部源代码和相关文件。
 1. C/C++ 代码用于演示作用，除了包含普通的 C/C++ 语言源代码之外，还要包含 SSE/AVX/AVX2/AVX512 等主要指令的使用 
