@@ -195,32 +195,10 @@ export TEST_RESULTS_NAME=${PN}
 ## 执行基准测试(标准)
 echo "[INFO] Step1: Start to perform standard PTS tests related to CPU/Memory/Cache and some simple workloads..."
 tests="\
-byte sysbench gmpbench primesieve stream intel-mlc cachebench ramspeed \
-compress-zstd compress-lz4 blosc openssl botan john-the-ripper \
-pyperformance cython-bench cpp-perf-bench \
-x264 x265 graphics-magick smallpt c-ray draco \
-renaissance dacapobench java-scimark2 \
-scimark2 arrayfire quantlib stockfish lczero \
+compress-zstd compress-lz4 openssl botan john-the-ripper pyperformance cython-bench cpp-perf-bench \
+x264 x265 graphics-magick smallpt c-ray draco renaissance dacapobench java-scimark2 scimark2 \
+stockfish lczero cassandra scylladb rocksdb clickhouse influxdb tjbench vvenc opencv \
 "
-for testname in ${tests} 
-do
-    phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
-    echo "${testname}.txt:" >> ${DATA_DIR}/pts-result-url-summary.txt
-    grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/pts-result-url-summary.txt
-    sleep 5
-done
-echo "[INFO] Step1: Complete STANDARD PTS TESTS."
-
-## 执行基准测试(更多)
-echo "[INFO] Step2: Start to perform more PTS tests related to complex workload..."
-tests="\
-blogbench nginx rabbitmq memtier-benchmark mariadb cassandra scylladb \
-spark rocksdb clickhouse influxdb tjbench vvenc libxsmm opencv \
-"
-# 下面这些需要再研究下如何运行
-# cpuminer-opt scikit-learn  
-# 有价值但是目前只在 x86 支持的 test：  embree
-
 for testname in ${tests} 
 do
     phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
