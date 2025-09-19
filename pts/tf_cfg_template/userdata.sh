@@ -206,7 +206,7 @@ do
     grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/pts-result-url-summary.txt
     sleep 5
 done
-echo "[INFO] Step2: Complete ALL PTS TESTS."
+echo "[INFO] Step: Complete ALL PTS TESTS."
 
 # 所有结果打包并上传到 S3 bucket
 phoronix-test-suite list-installed-tests > ${DATA_DIR}/pts-list-installed-tests.txt
@@ -222,4 +222,11 @@ echo "[INFO] Step3: Result files have been uploaded to s3 bucket. BYE BYE."
 INSTANCE_ID=$(ls /var/lib/cloud/instances/)
 aws ec2 stop-instances --instance-ids "${INSTANCE_ID}"
 
+
+#############################################################################################################
+## 其他备选的测试项目
+# tests="\
+# cachebench,primesieve,stream,ramspeed,blosc,spark, \
+# "
+#############################################################################################################
 
