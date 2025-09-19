@@ -3,46 +3,44 @@
 sudo su - root
 
 ################################################################################
-## Amazon Linux 2023, GCC 14（Graviton4 需要 GCC 13 以上支持 -march armv9 的参数）
 ## 安装依赖包
-yum install -y awscli autoconf automake bzip2 bzip2-devel cmake freetype-devel \
-  gcc14 gcc14-c++ git libtool make pkgconfig zlib-devel nasm yasm p7zip htop
+yum install -y awscli autoconf automake bzip2 bzip2-devel cmake freetype-devel zip \
+  gcc gcc-c++ git libtool make pkgconfig zlib-devel nasm yasm p7zip htop git cmake screen
 
-## 下载软件包
+## 使用 GCC 14 编译
+yum install -y gcc14 gcc14-c++
+export CC=/usr/bin/gcc14-cc
+export CXX=/usr/bin/gcc14-g++
+
 cd /root/ && rm -rf x264 x265_git ffmpeg-*
-git clone https://code.videolan.org/videolan/x264.git
-git clone https://bitbucket.org/multicoreware/x265_git
-ver="6.1.3"
-wget https://ffmpeg.org/releases/ffmpeg-$ver.tar.xz
-tar xf ffmpeg-$ver.tar.xz
 
 ## 编译安装 x264
+cd 
+git clone https://code.videolan.org/videolan/x264.git
 cd /root/x264/
 ./configure --prefix="/root/ffmpeg_build" --bindir="/root/ffmpeg_build/bin" --enable-static 
- make -j && make install && \
+make -j $(nproc) && make install && \
  echo "[INFO] $(date +%Y%m%d%H%M%S): x264 complied." 
 
-## 编译安装 x265
-cd /root/x265_git/build/linux
-cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="/root/ffmpeg_build" \
+## 编译安装 x265， arm 上安装 gcc14
+cd 
+ver=4.1
+wget https://bitbucket.org/multicoreware/x265_git/downloads/x265_$ver.tar.gz
+tar zxf x265_$ver.tar.gz
+cd /root/x265_$ver/build/linux
+cmake -G "Unix Makefiles" \
+ -DCMAKE_INSTALL_PREFIX="/root/ffmpeg_build" \
+ -DCMAKE_C_FLAGS="-Wno-unused-variable -Wunused-parameter" \
+ -DCMAKE_CXX_FLAGS="-Wno-unused-variable -Wunused-parameter" \
  -DENABLE_SHARED:bool=off ../../source
-
-cmake \
-  -DCMAKE_C_COMPILER=gcc14-gcc \
-  -DCMAKE_CXX_COMPILER=gcc14-g++ \
-  -DCMAKE_ASM_COMPILER=gcc14-as \
-  -DCMAKE_ASM_FLAGS="-march=armv8.2-a" \
-  -DCMAKE_C_FLAGS="-march=armv8.2-a" \
-  -DCMAKE_CXX_FLAGS="-march=armv8.2-a" \
-  -G "Unix Makefiles" \
-  -DCMAKE_INSTALL_PREFIX="/root/ffmpeg_build" \
-  -DENABLE_SHARED:bool=off \
-  ../../source
-
 make -j && make install && \
  echo "[INFO] $(date +%Y%m%d%H%M%S): x265 complied."
  
 ## 编译安装 ffmpeg
+cd 
+ver="6.1.3"
+wget https://ffmpeg.org/releases/ffmpeg-$ver.tar.xz
+tar xf ffmpeg-$ver.tar.xz
 cd /root/ffmpeg-$ver/
 PATH="/root/bin:$PATH" PKG_CONFIG_PATH="/root/ffmpeg_build/lib/pkgconfig" \
  ./configure \
@@ -53,7 +51,7 @@ PATH="/root/bin:$PATH" PKG_CONFIG_PATH="/root/ffmpeg_build/lib/pkgconfig" \
  --extra-libs=-lpthread --extra-libs=-lm \
  --enable-gpl --enable-libx264 --enable-libx265 \
  --enable-nonfree
-make -j && make install &&
+make -j  && make install &&
  echo "[INFO] $(date +%Y%m%d%H%M%S): ffmpeg complied" 
 echo "PATH=/root/ffmpeg_build/bin:$PATH" >> /etc/profile
 source /etc/profile
@@ -64,7 +62,13 @@ ffmpeg -hide_banner -codecs |grep 264
 ################################################################################
 ## 测试 ffmpeg 编码性能
 # 配置 AWS CLI
-# ......
+aws_ak_value="xxx"
+aws_sk_value="+xxx"
+aws_region_name=us-east-2
+aws configure set aws_access_key_id ${aws_ak_value}
+aws configure set aws_secret_access_key ${aws_sk_value}
+aws configure set default.region ${aws_region_name}
+aws_s3_bucket_name="s3://ec2-core-benchmark-ericyq"
 ## 下载 3 个视频文件 
 cd /root/
 aws s3 cp --recursive s3://ec2-core-benchmark-ericyq/insta360-videos/ .
