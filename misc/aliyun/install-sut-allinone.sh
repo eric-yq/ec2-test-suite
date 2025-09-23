@@ -224,19 +224,19 @@ docker pull valkey/valkey:8.1.0
 # MEM_TOTAL_GB=$(free -g |grep Mem | awk -F " " '{print $2}')
 # let XXX=${MEM_TOTAL_GB}*80/100
 # let PORT=8005
-cat > /root/valkey-8005.conf << EOF
+cat > /root/valkey-8007.conf << EOF
 bind 0.0.0.0
 port 6379
 protected-mode no
 maxmemory 48gb
 maxmemory-policy allkeys-lru
 io-threads-do-reads yes
-io-threads 5
+io-threads 7
 EOF
 # 启动 valkey
-docker run -d --name valkey-8005 --restart=always \
-    -p 8005:6379 \
-    -v /root/valkey-8005.conf:/etc/valkey/valkey.conf \
+docker run -d --name valkey-8007 --restart=always \
+    -p 8007:6379 \
+    -v /root/valkey-8007.conf:/etc/valkey/valkey.conf \
     valkey/valkey:8.1.0 \
     valkey-server /etc/valkey/valkey.conf
 
