@@ -42,6 +42,8 @@ RestartSec=5
 [Install]
 WantedBy=multi-user.target
 EOF
+
+
 ## 启用并启动服务：
 systemctl daemon-reload
 systemctl enable etcd
@@ -84,11 +86,13 @@ cd apisix-${APISIX_VERSION}
 sed -i.bak "s/LUAROCKS_VER=3.8.0/LUAROCKS_VER=3.12.0/g" utils/linux-install-luarocks.sh
 sed -i.bak "s/lualdap = 1.2.6-1/lualdap = 1.4.0/g" apisix-master-0.rockspec 
 bash utils/linux-install-luarocks.sh
+sed -i.bak "s/sudo yum-config-manager/#sudo yum-config-manager/g" utils/install-dependencies.sh
 make deps -j && make install
 sed -i.bak "s/bash -x/bash/g"   ./benchmark/run.sh
 sed -i "s/wrk -d 5/wrk -d 60/g" ./benchmark/run.sh
-ulimit -n 65535
 
+## run benchmark
+ulimit -n 65535
 rm -rf logs/* benchmark/fake-apisix/logs/*  && df -h
 ./benchmark/run.sh 1 && sleep 10
 ./benchmark/run.sh 2 && sleep 10
@@ -99,6 +103,7 @@ rm -rf logs/* benchmark/fake-apisix/logs/*  && df -h
 
 ##################################################################################################
 ## redis
+cd /root
 yum install -y python3-pip docker
 pip3 install dool
 
@@ -212,6 +217,7 @@ docker run -d --name redis-6379 --restart=always \
 
 ##################################################################################################
 ## valkey
+cd /root
 docker pull valkey/valkey:8.1.0
 ## 配置 3 种 io-threads = 5
 MEM_TOTAL_GB=$(free -g |grep Mem | awk -F " " '{print $2}')
@@ -224,7 +230,7 @@ protected-mode no
 maxmemory ${XXX}gb
 maxmemory-policy allkeys-lru
 io-threads-do-reads yes
-io-threads $i
+io-threads 5
 EOF
 # 启动 valkey
 docker run -d --name valkey-$PORT --restart=always \
