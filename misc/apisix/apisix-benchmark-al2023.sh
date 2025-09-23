@@ -11,7 +11,7 @@ yum update -y
 # 安装开发工具集
 yum group install -y "Development Tools"
 yum install -y gcc gcc-c++ make pcre pcre-devel zlib zlib-devel openssl openssl-devel gd gd-devel \
-  libxml2 libxml2-devel libxslt libxslt-devel geoip geoip-devel
+  libxml2 libxml2-devel libxslt libxslt-devel lua lua-devel libxcrypt-compat
 
 # 安装 etcd
 if [[ $(arch) == "x86_64" ]]; then
@@ -87,7 +87,7 @@ cd apisix-${APISIX_VERSION}
 sed -i.bak "s/LUAROCKS_VER=3.8.0/LUAROCKS_VER=3.12.0/g" utils/linux-install-luarocks.sh
 sed -i.bak "s/lualdap = 1.2.6-1/lualdap = 1.4.0/g" apisix-master-0.rockspec 
 bash utils/linux-install-luarocks.sh
-sed -i.bak "s/sudo yum-config-manager/#sudo yum-config-manager/g" utils/install-dependencies.sh
+# sed -i.bak "s/sudo yum-config-manager/#sudo yum-config-manager/g" utils/install-dependencies.sh
 make deps -j && make install
 sed -i.bak "s/bash -x/bash/g"   ./benchmark/run.sh
 sed -i "s/wrk -d 5/wrk -d 60/g" ./benchmark/run.sh
@@ -198,14 +198,14 @@ echo 1 > /proc/sys/vm/overcommit_memory
 ## 安装redis
 docker pull redis:7.0.15
 ## 计算内存容量
-# MEM_TOTAL_GB=$(free -g |grep Mem | awk -F " " '{print $2}')
-# let XXX=${MEM_TOTAL_GB}*80/100
-## 1. 配置一个单线程 redis, 不使用 io-threads， for r.2xlarge
+MEM_TOTAL_GB=$(free -g |grep Mem | awk -F " " '{print $2}')
+let XXX=${MEM_TOTAL_GB}*80/100
+## 1. 配置一个单线程 redis, 不使用 io-threads
 cat > /root/redis-6379.conf << EOF
 port 6379
 bind 0.0.0.0
 protected-mode no
-maxmemory 48gb
+maxmemory ${XXX}gb
 maxmemory-policy allkeys-lru
 EOF
 
@@ -220,23 +220,23 @@ docker run -d --name redis-6379 --restart=always \
 ## valkey
 cd /root
 docker pull valkey/valkey:8.1.0
-## 配置 io-threads = 5
-# MEM_TOTAL_GB=$(free -g |grep Mem | awk -F " " '{print $2}')
-# let XXX=${MEM_TOTAL_GB}*80/100
-# let PORT=8005
-cat > /root/valkey-8005.conf << EOF
+## 配置 3 种 io-threads = 5
+MEM_TOTAL_GB=$(free -g |grep Mem | awk -F " " '{print $2}')
+let XXX=${MEM_TOTAL_GB}*80/100
+let PORT=8005
+cat > /root/valkey-$PORT.conf << EOF
 bind 0.0.0.0
 port 6379
 protected-mode no
-maxmemory 48gb
+maxmemory ${XXX}gb
 maxmemory-policy allkeys-lru
 io-threads-do-reads yes
 io-threads 5
 EOF
 # 启动 valkey
-docker run -d --name valkey-8005 --restart=always \
-    -p 8005:6379 \
-    -v /root/valkey-8005.conf:/etc/valkey/valkey.conf \
+docker run -d --name valkey-$PORT --restart=always \
+    -p $PORT:6379 \
+    -v /root/valkey-$PORT.conf:/etc/valkey/valkey.conf \
     valkey/valkey:8.1.0 \
     valkey-server /etc/valkey/valkey.conf
 

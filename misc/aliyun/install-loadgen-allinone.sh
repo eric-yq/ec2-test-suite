@@ -8,7 +8,7 @@ yum update -y
 # 安装开发工具集
 yum -yq groupinstall "Development Tools"
 yum -yq install java-11-alibaba-dragonwell pcre-devel zlib-devel libmemcached-devel libevent-devel \
-                openssl-devel libaio-devel mariadb-devel cmake maven git redis
+                openssl-devel libaio-devel mariadb-devel cmake maven git redis screen htop
 
 ## memtier_benchmark
 cd /root/ && \
