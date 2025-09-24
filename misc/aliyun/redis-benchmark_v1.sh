@@ -15,7 +15,7 @@ TEST_TIME=${3}
 # 其他变量
 SUT_NAME="redis"
 OS_TYPE="alinux3"
-INSTANCE_TYPE=$(sshpass -p '3k3j9knjM' ssh root@$SUT_IP_ADDR "cloud-init query ds.meta-data.instance.instance-type")
+INSTANCE_TYPE=$(sshpass -p '3k3j9knjM' ssh -o StrictHostKeyChecking=no root@$SUT_IP_ADDR "cloud-init query ds.meta-data.instance.instance-type")
 
 # source /tmp/temp-setting
 RESULT_PATH="/root/benchmark-result-files"

@@ -3,22 +3,26 @@
 ## 使用方法： bash nginx-benchmark.sh <IP地址>
 
 SUT_IP_ADDR=${1}
-TEST_TIME=${2}
+# TEST_TIME=${2}
 
-source /tmp/temp-setting
-RESULT_PATH="/root/ec2-test-suite/benchmark-result-files"
+# source /tmp/temp-setting
+RESULT_PATH="/root/benchmark-result-files"
 mkdir -p ${RESULT_PATH}
 
 # 执行OS优化
-bash /root/ec2-test-suite/benchmark/os-optimization.sh
+#bash /root/ec2-test-suite/benchmark/os-optimization.sh
+
+SUT_NAME="nginx-loadbalance"
+OS_TYPE="alinux3"
+INSTANCE_TYPE=$(sshpass -p '3k3j9knjM' ssh -o StrictHostKeyChecking=no root@$SUT_IP_ADDR "cloud-init query ds.meta-data.instance.instance-type")
 
 # 命令
-THREADS=${INSTANCE_VCPU_NUM}
+THREADS=8
 CONNECTIONS="10 20 30 40 60 80 100 150 200 300"
 RESOURCE_FILE="test.html"
 # RESOURCE_FILE="1kb.bin"
 DURATION='3m'
-RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_LOADBALANCE}.txt"
+RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${SUT_IP_ADDR}.txt"
 
 for i in $CONNECTIONS
 do
@@ -32,14 +36,6 @@ EOF
 
 	~/wrk-4.2.0/wrk --threads $THREADS --connections $i --duration $DURATION \
 		--script ~/wrk-4.2.0/report.lua https://$SUT_IP_ADDR/$RESOURCE_FILE >> $RESULT_FILE
-		
-# 	~/wrk-4.2.0/wrk --threads ${THREADS} --connections ${CONNECTIONS} --duration ${DURATION} \
-# 		--script ~/wrk-4.2.0/report.lua -H 'Connection: close' \
-# 		https://${SUT_IP_ADDR}/${RESOURCE_FILE} | grep BENCH >> ${RESULT_FILE}
-		
-#    ~/wrk2/wrk --threads ${THREADS} --connections ${CONNECTIONS} --duration ${DURATION} \
-#       --script ~/wrk2/report.lua --rate ${RATE} -H 'Connection: close' \
-#       https://${SUT_IP_ADDR}/${RESOURCE_FILE} | grep BENCH >> ${RESULT_FILE}
 
 	sleep 10
 done
