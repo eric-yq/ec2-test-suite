@@ -15,8 +15,8 @@ IPADDR_R9AE="172.24.133.61"
 
 ##########################################################################################
 ## redis, valkey
-IPADDR_R8Y="172.24.133.63"
-IPADDR=${IPADDR_R8Y}
+IPADDR_R9A="172.24.133.62"
+IPADDR=${IPADDR_R9A}
 bash benchmark/redis-benchmark_v1.sh ${IPADDR} 6379 180
 echo "[Info] Redis on $IPADDR complete."
 echo "[Info] sleep 60 seconds for next benchmark..."
