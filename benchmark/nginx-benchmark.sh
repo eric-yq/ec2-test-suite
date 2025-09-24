@@ -15,8 +15,8 @@ bash /root/ec2-test-suite/benchmark/os-optimization.sh
 # 命令
 THREADS=${INSTANCE_VCPU_NUM}
 CONNECTIONS="10 20 30 40 60 80 100 150 200 300"
-RESOURCE_FILE="test.html"
-# RESOURCE_FILE="1kb.bin"
+# RESOURCE_FILE="test.html"
+RESOURCE_FILE="1kb.bin"
 DURATION='3m'
 RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_LOADBALANCE}.txt"
 
