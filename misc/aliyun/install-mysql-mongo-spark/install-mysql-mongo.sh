@@ -26,6 +26,7 @@ install_public_tools(){
 install_mysql(){
     wget https://repo.mysql.com//${MYSQL_REPO}
     rpm -Uvh ${MYSQL_REPO}
+    $PKGCMD remove  -y mariadb-devel
     $PKGCMD install -y mysql-server --nogpgcheck
     $PKGCMD install -y mysql-devel --nogpgcheck
     $PKGCMD install -y mysql --nogpgcheck

@@ -32,8 +32,9 @@ IPADDR_R8Y="172.24.133.63"
 IPADDR_R9I="172.24.133.XX"
 IPADDR_R9A="172.24.133.xx"
 IPADDR_R9AE="172.24.133.xx"
-## 选择测试的 IP 地址
-INSTANCE_IP_MASTER=$IPADDR_R8Y
+## 2.sh
+#!/bin/bash
+INSTANCE_IP_MASTER=${1}
 ## 准备数据
 bash benchmark/mysql-benchmark_v2_prepare.sh ${INSTANCE_IP_MASTER} 64
 
