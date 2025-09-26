@@ -16,37 +16,52 @@
 SUT_NAME="mysql"
 echo "$0: Install SUT_NAME: ${SUT_NAME}"
 
-## functions
-install_public_tools(){
-	$PKGCMD update -y
-	$PKGCMD1 install -y epel
-	$PKGCMD install -y dmidecode net-tools htop git python3-pip
-	pip3 install dool
-}
-install_mysql(){
-    wget https://repo.mysql.com//${MYSQL_REPO}
-    rpm -Uvh ${MYSQL_REPO}
-    $PKGCMD remove  -y mariadb-devel
-    $PKGCMD install -y mysql-server --nogpgcheck
-    $PKGCMD install -y mysql-devel --nogpgcheck
-    $PKGCMD install -y mysql --nogpgcheck
-}
-modify_mycnf(){
-	## 修改配置文件
-    cp ${MYSQL_CONF} ${MYSQL_CONF}.bak
-    IPADDR=$(ifconfig | grep "inet " | grep -v "127.0.0.1" | awk -F " " '{print $2}')
-    sed -i "s/127.0.0.1/${IPADDR}/g" ${MYSQL_CONF}
-    
-    
-	## 获取 CPU数 和 内存数量（MB）
-	CPU_CORES=$(nproc)
-	MEM_TOTAL_MB=$(free -m |grep Mem | awk -F " " '{print $2}')
+## 获取OS 、CPU 架构信息。
+PKGCMD=dnf
+PKGCMD1=dnf
+MYSQL_REPO="mysql80-community-release-el8.rpm"
 
-	## 变量计算
-	let XXX=${MEM_TOTAL_MB}*75/100
+# mysql conf
+MYSQL_SERVICE="mysqld"
+MYSQL_CONF="/etc/my.cnf"
 
-    mkdir -p /data/
-    cat << EOF > ${MYSQL_CONF}
+# 修改初始密码，
+cat << EOF > create_remote_login_user.sql
+alter user 'root'@'localhost' identified with mysql_native_password by 'DoNotChangeMe@@123';
+set global validate_password.policy=0;
+alter user 'root'@'localhost' identified with mysql_native_password by 'gv2mysql';
+create user 'root'@'%' identified with mysql_native_password by 'gv2mysql';
+grant all privileges on *.* to 'root'@'%' with grant option;
+flush privileges;
+EOF
+
+# ## functions
+# install_public_tools(){
+$PKGCMD update -y
+$PKGCMD install -y dmidecode net-tools htop git python3-pip
+pip3 install dool
+
+# install_mysql(){
+wget https://repo.mysql.com//${MYSQL_REPO}
+rpm -Uvh ${MYSQL_REPO}
+$PKGCMD remove  -y mariadb-devel
+$PKGCMD install -y mysql-server --nogpgcheck
+$PKGCMD install -y mysql-devel --nogpgcheck
+$PKGCMD install -y mysql --nogpgcheck
+
+# modify_mycnf(){
+## 修改配置文件
+cp ${MYSQL_CONF} ${MYSQL_CONF}.bak
+
+## 获取 CPU数 和 内存数量（MB）
+CPU_CORES=$(nproc)
+MEM_TOTAL_MB=$(free -m |grep Mem | awk -F " " '{print $2}')
+
+## 变量计算
+let XXX=${MEM_TOTAL_MB}*75/100
+
+mkdir -p /data/
+cat << EOF > ${MYSQL_CONF}
 [mysqld]
 server-id=123
 datadir=/data/
@@ -117,47 +132,17 @@ innodb_adaptive_hash_index=0
 innodb_use_fdatasync=ON
 EOF
 
-    systemctl restart ${MYSQL_SERVICE}
-	systemctl status  ${MYSQL_SERVICE}
-}
-init_start_mysql(){
-	MYSQL_INIT_PASSWORD=$(grep 'temporary password' /var/log/mysqld.log | awk '{print $NF}')
-	if [[ x${MYSQL_INIT_PASSWORD} == x ]]; then
-        MYSQL_CMD_OPTIONS=""
-    else 
-        MYSQL_CMD_OPTIONS="--connect-expired-password -uroot -p${MYSQL_INIT_PASSWORD}"
-    fi
-    ## 修改初始密码
-    cat create_remote_login_user.sql
-	mysql ${MYSQL_CMD_OPTIONS} < create_remote_login_user.sql
-}
+systemctl restart ${MYSQL_SERVICE}
+systemctl status  ${MYSQL_SERVICE}
 
-# 主要流程
-## 获取OS 、CPU 架构信息。
-PKGCMD=dnf
-PKGCMD1=dnf
-# MYSQL_REPO="mysql80-community-release-el9.rpm"
-MYSQL_REPO="mysql80-community-release-el8.rpm"
-
-# mysql conf
-MYSQL_SERVICE="mysqld"
-MYSQL_CONF="/etc/my.cnf"
-
-# 修改初始密码，
-cat << EOF > create_remote_login_user.sql
-alter user 'root'@'localhost' identified with mysql_native_password by 'DoNotChangeMe@@123';
-set global validate_password.policy=0;
-alter user 'root'@'localhost' identified with mysql_native_password by 'gv2mysql';
-create user 'root'@'%' identified with mysql_native_password by 'gv2mysql';
-grant all privileges on *.* to 'root'@'%' with grant option;
-flush privileges;
-EOF
-
-# mysql installation
-install_public_tools
-install_mysql
-modify_mycnf
-init_start_mysql
-
-	
+# init_start_mysql()
+MYSQL_INIT_PASSWORD=$(grep 'temporary password' /var/log/mysqld.log | awk '{print $NF}')
+if [[ x${MYSQL_INIT_PASSWORD} == x ]]; then
+    MYSQL_CMD_OPTIONS=""
+else 
+    MYSQL_CMD_OPTIONS="--connect-expired-password -uroot -p${MYSQL_INIT_PASSWORD}"
+fi
+## 修改初始密码
+cat create_remote_login_user.sql
+mysql ${MYSQL_CMD_OPTIONS} < create_remote_login_user.sql
 
