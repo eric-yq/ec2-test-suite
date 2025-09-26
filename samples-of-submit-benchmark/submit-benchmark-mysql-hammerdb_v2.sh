@@ -15,23 +15,23 @@ do
 		echo "$0: OS_TYPE=${os}, INSTANCE_TYPE=${ins}"
 		bash launch-instances-single.sh -s mysql-ebs -t ${ins} -o ${os}
 		launch_status=$?
-        
-        # 检查启动状态
-        if [ $launch_status -ne 0 ]; then
-            echo "\$0: [$(date +%Y%m%d.%H%M%S)] Instance launch failed for OS_TYPE=${os}, INSTANCE_TYPE=${ins}. Continuing with next configuration..."
-            continue
-        fi
-		
+
+		# 检查启动状态
+		if [ $launch_status -ne 0 ]; then
+			echo "\$0: [$(date +%Y%m%d.%H%M%S)] Instance launch failed for OS_TYPE=${os}, INSTANCE_TYPE=${ins}. Continuing with next configuration..."
+			continue
+		fi
+
 		echo "$0: [$(date +%Y%m%d.%H%M%S)] Sleep 180 seconds ..."
 		sleep 180
-		
+
 		## 执行 Benchmark 测试
 		echo "$0: Star to run benchmark"
 		source /tmp/temp-setting
-		
+
 		## 准备数据
 		bash benchmark/mysql-benchmark_v2_prepare.sh ${INSTANCE_IP_MASTER} 64 ${ins} 
-		
+
 		## 使用不同的vuser执行benchmark
 		bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 60  1 64 ${ins} 
 		bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 60  2 64 ${ins} 
