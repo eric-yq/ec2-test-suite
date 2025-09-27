@@ -47,7 +47,7 @@ submit_task(){
         ## 执行 Benchmark, run
         echo "[Info] This Test, current Thread=${i}: Run benchmark - Read only ..." >> ${RESULT_FILE1}
         /root/ycsb-0.17.0/bin/ycsb  run mongodb -P $(dirname $0)/workload_mongo_readonly -p mongodb.url=${MONGO_URL} \
-            -threads ${i} >> ${RESULT_FILE1}
+            -threads ${i} >> ${RESULT_FILE1} 
             
         echo "[Info] This Test, current Thread=${i}: Run benchmark - Update only ..." >> ${RESULT_FILE1}
         /root/ycsb-0.17.0/bin/ycsb  run mongodb -P $(dirname $0)/workload_mongo_updateonly -p mongodb.url=${MONGO_URL} \
