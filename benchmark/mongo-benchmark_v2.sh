@@ -26,10 +26,15 @@ submit_task(){
     fi
     
     ## Profile: workload_mongo
-#   THREAD_LIST="16 32 48 64 80 96 112 128 144 160 176 192"
     THREAD_LIST="2 4 6 8 10 12 14 16 32"
     RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${SUT_IP_ADDR}-ycsb-load.txt"
     RESULT_FILE1="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${SUT_IP_ADDR}-ycsb-run.txt"
+
+    ## 启动一个后台进程，执行dool命令，获取系统性能信息
+    DOOL_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${SUT_IP_ADDR}_dool.txt"
+    ssh -o StrictHostKeyChecking=no -i ~/ericyq-global.pem ec2-user@${SUT_IP_ADDR} \
+    "dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60" \
+    1> ${DOOL_FILE} 2>&1 &
 
 	### 加载数据, load
 	echo "[Info] Load data ..." >> ${RESULT_FILE}
