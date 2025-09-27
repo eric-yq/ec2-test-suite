@@ -9,6 +9,12 @@ echo "export HIVE_VERSION=3.1.3" >> ~/.bashrc
 echo "export SPARK_VERSION=3.3.1" >> ~/.bashrc
 echo "export SCALA_VERSION=2.12.18" >> ~/.bashrc
 
+## aliyun 特有：
+sudo vi /etc/hosts
+# 添加
+127.0.0.1 iZbp16qq4fgg0pvevgkg8iZ
+
+
 # 生成密钥用于无密码登录：
 ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
 cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
@@ -244,7 +250,7 @@ sed -i "s/rootLogger.level = info/rootLogger.level = error/g" $SPARK_HOME/conf/l
 ln -s /usr/share/java/mysql-connector-java.jar $SPARK_HOME/jars/mysql-connector-java.jar
 
 # 启动 Spark Local 集群
-$SPARK_HOME/sbin/start-all.sh
+    $SPARK_HOME/sbin/start-all.sh
 
 # 通过下面命令进行初步验证，spark-example 将完成指定位数的 Pi 值计算。
 spark-sql -e "show databases;"
