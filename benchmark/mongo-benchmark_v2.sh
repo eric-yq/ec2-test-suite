@@ -33,7 +33,7 @@ submit_task(){
     ## 启动一个后台进程，执行dool命令，获取系统性能信息
     DOOL_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${SUT_IP_ADDR}_dool.txt"
     ssh -o StrictHostKeyChecking=no -i ~/ericyq-global.pem ec2-user@${SUT_IP_ADDR} \
-    "dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60" \
+    "dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 1440" \
     1> ${DOOL_FILE} 2>&1 &
 
 	### 加载数据, load
