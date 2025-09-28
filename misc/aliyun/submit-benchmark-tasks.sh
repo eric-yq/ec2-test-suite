@@ -47,3 +47,12 @@ bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 60  8 64
 bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 30 10 64 
 bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 30 12 64
 bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 30 16 64
+
+##########################################################################################
+## mongo
+IPADDR_R8Y="172.24.133.60"
+IPADDR_R9I="172.24.133.XX"
+IPADDR_R9A="172.24.133.xx"
+IPADDR_R9AE="172.24.133.xx"
+
+bash benchmark/mongo-benchmark_v2.sh ${IPADDR_R8Y}

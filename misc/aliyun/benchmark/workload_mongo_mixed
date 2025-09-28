@@ -1,0 +1,15 @@
+recordcount=10000000
+operationcount=10000000
+workload=site.ycsb.workloads.CoreWorkload
+threadcount=100
+readallfields=true
+readproportion=0.4
+updateproportion=0.4
+scanproportion=0
+insertproportion=0
+readmodifywriteproportion=0.2
+requestdistribution=zipfian
+insertorder=hashed
+fieldlength=200
+fieldcount=10
+mongodb.writeConcern=acknowledged
