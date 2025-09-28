@@ -201,34 +201,34 @@ let XXX=${MEM_TOTAL_GB}*80/100
 
 cat << EOF > ${MONGO_CONF}
 systemLog:
-destination: file
-logAppend: true
-path: /var/log/mongodb/mongod.log
+  destination: file
+  logAppend: true
+  path: /var/log/mongodb/mongod.log
 
 processManagement:
-timeZoneInfo: /usr/share/zoneinfo
+  timeZoneInfo: /usr/share/zoneinfo
 
 net:
-port: 27017
-bindIpAll: true
-maxIncomingConnections: 65535
+  port: 27017
+  bindIpAll: true
+  maxIncomingConnections: 65535
 
 operationProfiling:
-mode: off
+  mode: off
 
 storage:
-dbPath: /data/mongodb
-directoryPerDB: true
-engine: wiredTiger
-wiredTiger:
-engineConfig:
-    cacheSizeGB: ${XXX}
-    directoryForIndexes: true
-    journalCompressor: snappy
-collectionConfig:
-    blockCompressor: snappy
-indexConfig:
-    prefixCompression: true
+  dbPath: /data/mongodb
+  directoryPerDB: true
+  engine: wiredTiger
+  wiredTiger:
+    engineConfig:
+      cacheSizeGB: ${XXX}
+      directoryForIndexes: true
+      journalCompressor: snappy
+    collectionConfig:
+      blockCompressor: snappy
+    indexConfig:
+      prefixCompression: true
 
 EOF
 
