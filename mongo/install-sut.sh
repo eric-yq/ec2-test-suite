@@ -7,6 +7,9 @@ echo "$0: Install SUT_NAME: ${SUT_NAME}"
 
 install_public_tools(){
     yum install -y dmidecode
+	  yum install -y epel
+	  yum install -y dmidecode net-tools htop git python3-pip
+	  pip3 install dool
     
     ## OS CONFIG
     sysctl -w vm.max_map_count=98000
