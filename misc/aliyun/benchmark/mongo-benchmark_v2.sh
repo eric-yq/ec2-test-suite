@@ -28,22 +28,23 @@ submit_task(){
 	### 加载数据, load
 	echo "[Info] Load data ..." >> ${RESULT_FILE}
 	remove_database
-	/root/ycsb-0.17.0/bin/ycsb load mongodb -P $(dirname $0)/workload_mongo_readonly -p mongodb.url=${MONGO_URL} \
+
+	python2 /root/ycsb-0.17.0/bin/ycsb load mongodb -P $(dirname $0)/workload_mongo_readonly -p mongodb.url=${MONGO_URL} \
 		-threads $(nproc) >> ${RESULT_FILE}
 		
     for i in ${THREAD_LIST}
     do
         ## 执行 Benchmark, run
         echo "[Info] This Test, current Thread=${i}: Run benchmark - Read only ..." >> ${RESULT_FILE1}
-        /root/ycsb-0.17.0/bin/ycsb  run mongodb -P $(dirname $0)/workload_mongo_readonly -p mongodb.url=${MONGO_URL} \
+        python2 /root/ycsb-0.17.0/bin/ycsb  run mongodb -P $(dirname $0)/workload_mongo_readonly -p mongodb.url=${MONGO_URL} \
             -threads ${i} >> ${RESULT_FILE1} 
             
         echo "[Info] This Test, current Thread=${i}: Run benchmark - Update only ..." >> ${RESULT_FILE1}
-        /root/ycsb-0.17.0/bin/ycsb  run mongodb -P $(dirname $0)/workload_mongo_updateonly -p mongodb.url=${MONGO_URL} \
+        python2 /root/ycsb-0.17.0/bin/ycsb  run mongodb -P $(dirname $0)/workload_mongo_updateonly -p mongodb.url=${MONGO_URL} \
             -threads ${i} >> ${RESULT_FILE1}
             
         echo "[Info] This Test, current Thread=${i}: Run benchmark - Mixed(Read 40%, Update 40%, Read-Modify-Write 20%) ..." >> ${RESULT_FILE1}
-        /root/ycsb-0.17.0/bin/ycsb  run mongodb -P $(dirname $0)/workload_mongo_mixed -p mongodb.url=${MONGO_URL} \
+        python2 /root/ycsb-0.17.0/bin/ycsb  run mongodb -P $(dirname $0)/workload_mongo_mixed -p mongodb.url=${MONGO_URL} \
             -threads ${i} >> ${RESULT_FILE1} 
     
         ### 完成测试后删除数据库
@@ -54,11 +55,11 @@ submit_task(){
 }
 
 remove_database(){
-mongosh ${MONGO_URL} << EOF
+    mongosh ${MONGO_URL} << EOF
 use ycsb
 db.dropDatabase()
 EOF
-rm -rf /data/mongodb/ycsb/ && ll /data/mongodb/
+    rm -rf /data/mongodb/ycsb/
 }
 
 ## 执行 benchmark 测试

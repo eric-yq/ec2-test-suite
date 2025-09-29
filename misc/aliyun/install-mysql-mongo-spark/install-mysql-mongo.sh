@@ -156,7 +156,7 @@ echo "$0: Install SUT_NAME: ${SUT_NAME}"
 ## 获取OS 、CPU 架构信息。
 OS_NAME=$(egrep ^NAME /etc/os-release | awk -F "\"" '{print $2}')
 OS_VERSION=$(egrep ^VERSION_ID /etc/os-release | awk -F "\"" '{print $2}')
-ARCH=$(lscpu | grep Architecture | awk -F " " '{print $NF}')
+ARCH=$(arch)
 
 ## 添加 MongoDB Repo
 MONGO_XY="8.0"
@@ -203,7 +203,8 @@ cat << EOF > ${MONGO_CONF}
 systemLog:
   destination: file
   logAppend: true
-  path: /var/log/mongodb/mongod.log
+  # path: /var/log/mongodb/mongod.log
+  path: /data/mongodb/mongod.log
 
 processManagement:
   timeZoneInfo: /usr/share/zoneinfo
@@ -249,7 +250,7 @@ echo "  authorization: enabled" >> ${MONGO_CONF}
 systemctl restart ${MONGO_SERVICE}
 systemctl status ${MONGO_SERVICE}
 
-wget --quiet https://atlas-education.s3.amazonaws.com/sampledata.archive
+wget https://atlas-education.s3.amazonaws.com/sampledata.archive
 mongorestore --archive=sampledata.archive --username root --password gv2mongo
 
 ###################################################################################

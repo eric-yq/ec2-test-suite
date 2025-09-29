@@ -20,7 +20,7 @@ do
 	mkdir -p $MOUNTDIR
 	
 	# fstab 添加表项
-	echo "UUID=$UUID $MOUNTDIR xfs  defaults,nofail  0  2" >> /etc/fstab
+		
 done
 # cat /etc/fstab
 mount -a && df -h
