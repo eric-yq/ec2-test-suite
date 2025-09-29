@@ -363,10 +363,10 @@ SF=600
 ################################################################################################
 # 执行全部的 SQL 分析任务
 # 待数据全部完成之后，预先准备 Benchmark 过程中需要的一些结果目录：
-cd ~
+cd ~/data
 SUT_NAME="spark-tpcds"
 PN=$(sudo cloud-init query ds.meta_data.instance.instance-type)
-DATA_DIR=~/${PN}_${SUT_NAME}
+DATA_DIR=~/data/${PN}_${SUT_NAME}
 CFG_DIR=$DATA_DIR/system-infomation
 TPCDS_RESULT_DIR=$DATA_DIR/spark-tpcds-result
 LOG_DIR=$DATA_DIR/logs
@@ -378,7 +378,7 @@ RESULT_SUMMARY="$RESULT_PATH/result_summary_spark_tpc-ds.txt"
 
 # 逐个执行 *.sql 文件的方式执行 Benchmark：
 echo "[$TIMESTAMP] Start Spark TPC-DS Benchmark(SF=$SF) on $PN ...... " > $RESULT_SUMMARY
-cd $HOME/hive-testbench/spark-queries-tpcds
+cd $HOME/data/hive-testbench/spark-queries-tpcds
 LIST=$(ls *.sql)
 for i in $LIST; do
     RESULT_LOG="$RESULT_PATH/$i.log"
