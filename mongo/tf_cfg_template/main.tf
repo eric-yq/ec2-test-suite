@@ -24,7 +24,7 @@ resource "aws_instance" "sut_server" {
   user_data 				= file(var.userdata_file)
 
   # 设置实例租户为 dedicated
-  tenancy                = "dedicated"
+  # tenancy                = "dedicated"
 
   root_block_device {
     volume_type           	= var.root_block_volume_type
