@@ -16,6 +16,13 @@ source /tmp/temp-setting
 RESULT_PATH="/root/ec2-test-suite/benchmark-result-files"
 mkdir -p ${RESULT_PATH}
 
+## 启动一个后台进程，执行dool命令，获取系统性能信息
+## Note: prepare: 按 38 分钟计算;  run: 按 64*8=512 分钟计算 ，总计打印 550 分钟的监控信息。
+DOOL_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${SUT_IP_ADDR}_dool.txt"
+ssh -o StrictHostKeyChecking=no -i ~/ericyq-global.pem ec2-user@${SUT_IP_ADDR} \
+  "sudo dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 100" \
+  1> ${DOOL_FILE} 2>&1 &
+
 THREAD_LIST="1 2 4 6 8 12 16 32 48 64"
 # THREAD_LIST="1 4 8 12 16"
 
