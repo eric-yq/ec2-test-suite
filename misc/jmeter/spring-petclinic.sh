@@ -42,7 +42,6 @@ jmeter -n -t petclinic_test_plan-modified.jmx \
   -JPETCLINIC_HOST=172.31.28.254 \
   -l results.jtl
 
-
 # PARSE RESULTS AND GENERATE REPORT
 REPORT_DIR=summary_report_${TIMESTAMP}
 REPORT_ZIP=spring-petclinic_jmeter-summary-report_${JDK_VERSION}-${PN}-${TIMESTAMP}
