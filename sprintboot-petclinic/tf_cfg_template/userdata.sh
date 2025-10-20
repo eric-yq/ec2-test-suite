@@ -13,7 +13,9 @@ java -version
 cd /root/
 git clone https://github.com/spring-projects/spring-petclinic.git
 cd spring-petclinic
+echo "yuanquan1: HOME is $HOME"
 export HOME=/root/
+echo "yuanquan2: HOME is $HOME"
 ./mvnw package
 cp target/*.jar /usr/local/bin/spring-petclinic.jar
 #nohup java -jar target/*.jar &
