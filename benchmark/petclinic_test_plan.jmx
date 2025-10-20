@@ -38,7 +38,6 @@
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">10</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.host_ip_address">${__P(HOST,localhost)}</stringProp>
         <stringProp name="ThreadGroup.num_threads">${__P(USERS,500)}</stringProp>
         <stringProp name="ThreadGroup.ramp_time">10</stringProp>
         <longProp name="ThreadGroup.start_time">1361531541000</longProp>
