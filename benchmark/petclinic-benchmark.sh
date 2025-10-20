@@ -18,10 +18,10 @@ mkdir -p ${RESULT_PATH}
 
 RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${SUT_IP_ADDR}_${SUT_PORT}_${i}.jtl"
 
-jmeter -n -t $(dirname $0)/petclinic_test_plan.jmx \
+jmeter -v -n -t $(dirname $0)/petclinic_test_plan.jmx \
   -JUSERS=$i \
   -JPETCLINIC_HOST=$SUT_IP_ADDR \
-  -l ${RESULT_FILE} -v
+  # -l ${RESULT_FILE}
 
 echo "[Info] Complete jmeter test for USERS=$i. "
 #解析结果
