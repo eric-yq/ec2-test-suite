@@ -21,7 +21,7 @@ RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${SUT_IP_ADD
 jmeter -n -t $(dirname $0)/petclinic_test_plan.jmx \
   -JUSERS=$i \
   -JPETCLINIC_HOST=$SUT_IP_ADDR \
-  -l ${RESULT_FILE}
+  -l ${RESULT_FILE} -v
 
 echo "[Info] Complete jmeter test for USERS=$i. "
 #解析结果
