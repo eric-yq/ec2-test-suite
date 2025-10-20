@@ -13,6 +13,7 @@ java -version
 cd /root/
 git clone https://github.com/spring-projects/spring-petclinic.git
 cd spring-petclinic
+export HOME=/root/
 ./mvnw package
 cp target/*.jar /usr/local/bin/spring-petclinic.jar
 #nohup java -jar target/*.jar &
