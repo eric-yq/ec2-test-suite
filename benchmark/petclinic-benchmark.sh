@@ -1,6 +1,6 @@
 #!/bin/bash
 
-## 使用方法： bash petclinic.sh <IP地址> <并发数>
+## 使用方法： bash petclinic-benchmark.sh <IP地址> <并发数>
 
 SUT_IP_ADDR=${1}
 SUT_PORT=8080
