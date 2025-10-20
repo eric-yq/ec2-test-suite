@@ -17,11 +17,11 @@ mkdir -p ${RESULT_PATH}
 #   1> ${DOOL_FILE} 2>&1 &
 
 RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${SUT_IP_ADDR}_${SUT_PORT}_${i}.jtl"
-
+echo "[Info] Start jmeter test for PETCLINIC_HOST=${SUT_IP_ADDR}, USERS=$i ..."
 jmeter -n -t $(dirname $0)/petclinic_test_plan.jmx \
   -JUSERS=$i \
   -JPETCLINIC_HOST=${SUT_IP_ADDR} \
-  -l ${RESULT_FILE}
+  -f -l ${RESULT_FILE}
 
 echo "[Info] Complete jmeter test for USERS=$i. "
 #解析结果
