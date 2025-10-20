@@ -4,7 +4,7 @@
 yum update -y
 
 ## Corretto 25
-yum install -y java-25-amazon-corretto java-25-amazon-corretto-devel python3-pip htop dmidecode
+yum install -y java-25-amazon-corretto java-25-amazon-corretto-devel python3-pip git
 pip3 install dool
 JDK_VERSION='corretto25'
 java -version
