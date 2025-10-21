@@ -42,7 +42,7 @@
         <stringProp name="ThreadGroup.ramp_time">${__P(RAMP_TIME,10)}</stringProp>
         <longProp name="ThreadGroup.start_time">1361531541000</longProp>
         <longProp name="ThreadGroup.end_time">1361531541000</longProp>
-        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <boolProp name="ThreadGroup.scheduler">${__P(SCHEDULE,false)}</boolProp>
         <stringProp name="ThreadGroup.duration">${__P(DURATION,180)}</stringProp>
         <stringProp name="ThreadGroup.delay"></stringProp>
         <boolProp name="ThreadGroup.delayedStart">true</boolProp>
