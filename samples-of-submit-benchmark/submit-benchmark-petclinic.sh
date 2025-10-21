@@ -33,7 +33,8 @@ do
 		## 使用不同的user执行benchmark
 		bash benchmark/petclinic-benchmark.sh ${INSTANCE_IP_MASTER} 30
         bash benchmark/petclinic-benchmark.sh ${INSTANCE_IP_MASTER} 60
-        bash benchmark/petclinic-benchmark.sh ${INSTANCE_IP_MASTER} 100
+        bash benchmark/petclinic-benchmark.sh ${INSTANCE_IP_MASTER} 90
+		bash benchmark/petclinic-benchmark.sh ${INSTANCE_IP_MASTER} 120
         bash benchmark/petclinic-benchmark.sh ${INSTANCE_IP_MASTER} 150
         bash benchmark/petclinic-benchmark.sh ${INSTANCE_IP_MASTER} 200
 
