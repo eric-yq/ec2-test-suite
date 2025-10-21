@@ -4,7 +4,9 @@ set -e
 
 ## 待测 EC2 规格和 OS
 os_types="al2023"
-instance_types="r8g.2xlarge r8i.2xlarge r7a.2xlarge r7g.2xlarge r7i.2xlarge r6a.2xlarge r6g.2xlarge r6i.2xlarge" 
+# instance_types="r8g.2xlarge r8i.2xlarge r7a.2xlarge r7g.2xlarge r7i.2xlarge r6a.2xlarge r6g.2xlarge r6i.2xlarge" 
+instance_types="r8g.2xlarge" 
+
 
 for os in ${os_types} 
 do
@@ -29,8 +31,15 @@ do
 		source /tmp/temp-setting
 
 		## 使用不同的user执行benchmark
-		bash benchmark/petclinic-benchmark.sh ${INSTANCE_IP_MASTER} 
- 
+		bash benchmark/petclinic-benchmark.sh ${INSTANCE_IP_MASTER} 10
+        bash benchmark/petclinic-benchmark.sh ${INSTANCE_IP_MASTER} 20
+        bash benchmark/petclinic-benchmark.sh ${INSTANCE_IP_MASTER} 30
+        bash benchmark/petclinic-benchmark.sh ${INSTANCE_IP_MASTER} 50
+        bash benchmark/petclinic-benchmark.sh ${INSTANCE_IP_MASTER} 100
+        bash benchmark/petclinic-benchmark.sh ${INSTANCE_IP_MASTER} 150
+        bash benchmark/petclinic-benchmark.sh ${INSTANCE_IP_MASTER} 200
+        bash benchmark/petclinic-benchmark.sh ${INSTANCE_IP_MASTER} 250
+        bash benchmark/petclinic-benchmark.sh ${INSTANCE_IP_MASTER} 300
 
 		## 停止实例
 		aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region) &
