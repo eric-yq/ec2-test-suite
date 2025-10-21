@@ -23,7 +23,7 @@ jmeter -n -t $(dirname $0)/petclinic_test_plan.jmx \
   -JUSERS=$i \
   -JSCHEDULE=true \
   -JRAMP_TIME=30 \
-  -JDURATION=300 \
+  -JDURATION=30 \
   -f -l ${RESULT_FILE}
 
 echo "[Info] Complete jmeter test for USERS=$i. "
