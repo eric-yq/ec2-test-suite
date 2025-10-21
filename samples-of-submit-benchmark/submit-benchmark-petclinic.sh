@@ -38,6 +38,6 @@ do
         bash benchmark/petclinic-benchmark.sh ${INSTANCE_IP_MASTER} 200
 
 		## 停止实例
-		aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region) &
+		aws ec2 stop-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region) &
 	done
 done
