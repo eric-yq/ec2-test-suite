@@ -36,12 +36,12 @@
           guiclass="LoopControlPanel" testclass="LoopController" testname="Contr�leur Boucle"
           enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
-          <stringProp name="LoopController.loops">${__P(LOOPS,123456789)}</stringProp>
+          <stringProp name="LoopController.loops">-1</stringProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">${__P(USERS,100)}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">${__P(RAMP_TIME,30)}</stringProp>
-        <boolProp name="ThreadGroup.scheduler">${__P(SCHEDULE,true)}</boolProp>
-        <stringProp name="ThreadGroup.duration">${__P(DURATION,180)}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">30</stringProp>
+        <boolProp name="ThreadGroup.scheduler">true</boolProp>
+        <stringProp name="ThreadGroup.duration">90</stringProp>
         <stringProp name="ThreadGroup.delay"></stringProp>
         <boolProp name="ThreadGroup.delayedStart">true</boolProp>
         <longProp name="ThreadGroup.start_time">1361531541000</longProp>
