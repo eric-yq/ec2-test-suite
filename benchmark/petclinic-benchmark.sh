@@ -27,6 +27,7 @@ jmeter -n -t $(dirname $0)/petclinic_test_plan.jmx \
   -f -l ${RESULT_FILE}
 
 echo "[Info] Complete jmeter test for USERS=$i. "
+
 #解析结果
 REPORT_DIR="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${SUT_IP_ADDR}_${SUT_PORT}_${i}_report"
 jmeter -g ${RESULT_FILE} -o ${REPORT_DIR}
