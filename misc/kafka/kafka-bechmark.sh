@@ -62,7 +62,7 @@ bin/kafka-topics.sh --describe --topic quickstart-events --bootstrap-server loca
 
 ########################################################################################################
 ## Benchmark ， Producer
-="172.31.47.75"  # i3.2xlarge，
+BROKER_IPADDR="172.31.47.75"  # i3.2xlarge，
 BROKER_IPADDR="172.31.41.71"  # i4i.2xlarge，
 BROKER_IPADDR="172.31.45.2"   # i7ie.2xlarge，
 BROKER_IPADDR="172.31.44.179" # i4g.2xlarge，
