@@ -44,8 +44,8 @@ pip3 install dool
 
 # OS系统优化
 # 增加系统文件描述符限制
-sudo sh -c 'echo "* soft nofile 1000000" >> /etc/security/limits.conf'
-sudo sh -c 'echo "* hard nofile 1000000" >> /etc/security/limits.conf'
+sudo sh -c 'echo "* soft nofile 1073741824" >> /etc/security/limits.conf'
+sudo sh -c 'echo "* hard nofile 1073741824" >> /etc/security/limits.conf'
 
 # 调整内核参数
 sudo sysctl -w fs.file-max=1000000
@@ -276,3 +276,5 @@ echo "[Info] TPCC 测试完成！"
 
 systemctl disable userdata.service
 killall dool
+
+# 100warehouse: 50G 磁盘空间？
