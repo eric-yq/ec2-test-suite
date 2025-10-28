@@ -245,6 +245,8 @@ nohup tiup playground --host ${IPADDR} \
   --kv.config conf/tikv.toml \
   --pd.config conf/pd.toml &
 
+echo "[Info] 等待(3 分钟) TiDB 集群启动完成......" && sleep 180
+
 ## 准备进行 TPCC 测试
 tiup install bench
 WARES=5000
