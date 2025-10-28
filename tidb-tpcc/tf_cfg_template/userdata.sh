@@ -238,9 +238,9 @@ curl --proto '=https' --tlsv1.2 -sSf https://tiup-mirrors.pingcap.com/install.sh
 source /root/.bash_profile
 IPADDR=$(ec2-metadata --quiet --local-ipv4)
 nohup tiup playground --host ${IPADDR} \
-  --db 4 \
-  --pd 3 \
-  --kv 6 \
+  --db 1 \
+  --kv 3 \
+  --pd 1 \
   --db.config conf/tidb.toml \
   --kv.config conf/tikv.toml \
   --pd.config conf/pd.toml &
@@ -275,3 +275,4 @@ tiup bench tpcc -H ${IPADDR} -P 4000 -D tpcc --warehouses ${WARES} --threads $(n
 echo "[Info] TPCC 测试完成！"
 
 systemctl disable userdata.service
+killall dool
