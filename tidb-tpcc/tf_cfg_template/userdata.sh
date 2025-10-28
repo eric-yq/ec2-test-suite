@@ -250,7 +250,7 @@ echo "[Info] 等待(3 分钟) TiDB 集群启动完成......" && sleep 180
 ## 准备进行 TPCC 测试
 tiup install bench
 SUT_NAME="tidb-tpcc"
-WARES=10
+WARES=100
 IPADDR=$(ec2-metadata --quiet --local-ipv4)
 INSTANCE_TYPE=$(ec2-metadata --quiet --instance-type)
 RESULT_PATH="/root/tidb-tpcc-results-${INSTANCE_TYPE}-${WARES}-warehouses"
