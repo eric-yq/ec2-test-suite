@@ -249,17 +249,29 @@ echo "[Info] 等待(3 分钟) TiDB 集群启动完成......" && sleep 180
 
 ## 准备进行 TPCC 测试
 tiup install bench
+SUT_NAME="tidb-tpcc"
 WARES=5000
 IPADDR=$(ec2-metadata --quiet --local-ipv4)
+INSTANCE_TYPE=$(ec2-metadata --quiet --instance-type)
+RESULT_PATH="/root/tidb-tpcc-results-${INSTANCE_TYPE}-${WARES}-warehouses"
+mkdir -p ${RESULT_PATH}
+PREPARE_RESULT_FILE="${RESULT_PATH}/tidb-tpcc_prepare_${WARES}_warehouses.txt"
+CHECK_RESULT_FILE="${RESULT_PATH}/tidb-tpcc_check_${WARES}_warehouses.txt"
+RUN_RESULT_FILE="${RESULT_PATH}/tidb-tpcc_run_${WARES}_warehouses.txt"
+
+## 启动一个后台进程，执行dool命令，获取系统性能信息
+DOOL_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${IPADDR}_dool.txt"
+dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 720" 1> ${DOOL_FILE} 2>&1 &
+
 # 准备 tpcc 数据：根据数据量，时间比较长, 每个 warehouse 约 100 MB 数据
-tiup bench tpcc -H ${IPADDR} -P 4000 -D tpcc --warehouses ${WARES} --threads $(nproc) --output csv prepare
+tiup bench tpcc -H ${IPADDR} -P 4000 -D tpcc --warehouses ${WARES} --threads $(nproc) prepare > ${PREPARE_RESULT_FILE} 2>&1
 echo "[Info] TPCC 数据准备完成！" && sleep 10
 
-tiup bench tpcc -H ${IPADDR} -P 4000 -D tpcc --warehouses ${WARES} check
+tiup bench tpcc -H ${IPADDR} -P 4000 -D tpcc --warehouses ${WARES} check > ${CHECK_RESULT_FILE} 2>&1
 echo "[Info] TPCC 数据校验完成！" && sleep 10
 
 ## 执行 TPCC 测试
-tiup bench tpcc -H ${IPADDR} -P 4000 -D tpcc --warehouses ${WARES} --threads $(nproc) --time 3h --output-type csv run
+tiup bench tpcc -H ${IPADDR} -P 4000 -D tpcc --warehouses ${WARES} --threads $(nproc) --time 3h run > ${RUN_RESULT_FILE} 2>&1
 echo "[Info] TPCC 测试完成！"
 
 systemctl disable userdata.service
