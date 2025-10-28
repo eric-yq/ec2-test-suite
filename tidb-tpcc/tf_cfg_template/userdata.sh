@@ -38,8 +38,8 @@ fi
 
 ###################################################################################################
 ## 安装常用工具
-yum update -y
-yum install -y python3-pip htop
+yum update -yq
+yum install -yq python3-pip htop
 pip3 install dool
 
 # OS系统优化
@@ -242,8 +242,8 @@ nohup tiup playground --host ${IPADDR} \
   --pd 3 \
   --kv 6 \
   --db.config conf/tidb.toml \
-  --pd.config conf/pd.toml \
-  --kv.config conf/tikv.toml &
+  --kv.config conf/tikv.toml \
+  --pd.config conf/pd.toml &
 
 ## 准备进行 TPCC 测试
 tiup install bench
