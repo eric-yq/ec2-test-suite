@@ -243,10 +243,7 @@ nohup tiup playground --host ${IPADDR} \
   --kv 6 \
   --db.config conf/tidb.toml \
   --pd.config conf/pd.toml \
-  --kv.config conf/tikv.toml
-
-systemctl disable userdata.service
-exit 0
+  --kv.config conf/tikv.toml &
 
 ## 准备进行 TPCC 测试
 tiup install bench
@@ -264,3 +261,5 @@ echo "[Info] TPCC 数据校验完成！" && sleep 10
 tiup bench tpcc -H ${IPADDR} -P 4000 -D tpcc --warehouses ${WARES} --threads $(nproc) \
     --time 3h --output-type csv --output-dir "/root/tpcc-output" run
 echo "[Info] TPCC 测试完成！" && sleep 10
+
+systemctl disable userdata.service
