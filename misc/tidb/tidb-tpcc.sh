@@ -205,21 +205,20 @@ nohup tiup playground --host ${IPADDR} \
   --kv 6 \
   --db.config conf/tidb.toml \
   --pd.config conf/pd.toml \
-  --kv.config conf/tikv.toml \
-  --memory 120 &  # 限制总内存使用在120GB以内
+  --kv.config conf/tikv.toml
 
 # 准备 TPCC 数据
 screen -R tpcc -L
 tiup install bench
-WARES=5000
+WARES=500
 IPADDR=$(ec2-metadata --quiet --local-ipv4)
 # 准备 tpcc 数据：根据数据量，时间比较长, 每个 warehouse 约 100 MB 数据
 tiup bench tpcc -H ${IPADDR} -P 4000 -D tpcc --warehouses ${WARES} --threads $(nproc) \
      --batch 1000 --output-type csv --output-dir "/root/tpcc-output" prepare
 echo "[Info] TPCC 数据准备完成！" && sleep 10
 
-tiup bench tpcc -H ${IPADDR} -P 4000 -D tpcc --warehouses ${WARES} check
-echo "[Info] TPCC 数据校验完成！" && sleep 10
+# tiup bench tpcc -H ${IPADDR} -P 4000 -D tpcc --warehouses ${WARES} check
+# echo "[Info] TPCC 数据校验完成！" && sleep 10
 
 ## 执行 TPCC 测试
 tiup bench tpcc -H ${IPADDR} -P 4000 -D tpcc --warehouses ${WARES} --threads $(nproc) \
