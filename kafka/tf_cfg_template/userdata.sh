@@ -33,6 +33,7 @@ EOF
     ### 如果 3 分钟之后，实例没有重启，或者也有可能不需要重启，则开始启动服务执行后续安装过程。
     sleep 180
     systemctl start userdata.service
+    systemctl disable userdata.service
     exit 0
 fi
 
@@ -88,4 +89,4 @@ bin/kafka-topics.sh --create   --topic quickstart-events --bootstrap-server loca
 bin/kafka-topics.sh --describe --topic quickstart-events --bootstrap-server localhost:9092
 ## 如果远程连接，使用 broker-ip 替换 localhost
 
-
+systemctl disble userdata.service
