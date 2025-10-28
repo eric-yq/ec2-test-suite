@@ -39,7 +39,7 @@ fi
 ###################################################################################################
 ## 安装常用工具
 yum update -y
-yum install -y python3-pip
+yum install -y python3-pip htop
 pip3 install dool
 
 # OS系统优化
@@ -243,8 +243,7 @@ nohup tiup playground --host ${IPADDR} \
   --kv 6 \
   --db.config conf/tidb.toml \
   --pd.config conf/pd.toml \
-  --kv.config conf/tikv.toml \
-  --memory 120 &  # 限制总内存使用在120GB以内
+  --kv.config conf/tikv.toml
 
 systemctl disable userdata.service
 exit 0
