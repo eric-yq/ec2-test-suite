@@ -271,7 +271,7 @@ echo "[Info] TPCC 数据准备完成！" && sleep 10
 # echo "[Info] TPCC 数据校验完成！" && sleep 10
 
 ## 执行 TPCC 测试
-tiup bench tpcc -H ${IPADDR} -P 4000 -D tpcc --warehouses ${WARES} --threads $(nproc) --time 3h run > ${RUN_RESULT_FILE} 2>&1
+tiup bench tpcc -H ${IPADDR} -P 4000 -D tpcc --warehouses ${WARES} --threads $(nproc) --time 10m run > ${RUN_RESULT_FILE} 2>&1
 echo "[Info] TPCC 测试完成！"
 
 systemctl disable userdata.service
