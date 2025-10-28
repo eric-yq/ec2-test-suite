@@ -237,7 +237,7 @@ cd /root/
 curl --proto '=https' --tlsv1.2 -sSf https://tiup-mirrors.pingcap.com/install.sh | sh
 source /root/.bash_profile
 IPADDR=$(ec2-metadata --quiet --local-ipv4)
-nohup tiup playground --host ${IPADDR} \
+nohup tiup playground --host ${IPADDR} --without-monitor \
   --db 1 \
   --kv 3 \
   --pd 1 \
