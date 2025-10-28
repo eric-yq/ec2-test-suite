@@ -261,7 +261,7 @@ RUN_RESULT_FILE="${RESULT_PATH}/tidb-tpcc_run_${WARES}_warehouses.txt"
 
 ## 启动一个后台进程，执行dool命令，获取系统性能信息
 DOOL_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${IPADDR}_dool.txt"
-dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 720" 1> ${DOOL_FILE} 2>&1 &
+dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 720 1> ${DOOL_FILE} 2>&1 &
 
 # 准备 tpcc 数据：根据数据量，时间比较长, 每个 warehouse 约 100 MB 数据
 tiup bench tpcc -H ${IPADDR} -P 4000 -D tpcc --warehouses ${WARES} --threads $(nproc) prepare > ${PREPARE_RESULT_FILE} 2>&1
