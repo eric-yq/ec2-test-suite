@@ -312,31 +312,3 @@ tiup bench tpcc -H ${IPADDR} -P 4000 -D tpcc --warehouses ${WARES} cleanup
 
 systemctl disable userdata.service
 killall dool
-
-## 数据量统计，当前tidb/tikv 配置下：
-# 1000 warehouses 约 100 GB 磁盘容量: 线程数 8 , 1 小时测试结果：
-## r8g.4xlarge 实例：CPU 利用率 60% 左右（usr+sys+wait）
-# [Summary] DELIVERY - Takes(s): 3599.9, Count: 106778, TPM: 1779.7, Sum(ms): 3299171.4, Avg(ms): 30.9, 50th(ms): 30.4, 90th(ms): 35.7, 95th(ms): 37.7, 99th(ms): 41.9, 99.9th(ms): 50.3, Max(ms): 109.1
-# [Summary] DELIVERY_ERR - Takes(s): 3599.9, Count: 1, TPM: 0.0, Sum(ms): 11.3, Avg(ms): 11.3, 50th(ms): 11.5, 90th(ms): 11.5, 95th(ms): 11.5, 99th(ms): 11.5, 99.9th(ms): 11.5, Max(ms): 11.5
-# [Summary] NEW_ORDER - Takes(s): 3600.0, Count: 1205958, TPM: 20099.5, Sum(ms): 13975260.0, Avg(ms): 11.6, 50th(ms): 11.5, 90th(ms): 14.2, 95th(ms): 15.2, 99th(ms): 17.8, 99.9th(ms): 24.1, Max(ms): 121.6
-# [Summary] NEW_ORDER_ERR - Takes(s): 3600.0, Count: 1, TPM: 0.0, Sum(ms): 3.9, Avg(ms): 3.9, 50th(ms): 4.2, 90th(ms): 4.2, 95th(ms): 4.2, 99th(ms): 4.2, 99.9th(ms): 4.2, Max(ms): 4.2
-# [Summary] ORDER_STATUS - Takes(s): 3599.9, Count: 107279, TPM: 1788.0, Sum(ms): 876233.6, Avg(ms): 8.2, 50th(ms): 7.3, 90th(ms): 15.7, 95th(ms): 17.8, 99th(ms): 21.0, 99.9th(ms): 26.2, Max(ms): 117.4
-# [Summary] PAYMENT - Takes(s): 3600.0, Count: 1152257, TPM: 19204.4, Sum(ms): 9490873.2, Avg(ms): 8.2, 50th(ms): 8.4, 90th(ms): 10.5, 95th(ms): 11.0, 99th(ms): 12.6, 99.9th(ms): 19.9, Max(ms): 436.2
-# [Summary] PAYMENT_ERR - Takes(s): 3600.0, Count: 2, TPM: 0.0, Sum(ms): 1.3, Avg(ms): 0.8, 50th(ms): 1.0, 90th(ms): 1.0, 95th(ms): 1.0, 99th(ms): 1.0, 99.9th(ms): 1.0, Max(ms): 1.0
-# [Summary] STOCK_LEVEL - Takes(s): 3599.9, Count: 107300, TPM: 1788.4, Sum(ms): 770250.0, Avg(ms): 7.2, 50th(ms): 6.3, 90th(ms): 9.4, 95th(ms): 12.6, 99th(ms): 32.5, 99.9th(ms): 60.8, Max(ms): 117.4
-
-## r6i.4xlarge 实例：CPU 利用率 60% 左右（usr+sys+wait）
-# [Summary] DELIVERY - Takes(s): 3599.9, Count: 91739, TPM: 1529.0, Sum(ms): 3356105.2, Avg(ms): 36.6, 50th(ms): 37.7, 90th(ms): 41.9, 95th(ms): 44.0, 99th(ms): 50.3, 99.9th(ms): 58.7, Max(ms): 88.1
-# [Summary] NEW_ORDER - Takes(s): 3600.0, Count: 1029421, TPM: 17157.2, Sum(ms): 13997003.0, Avg(ms): 13.6, 50th(ms): 13.6, 90th(ms): 16.3, 95th(ms): 17.8, 99th(ms): 21.0, 99.9th(ms): 27.3, Max(ms): 121.6
-# [Summary] NEW_ORDER_ERR - Takes(s): 3600.0, Count: 1, TPM: 0.0, Sum(ms): 7.3, Avg(ms): 7.1, 50th(ms): 7.3, 90th(ms): 7.3, 95th(ms): 7.3, 99th(ms): 7.3, 99.9th(ms): 7.3, Max(ms): 7.3
-# [Summary] ORDER_STATUS - Takes(s): 3599.9, Count: 91485, TPM: 1524.8, Sum(ms): 890627.3, Avg(ms): 9.7, 50th(ms): 9.4, 90th(ms): 17.8, 95th(ms): 19.9, 99th(ms): 23.1, 99.9th(ms): 26.2, Max(ms): 159.4
-# [Summary] PAYMENT - Takes(s): 3600.0, Count: 983882, TPM: 16398.2, Sum(ms): 9276517.8, Avg(ms): 9.4, 50th(ms): 9.4, 90th(ms): 11.5, 95th(ms): 12.1, 99th(ms): 13.6, 99.9th(ms): 21.0, Max(ms): 79.7
-# [Summary] PAYMENT_ERR - Takes(s): 3600.0, Count: 2, TPM: 0.0, Sum(ms): 19.3, Avg(ms): 9.7, 50th(ms): 10.0, 90th(ms): 10.0, 95th(ms): 10.0, 99th(ms): 10.0, 99.9th(ms): 10.0, Max(ms): 10.0
-# [Summary] STOCK_LEVEL - Takes(s): 3599.8, Count: 90670, TPM: 1511.3, Sum(ms): 874669.1, Avg(ms): 9.6, 50th(ms): 8.4, 90th(ms): 12.6, 95th(ms): 19.9, 99th(ms): 50.3, 99.9th(ms): 83.9, Max(ms): 151.0
-# [Summary] STOCK_LEVEL_ERR - Takes(s): 3599.8, Count: 1, TPM: 0.0, Sum(ms): 10.0, Avg(ms): 10.2, 50th(ms): 10.5, 90th(ms): 10.5, 95th(ms): 10.5, 99th(ms): 10.5, 99.9th(ms): 10.5, Max(ms): 10.5
-
-
-# 1000 warehouses 约 100 GB 磁盘容量: 线程数 8 , 1 小时测试结果：
-## r8g.4xlarge 实例：CPU 利用率 65% 左右（usr+sys+wait）
-
-## r6i.4xlarge 实例：CPU 利用率 60% 左右（usr+sys+wait）
