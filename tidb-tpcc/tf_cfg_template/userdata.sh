@@ -72,9 +72,10 @@ cat >> /etc/security/limits.conf << EOF
 * hard nofile 1000000
 * soft stack 32768
 * hard stack 32768
-* soft core 2147483648
-* hard core 2147483648
+* soft core unlimited
+* hard core unlimited
 EOF
+ulimit -c unlimited
 
 # 创建配置文件目录
 mkdir -p ~/tidb-config
@@ -334,9 +335,3 @@ killall dool
 # [Summary] PAYMENT_ERR - Takes(s): 3600.0, Count: 2, TPM: 0.0, Sum(ms): 19.3, Avg(ms): 9.7, 50th(ms): 10.0, 90th(ms): 10.0, 95th(ms): 10.0, 99th(ms): 10.0, 99.9th(ms): 10.0, Max(ms): 10.0
 # [Summary] STOCK_LEVEL - Takes(s): 3599.8, Count: 90670, TPM: 1511.3, Sum(ms): 874669.1, Avg(ms): 9.6, 50th(ms): 8.4, 90th(ms): 12.6, 95th(ms): 19.9, 99th(ms): 50.3, 99.9th(ms): 83.9, Max(ms): 151.0
 # [Summary] STOCK_LEVEL_ERR - Takes(s): 3599.8, Count: 1, TPM: 0.0, Sum(ms): 10.0, Avg(ms): 10.2, 50th(ms): 10.5, 90th(ms): 10.5, 95th(ms): 10.5, 99th(ms): 10.5, 99.9th(ms): 10.5, Max(ms): 10.5
-
-
-# 1000 warehouses 约 100 GB 磁盘容量: 线程数 8 , 1 小时测试结果：
-## r8g.4xlarge 实例：CPU 利用率 65% 左右（usr+sys+wait）
-
-## r6i.4xlarge 实例：CPU 利用率 60% 左右（usr+sys+wait）

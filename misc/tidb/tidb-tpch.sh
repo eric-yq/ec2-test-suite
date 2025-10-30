@@ -41,6 +41,10 @@ fi
 yum update -yq
 yum install -yq python3-pip htop
 pip3 install dool
+## 安装 mysql 客户端
+rpm -Uvh https://repo.mysql.com/mysql80-community-release-el9.rpm
+yum install -yq mysql
+###################################################################################################
 
 # 系统优化
 cat > /etc/sysctl.d/tidb.conf << EOF
@@ -72,9 +76,10 @@ cat >> /etc/security/limits.conf << EOF
 * hard nofile 1000000
 * soft stack 32768
 * hard stack 32768
-* soft core 2147483648
-* hard core 2147483648
+* soft core unlimited
+* hard core unlimited
 EOF
+ulimit -c unlimited
 
 # 创建配置文件目录
 mkdir -p ~/tidb-config
@@ -280,35 +285,31 @@ tiup playground v8.1.2 \
 
 echo "[Info] 等待(5 分钟) TiDB 集群启动完成......" && sleep 300
 
-## 准备进行 TPCC 测试
-SUT_NAME="tidb-tpcc"
-WARES=5000
+## 准备进行 TPCH 测试
+SUT_NAME="tidb-tpch"
+SF=100
 IPADDR=$(ec2-metadata --quiet --local-ipv4)
 INSTANCE_TYPE=$(ec2-metadata --quiet --instance-type)
-RESULT_PATH="/root/tidb-tpcc-results-${INSTANCE_TYPE}-${WARES}-warehouses"
+RESULT_PATH="/root/${SUT_NAME}-results-${INSTANCE_TYPE}-sf${SF}"
 mkdir -p ${RESULT_PATH}
-PREPARE_RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_prepare_${WARES}_warehouses.txt"
-CHECK_RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_check_${WARES}_warehouses.txt"
-RUN_RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_run_${WARES}_warehouses.txt"
+PREPARE_RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_prepare_sf${SF}.txt"
+RUN_RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_run_sf${SF}.txt"
 
 ## 启动一个后台进程，执行dool命令，获取系统性能信息
 DOOL_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${IPADDR}_dool.txt"
 dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 720 1> ${DOOL_FILE} 2>&1 &
 
-# 准备 tpcc 数据：根据数据量，时间比较长, 每个 warehouse 约 100 MB 数据
-tiup bench tpcc -H ${IPADDR} -P 4000 -D tpcc --warehouses ${WARES} --threads $(nproc) prepare > ${PREPARE_RESULT_FILE} 2>&1
-echo "[Info] TPCC 数据准备完成！" && sleep 10
+# 准备 tpch 数据
+tiup bench tpch --sf=${SF} --dropdata --threads $(nproc) prepare > ${PREPARE_RESULT_FILE} 2>&1
+echo "[Info] TPCH 数据准备完成！" && sleep 10
 
-# tiup bench tpcc -H ${IPADDR} -P 4000 -D tpcc --warehouses ${WARES} check > ${CHECK_RESULT_FILE} 2>&1
-# echo "[Info] TPCC 数据校验完成！" && sleep 10
-
-## 执行 TPCC 测试
-i=8
-tiup bench tpcc -H ${IPADDR} -P 4000 -D tpcc --warehouses ${WARES} --threads ${i} --time 1h run > ${RUN_RESULT_FILE} 2>&1
-echo "[Info] TPCC 测试完成！"
+## 执行 TPCH 测试
+i=1
+tiup bench tpch --sf=${SF} --count=22 --threads ${i} run > ${RUN_RESULT_FILE} 2>&1
+echo "[Info] TPCH 测试完成！"
 
 # 清理测试数据
-tiup bench tpcc -H ${IPADDR} -P 4000 -D tpcc --warehouses ${WARES} cleanup
+tiup bench tpch -cleanup
 
 systemctl disable userdata.service
 killall dool
