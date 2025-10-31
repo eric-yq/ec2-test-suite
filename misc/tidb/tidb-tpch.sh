@@ -41,7 +41,6 @@ fi
 yum update -yq
 yum install -yq python3-pip htop
 pip3 install dool
-## 安装 mysql 客户端
 rpm -Uvh https://repo.mysql.com/mysql80-community-release-el9.rpm
 yum install -yq mysql
 ###################################################################################################

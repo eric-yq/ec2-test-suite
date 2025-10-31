@@ -1,12 +1,12 @@
 # 创建集群
-eksctl create cluster -f tidb-cluster.yaml 
+eksctl create cluster -f tidb-cluster-arm64.yaml 
 
 # 创建 IAM
-eksctl utils associate-iam-oidc-provider --region=us-east-2 --cluster=tidb-cluster --approve
+eksctl utils associate-iam-oidc-provider --region=us-east-2 --cluster=arm64-tidb-cluster --approve
 eksctl create iamserviceaccount \
         --name ebs-csi-controller-sa \
         --namespace kube-system \
-        --cluster tidb-cluster \
+        --cluster arm64-tidb-cluster \
         --role-name AmazonEKS_EBS_CSI_DriverRole \
         --role-only \
         --attach-policy-arn arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy \
@@ -28,15 +28,15 @@ kubectl create -f https://raw.githubusercontent.com/pingcap/tidb-operator/v1.6.3
 ## 添加 PingCAP 仓库。
 helm repo add pingcap https://charts.pingcap.org/
 ## 为 TiDB Operator 创建一个命名空间。
-kubectl create namespace tidb-admin
+kubectl create namespace arm64-tidb-admin
 ## 安装 TiDB Operator
-helm install --namespace tidb-admin tidb-operator pingcap/tidb-operator --version v1.6.3
+helm install --namespace arm64-tidb-admin tidb-operator pingcap/tidb-operator --version v1.6.3
 ## 查看 TiDB Operator Pod 状态
-kubectl get pods --namespace tidb-admin -l app.kubernetes.io/instance=tidb-operator
+kubectl get pods --namespace arm64-tidb-admin -l app.kubernetes.io/instance=tidb-operator
 
 # 部署 TiDB 集群
 ## 创建 TiDB 集群命名空间
-kubectl create namespace tidb-cluster
+kubectl create namespace arm64-tidb-cluster
 ## 下载 TidbCluster 和 TidbMonitor CR 的配置文件。
 mkdir -p tidb-cluster-software-config
 cd tidb-cluster-software-config
@@ -46,26 +46,39 @@ curl -O https://raw.githubusercontent.com/pingcap/tidb-operator/v1.6.3/examples/
 ###### 修改参数，参考 tidb-cluster-software-config/tidb-cluster.yaml ######
 # ......
 ## 执行部署 TiDB 集群
-kubectl apply -f tidb-cluster.yaml -n tidb-cluster
+kubectl apply -f tidb-cluster.yaml -n arm64-tidb-cluster
 ## 查看 TiDB 集群 Pod 状态
-kubectl get pods -n tidb-cluster -o wide
-kubectl get pvc  -n tidb-cluster -o wide
+kubectl get pods -n arm64-tidb-cluster -o wide
+kubectl get pvc  -n arm64-tidb-cluster -o wide
 
 ## 附加：删除 TiDB 集群
-kubectl delete tc basic -n tidb-cluster
+# kubectl delete tc basic -n arm64-tidb-cluster
 
 # 测试 mysql 客户端远程访问
-EXTERNAL_IP=$(kubectl get svc basic-tidb -n tidb-cluster -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+EXTERNAL_IP=$(kubectl get svc basic-tidb -n arm64-tidb-cluster -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
 echo $EXTERNAL_IP
-mysql --comments -h a69ffeedf46f247f8bb0203acd486c43-78d600dac3ead463.elb.us-east-2.amazonaws.com -P 4000 -u root
+mysql --comments -h a363275b91da64ac9b1a4b6e39510533-5be95794feb4c9c8.elb.us-east-2.amazonaws.com -P 4000 -u root
 
 #################################################################################################################
 # TiDB TPC-H 测试脚本 , 在一台 tidb-client 节点上执行
 #################################################################################################################
+# 安装常用工具
+yum update -yq
+yum install -yq python3-pip htop
+pip3 install dool
+rpm -Uvh https://repo.mysql.com/mysql80-community-release-el9.rpm
+yum install -yq mysql
+# 安装 TiUP
+cd /root/
+curl --proto '=https' --tlsv1.2 -sSf https://tiup-mirrors.pingcap.com/install.sh | sh
+source /root/.bash_profile
+tiup install playground
+tiup install bench
+
 # 准备数据
 screen -R ttt -L
 SF=500
-tidb_host="a69ffeedf46f247f8bb0203acd486c43-78d600dac3ead463.elb.us-east-2.amazonaws.com"
+tidb_host="a363275b91da64ac9b1a4b6e39510533-5be95794feb4c9c8.elb.us-east-2.amazonaws.com"
 tidb_port=4000
 tiup bench tpch prepare \
   --sf $SF --dropdata --threads 64 \
@@ -77,9 +90,8 @@ tiup bench tpch prepare \
   --tiflash-replica 3
   
 
-# 查询数据表容量
-mysql --comments -h a69ffeedf46f247f8bb0203acd486c43-78d600dac3ead463.elb.us-east-2.amazonaws.com -P 4000 -u root
-## 执行下面SQL
+# 查询数据库中的信息
+mysql --comments --host ${tidb_host} --port ${tidb_port} -u root
 ## -- 查询各个表占用的磁盘容量
 SELECT 
     table_name,
@@ -112,8 +124,7 @@ FROM
     information_schema.tables 
 WHERE 
     table_schema = 'test' 
-ORDER BY 
-    table_name;
+ORDER BY table_name;
 # +------------+------------+
 # | table_name | table_rows |
 # +------------+------------+
@@ -142,19 +153,22 @@ FROM
     information_schema.tikv_store_status
 ORDER BY address;
 
+# -- 查询 TiFlash 副本信息
+SELECT * FROM information_schema.tiflash_replica WHERE TABLE_SCHEMA = 'test' ORDER BY TABLE_NAME;
 
-# 执行测试
-tidb_host="a69ffeedf46f247f8bb0203acd486c43-78d600dac3ead463.elb.us-east-2.amazonaws.com"
+
+#################################################################################################################
+# 运行 TPC-H 查询
+SF=500
+tidb_host="a363275b91da64ac9b1a4b6e39510533-5be95794feb4c9c8.elb.us-east-2.amazonaws.com"
 tidb_port=4000
 tiup bench tpch run \
   --host ${tidb_host} --port ${tidb_port} \
-  --sf 100 \
+  --sf ${SF} \
   --conn-params="tidb_isolation_read_engines = 'tiflash'" \
   --conn-params="tidb_allow_mpp = 1" \
   --conn-params="tidb_enforce_mpp = 1" \
   --count 22
-
-   
 
 
 

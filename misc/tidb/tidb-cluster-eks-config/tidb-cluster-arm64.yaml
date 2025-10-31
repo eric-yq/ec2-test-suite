@@ -1,0 +1,71 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: arm64-tidb-cluster
+  region: us-east-2
+addons:
+  - name: aws-ebs-csi-driver
+
+nodeGroups:
+  - name: admin
+    desiredCapacity: 1
+    privateNetworking: true
+    availabilityZones: ["us-east-2a"]
+    instanceType: c8g.large
+    labels:
+      dedicated: admin
+    iam:
+      withAddonPolicies:
+        ebs: true
+    
+  - name: tidb
+    desiredCapacity: 2
+    privateNetworking: true
+    availabilityZones: ["us-east-2a"]
+    instanceType: c8g.2xlarge
+    labels:
+      dedicated: tidb
+    taints:
+      dedicated: tidb:NoSchedule
+    iam:
+      withAddonPolicies:
+        ebs: true
+    
+  - name: pd
+    desiredCapacity: 1
+    privateNetworking: true
+    availabilityZones: ["us-east-2a"]
+    instanceType: c8g.large
+    labels:
+      dedicated: pd
+    taints:
+      dedicated: pd:NoSchedule
+    iam:
+      withAddonPolicies:
+        ebs: true
+    
+  - name: tikv
+    desiredCapacity: 3
+    privateNetworking: true
+    availabilityZones: ["us-east-2a"]
+    instanceType: r8g.2xlarge
+    labels:
+      dedicated: tikv
+    taints:
+      dedicated: tikv:NoSchedule
+    iam:
+      withAddonPolicies:
+        ebs: true
+    
+  - name: tiflash
+    desiredCapacity: 3
+    privateNetworking: true
+    availabilityZones: ["us-east-2a"]
+    instanceType: r8g.2xlarge
+    labels:
+      dedicated: tiflash
+    taints:
+      dedicated: tiflash:NoSchedule
+    iam:
+      withAddonPolicies:
+        ebs: true
