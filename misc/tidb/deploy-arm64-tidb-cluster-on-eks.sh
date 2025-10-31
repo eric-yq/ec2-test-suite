@@ -168,7 +168,11 @@ tiup bench tpch run \
   --conn-params="tidb_isolation_read_engines = 'tiflash'" \
   --conn-params="tidb_allow_mpp = 1" \
   --conn-params="tidb_enforce_mpp = 1" \
-  --count 22
+  --conn-params="tidb_mem_quota_query = 34359738368" \
+  --conn-params="tidb_broadcast_join_threshold_count=10000000" \
+  --conn-params="tidb_broadcast_join_threshold_size=104857600" \
+  --queries "q1,q2,q3,q4,q5,q6,q7,q8,q9,q10,q11,q12,q13,q14,q15,q16,q17,q18,q19,q20,q21,q22"
+
 
 
 
