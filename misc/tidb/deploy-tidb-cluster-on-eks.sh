@@ -53,7 +53,7 @@ kubectl get pods -n tidb-cluster -o wide
 
 
 ## 附加：删除 TiDB 集群
-kubectl delete tc basic -n tidb-cluster
+# kubectl delete tc basic -n tidb-cluster
 
 
 #################################################################################################################
@@ -74,7 +74,7 @@ yum install -yq mysql
 # 测试 mysql 客户端远程访问
 # kubectl get svc basic-tidb -n tidb-cluster -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
 tidb_host="a1d9f7f96cd3b4f919c8af2fbec68888-5ed09ee5e8020c5c.elb.us-east-2.amazonaws.com"
-mysql --comments -h ${tidb_host} -P 4000 -u root
+mysql --comments -h ${tidb_host} -P 4000 -u root -e "show databases;"
 
 # 安装 TiUP
 cd /root/

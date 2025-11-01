@@ -7,7 +7,7 @@ eksctl create iamserviceaccount \
         --name ebs-csi-controller-sa \
         --namespace kube-system \
         --cluster arm64-tidb-cluster \
-        --role-name AmazonEKS_EBS_CSI_DriverRole \
+        --role-name AmazonEKS_EBS_CSI_DriverRole-arm64 \
         --role-only \
         --attach-policy-arn arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy \
         --approve
@@ -36,24 +36,24 @@ kubectl get pods --namespace tidb-admin -l app.kubernetes.io/instance=tidb-opera
 
 # 部署 TiDB 集群
 ## 创建 TiDB 集群命名空间
-kubectl create namespace tidb-cluster
+kubectl create namespace tidb-cluster-arm64
 ## 下载 TidbCluster 和 TidbMonitor CR 的配置文件。
-mkdir -p tidb-cluster-software-config
-cd tidb-cluster-software-config
-curl -O https://raw.githubusercontent.com/pingcap/tidb-operator/v1.6.3/examples/aws/tidb-cluster.yaml
-curl -O https://raw.githubusercontent.com/pingcap/tidb-operator/v1.6.3/examples/aws/tidb-monitor.yaml
-curl -O https://raw.githubusercontent.com/pingcap/tidb-operator/v1.6.3/examples/aws/tidb-dashboard.yaml
-###### 修改参数，参考 tidb-cluster-software-config/tidb-cluster.yaml ######
+mkdir -p tidb-deployment
+cd tidb-deployment
+# curl -O https://raw.githubusercontent.com/pingcap/tidb-operator/v1.6.3/examples/aws/tidb-cluster.yaml
+# curl -O https://raw.githubusercontent.com/pingcap/tidb-operator/v1.6.3/examples/aws/tidb-monitor.yaml
+# curl -O https://raw.githubusercontent.com/pingcap/tidb-operator/v1.6.3/examples/aws/tidb-dashboard.yaml
+###### 修改参数，参考 tidb-deployment/tidb-cluster.yaml ######
 # ......
 ## 执行部署 TiDB 集群
-kubectl apply -f tidb-cluster.yaml -n tidb-cluster
+kubectl apply -f tidb-cluster.yaml -n tidb-cluster-arm64
 ## 查看 TiDB 集群 Pod 状态
-kubectl get pvc  -n tidb-cluster -o wide
-kubectl get pods -n tidb-cluster -o wide
+kubectl get pvc  -n tidb-cluster-arm64 -o wide
+kubectl get pods -n tidb-cluster-arm64 -o wide
 
 
 ## 附加：删除 TiDB 集群
-kubectl delete tc basic -n tidb-cluster
+# kubectl delete tc basic -n tidb-cluster-arm64
 
 
 #################################################################################################################
@@ -72,9 +72,9 @@ rpm -Uvh https://repo.mysql.com/mysql80-community-release-el9.rpm
 yum install -yq mysql
 
 # 测试 mysql 客户端远程访问
-# kubectl get svc basic-tidb -n tidb-cluster -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
-tidb_host="a1d9f7f96cd3b4f919c8af2fbec68888-5ed09ee5e8020c5c.elb.us-east-2.amazonaws.com"
-mysql --comments -h ${tidb_host} -P 4000 -u root
+# kubectl get svc basic-tidb -n tidb-cluster-arm64 -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
+tidb_host="a8a4039336bd04644a7bfe24b4b39286-74e2214757238f41.elb.us-east-2.amazonaws.com"
+mysql --comments -h ${tidb_host} -P 4000 -u root -e "show databases;"
 
 # 安装 TiUP
 cd /root/
@@ -86,7 +86,7 @@ tiup install bench
 # 准备数据
 screen -R ttt -L
 sf=300
-tidb_host="a1d9f7f96cd3b4f919c8af2fbec68888-5ed09ee5e8020c5c.elb.us-east-2.amazonaws.com"
+tidb_host="a8a4039336bd04644a7bfe24b4b39286-74e2214757238f41.elb.us-east-2.amazonaws.com"
 tidb_port=4000
 tiup bench tpch prepare \
   --sf $sf --dropdata --threads 16 \
