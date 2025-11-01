@@ -125,8 +125,7 @@ tiup bench tpch run \
 LIST="q1 q2 q3 q4 q5 q6 q7 q8 q9 q10 q11 q12 q13 q14 q15 q16 q17 q18 q19 q20 q21 q22"
 for i in $LIST; do
   tiup bench tpch run \
-    --host ${tidb_host} --port ${tidb_port} \
-    --sf ${SF} \
+    --host ${tidb_host} --port ${tidb_port} --db tpch${sf} \
     --conn-params="tidb_isolation_read_engines = 'tiflash'" \
     --conn-params="tidb_allow_mpp = 1" \
     --conn-params="tidb_enforce_mpp = 0" \

@@ -35,7 +35,7 @@ mysql --comments  -h ${tidb_host} -P ${tidb_port} -u root -e \
  
 ## -- 查询各个表占用的磁盘容量
 mysql --comments  -h ${tidb_host} -P ${tidb_port} -u root -e \
-  "SELECT table_name, CONCAT(ROUND(data_length/1024/1024, 2), ' MB') as data_size FROM information_schema.tables WHERE table_schema = 'tpch300' ORDER BY data_length DESC;"
+  "SELECT table_name, CONCAT(ROUND(data_length/1024/1024, 2), ' MB') as data_size FROM information_schema.tables WHERE table_schema = 'tpch300' ORDER BY table_name;"
 
 ## -- 查询各个表的记录数
 mysql --comments  -h ${tidb_host} -P ${tidb_port} -u root -e \
