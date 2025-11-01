@@ -28,15 +28,15 @@ kubectl create -f https://raw.githubusercontent.com/pingcap/tidb-operator/v1.6.3
 ## 添加 PingCAP 仓库。
 helm repo add pingcap https://charts.pingcap.org/
 ## 为 TiDB Operator 创建一个命名空间。
-kubectl create namespace arm64-tidb-admin
+kubectl create namespace tidb-admin
 ## 安装 TiDB Operator
-helm install --namespace arm64-tidb-admin tidb-operator pingcap/tidb-operator --version v1.6.3
+helm install --namespace tidb-admin tidb-operator pingcap/tidb-operator --version v1.6.3
 ## 查看 TiDB Operator Pod 状态
-kubectl get pods --namespace arm64-tidb-admin -l app.kubernetes.io/instance=tidb-operator
+kubectl get pods --namespace tidb-admin -l app.kubernetes.io/instance=tidb-operator
 
 # 部署 TiDB 集群
 ## 创建 TiDB 集群命名空间
-kubectl create namespace arm64-tidb-cluster
+kubectl create namespace tidb-cluster
 ## 下载 TidbCluster 和 TidbMonitor CR 的配置文件。
 mkdir -p tidb-cluster-software-config
 cd tidb-cluster-software-config
@@ -46,28 +46,36 @@ curl -O https://raw.githubusercontent.com/pingcap/tidb-operator/v1.6.3/examples/
 ###### 修改参数，参考 tidb-cluster-software-config/tidb-cluster.yaml ######
 # ......
 ## 执行部署 TiDB 集群
-kubectl apply -f tidb-cluster.yaml -n arm64-tidb-cluster
+kubectl apply -f tidb-cluster.yaml -n tidb-cluster
 ## 查看 TiDB 集群 Pod 状态
-kubectl get pods -n arm64-tidb-cluster -o wide
-kubectl get pvc  -n arm64-tidb-cluster -o wide
+kubectl get pvc  -n tidb-cluster -o wide
+kubectl get pods -n tidb-cluster -o wide
+
 
 ## 附加：删除 TiDB 集群
-# kubectl delete tc basic -n arm64-tidb-cluster
+kubectl delete tc basic -n tidb-cluster
 
-# 测试 mysql 客户端远程访问
-EXTERNAL_IP=$(kubectl get svc basic-tidb -n arm64-tidb-cluster -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
-echo $EXTERNAL_IP
-mysql --comments -h a363275b91da64ac9b1a4b6e39510533-5be95794feb4c9c8.elb.us-east-2.amazonaws.com -P 4000 -u root
 
 #################################################################################################################
-# TiDB TPC-H 测试脚本 , 在一台 tidb-client 节点上执行
+# TiDB TPC-H 测试脚本 , 在一台 tidb-client 实例上执行.
+# 该实例和 tidb-node 在同一个 subnet 和 安全组，同时加入 default 安全组
+# vpc-06dbc18662bfa85ce
+# subnet-06551afad84c73eb5
+# sg-033ec1591d571fa14
+# sg-05fcf897e5bfd4f27
 #################################################################################################################
-# 安装常用工具
+# 安装基础软件包
 yum update -yq
 yum install -yq python3-pip htop
 pip3 install dool
 rpm -Uvh https://repo.mysql.com/mysql80-community-release-el9.rpm
 yum install -yq mysql
+
+# 测试 mysql 客户端远程访问
+# kubectl get svc basic-tidb -n tidb-cluster -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
+tidb_host="a1d9f7f96cd3b4f919c8af2fbec68888-5ed09ee5e8020c5c.elb.us-east-2.amazonaws.com"
+mysql --comments -h ${tidb_host} -P 4000 -u root
+
 # 安装 TiUP
 cd /root/
 curl --proto '=https' --tlsv1.2 -sSf https://tiup-mirrors.pingcap.com/install.sh | sh
@@ -77,103 +85,40 @@ tiup install bench
 
 # 准备数据
 screen -R ttt -L
-SF=300
-tidb_host="a363275b91da64ac9b1a4b6e39510533-5be95794feb4c9c8.elb.us-east-2.amazonaws.com"
+sf=300
+tidb_host="a1d9f7f96cd3b4f919c8af2fbec68888-5ed09ee5e8020c5c.elb.us-east-2.amazonaws.com"
 tidb_port=4000
 tiup bench tpch prepare \
-  --sf $SF --dropdata --threads 64 \
-  --host ${tidb_host} --port ${tidb_port} --db tpch$SF \
+  --sf $sf --dropdata --threads 16 \
+  --host ${tidb_host} --port ${tidb_port} --db tpch${sf} \
   --analyze \
   --tiflash-replica 3
   
 #   --tidb_build_stats_concurrency 8 \
 #   --tidb_distsql_scan_concurrency 30 \
 #   --tidb_index_serial_scan_concurrency 8 \
-  
 
-# 查询数据库中的信息
-mysql --comments --host ${tidb_host} --port ${tidb_port} -u root
-## -- 查询各个表占用的磁盘容量
-SELECT 
-    table_name,
-    CONCAT(ROUND(data_length/1024/1024, 2), ' MB') as data_size
-FROM 
-    information_schema.tables 
-WHERE 
-    table_schema = 'test' 
-ORDER BY 
-    data_length DESC;
-# +------------+--------------+
-# | table_name | data_size    |
-# +------------+--------------+
-# | lineitem   | 230042.63 MB |
-# | orders     | 49846.07 MB  |
-# | partsupp   | 35796.75 MB  |
-# | customer   | 8583.21 MB   |
-# | part       | 7176.87 MB   |
-# | supplier   | 633.61 MB    |
-# | nation     | 0.00 MB      |
-# | region     | 0.00 MB      |
-# +------------+--------------+
-# 8 rows in set (0.00 sec)
-
-## -- 查询各个表的记录数
-SELECT 
-    table_name, 
-    table_rows
-FROM 
-    information_schema.tables 
-WHERE 
-    table_schema = 'test' 
-ORDER BY table_name;
-# +------------+------------+
-# | table_name | table_rows |
-# +------------+------------+
-# | customer   |   53541403 |
-# | lineitem   | 1803017836 |
-# | nation     |         25 |
-# | orders     |  450000000 |
-# | part       |   60000000 |
-# | partsupp   |  240000000 |
-# | region     |          5 |
-# | supplier   |    4489600 |
-# +------------+------------+
-# 8 rows in set (0.00 sec)
-
-# -- 查询所有存储节点信息
-SELECT 
-    store_id,
-    address,
-    store_state,
-    capacity,
-    available,
-    capacity - available AS used,
-    (capacity - available) / capacity AS usage_ratio,
-    version
-FROM 
-    information_schema.tikv_store_status
-ORDER BY address;
-
-# -- 查询 TiFlash 副本信息
-SELECT * FROM information_schema.tiflash_replica WHERE TABLE_SCHEMA = 'test' ORDER BY TABLE_NAME;
+#################################################################################################################
+## 常用操作 eks-and-tidb-commands.sh
+#################################################################################################################
 
 
 #################################################################################################################
 # 运行 TPC-H 查询
 # 执行测试:q4,q17 这两条查询在 SF500 有点问题，先不执行
-SF=500
+sf=300
 tidb_host="a363275b91da64ac9b1a4b6e39510533-5be95794feb4c9c8.elb.us-east-2.amazonaws.com"
 tidb_port=4000
 tiup bench tpch run \
-  --host ${tidb_host} --port ${tidb_port} \
-  --sf ${SF} \
+  --host ${tidb_host} --port ${tidb_port} --db tpch${sf} \
+  --sf ${sf} \
   --conn-params="tidb_isolation_read_engines = 'tiflash'" \
   --conn-params="tidb_allow_mpp = 1" \
-  --conn-params="tidb_enforce_mpp = 1" \
+  --conn-params="tidb_enforce_mpp = 0" \
   --conn-params="tidb_mem_quota_query = 34359738368" \
   --conn-params="tidb_broadcast_join_threshold_count=10000000" \
   --conn-params="tidb_broadcast_join_threshold_size=104857600" \
-  --queries "q1,q2,q3,q5,q6,q7,q8,q9,q10,q11,q12,q13,q14,q15,q16,q18,q19,q20,q21,q22"
+  --queries "q1,q2,q3,q4,q5,q6,q7,q8,q9,q10,q11,q12,q13,q14,q15,q16,q17,q18,q19,q20,q21,q22"
 
 
 ####
@@ -184,32 +129,12 @@ for i in $LIST; do
     --sf ${SF} \
     --conn-params="tidb_isolation_read_engines = 'tiflash'" \
     --conn-params="tidb_allow_mpp = 1" \
-    --conn-params="tidb_enforce_mpp = 1" \
+    --conn-params="tidb_enforce_mpp = 0" \
     --conn-params="tidb_mem_quota_query = 34359738368" \
     --conn-params="tidb_broadcast_join_threshold_count=10000000" \
     --conn-params="tidb_broadcast_join_threshold_size=104857600" \
     --queries "$i" \
     --count 1
+  
+  sleep 10
 done
-
-
-#################################################################################################################
-# 为 TPC-H 表创建 TiFlash 副本
-## TPC-H 查询是分析型工作负载，使用 TiFlash 能显著提升性能：
-mysql --comments -h a69ffeedf46f247f8bb0203acd486c43-78d600dac3ead463.elb.us-east-2.amazonaws.com -P 4000 -u root
-## 执行下面SQL：（顺序按上面查询结果调整为从小到大）
-ALTER TABLE region SET TIFLASH REPLICA 1;
-ALTER TABLE nation SET TIFLASH REPLICA 1;
-ALTER TABLE supplier SET TIFLASH REPLICA 1;
-ALTER TABLE part SET TIFLASH REPLICA 1;
-ALTER TABLE customer SET TIFLASH REPLICA 1;
-ALTER TABLE partsupp SET TIFLASH REPLICA 1;
-ALTER TABLE orders SET TIFLASH REPLICA 1;
-ALTER TABLE lineitem SET TIFLASH REPLICA 1;
-## 等待副本创建完成，可以通过下面 SQL 查看进度：1代表完成
-SELECT * FROM information_schema.tiflash_replica WHERE TABLE_SCHEMA = 'test' ORDER BY TABLE_NAME;
-
-## 不进入mysql 客户端，直接执行SQL
-mysql --comments -h a69ffeedf46f247f8bb0203acd486c43-78d600dac3ead463.elb.us-east-2.amazonaws.com -P 4000 -u root \
-  -e "SELECT * FROM information_schema.tiflash_replica WHERE TABLE_SCHEMA = 'test' ORDER BY TABLE_NAME;"
-
