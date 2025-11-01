@@ -64,18 +64,18 @@ mysql --comments -h a69ffeedf46f247f8bb0203acd486c43-78d600dac3ead463.elb.us-eas
 #################################################################################################################
 # 准备数据
 screen -R ttt -L
-SF=500
+SF=300
 tidb_host="a69ffeedf46f247f8bb0203acd486c43-78d600dac3ead463.elb.us-east-2.amazonaws.com"
 tidb_port=4000
 tiup bench tpch prepare \
   --sf $SF --dropdata --threads 64 \
-  --host ${tidb_host} --port ${tidb_port} \
+  --host ${tidb_host} --port ${tidb_port} --db tpch$SF \
   --analyze \
-  --tidb_build_stats_concurrency 8 \
-  --tidb_distsql_scan_concurrency 30 \
-  --tidb_index_serial_scan_concurrency 8 \
   --tiflash-replica 3
   
+#   --tidb_build_stats_concurrency 8 \
+#   --tidb_distsql_scan_concurrency 30 \
+#   --tidb_index_serial_scan_concurrency 8 \
 
 # 查询数据表容量
 mysql --comments -h a69ffeedf46f247f8bb0203acd486c43-78d600dac3ead463.elb.us-east-2.amazonaws.com -P 4000 -u root
@@ -143,8 +143,10 @@ FROM
 ORDER BY address;
 
 
-# 执行测试
-SF=500
+#################################################################################################################
+# 运行 TPC-H 查询
+# 执行测试:q4,q17 这两条查询在 SF500 有点问题，先不执行
+SF=300
 tidb_host="a69ffeedf46f247f8bb0203acd486c43-78d600dac3ead463.elb.us-east-2.amazonaws.com"
 tidb_port=4000
 tiup bench tpch run \
@@ -152,11 +154,15 @@ tiup bench tpch run \
   --sf ${SF} \
   --conn-params="tidb_isolation_read_engines = 'tiflash'" \
   --conn-params="tidb_allow_mpp = 1" \
-  --conn-params="tidb_enforce_mpp = 1" \
+  --conn-params="tidb_enforce_mpp = 0" \
   --conn-params="tidb_mem_quota_query = 34359738368" \
   --conn-params="tidb_broadcast_join_threshold_count=10000000" \
   --conn-params="tidb_broadcast_join_threshold_size=104857600" \
-  --queries "q1,q2,q3,q4,q5,q6,q7,q8,q9,q10,q11,q12,q13,q14,q15,q16,q17,q18,q19,q20,q21,q22"
+  --queries "q1,q2,q3,q5,q6,q7,q8,q9,q10,q11,q12,q13,q14,q15,q16,q18,q19,q20,q21,q22"
+
+
+
+
 
    
 

@@ -77,17 +77,18 @@ tiup install bench
 
 # 准备数据
 screen -R ttt -L
-SF=500
+SF=300
 tidb_host="a363275b91da64ac9b1a4b6e39510533-5be95794feb4c9c8.elb.us-east-2.amazonaws.com"
 tidb_port=4000
 tiup bench tpch prepare \
   --sf $SF --dropdata --threads 64 \
-  --host ${tidb_host} --port ${tidb_port} \
+  --host ${tidb_host} --port ${tidb_port} --db tpch$SF \
   --analyze \
-  --tidb_build_stats_concurrency 8 \
-  --tidb_distsql_scan_concurrency 30 \
-  --tidb_index_serial_scan_concurrency 8 \
   --tiflash-replica 3
+  
+#   --tidb_build_stats_concurrency 8 \
+#   --tidb_distsql_scan_concurrency 30 \
+#   --tidb_index_serial_scan_concurrency 8 \
   
 
 # 查询数据库中的信息
@@ -159,6 +160,7 @@ SELECT * FROM information_schema.tiflash_replica WHERE TABLE_SCHEMA = 'test' ORD
 
 #################################################################################################################
 # 运行 TPC-H 查询
+# 执行测试:q4,q17 这两条查询在 SF500 有点问题，先不执行
 SF=500
 tidb_host="a363275b91da64ac9b1a4b6e39510533-5be95794feb4c9c8.elb.us-east-2.amazonaws.com"
 tidb_port=4000
@@ -171,11 +173,24 @@ tiup bench tpch run \
   --conn-params="tidb_mem_quota_query = 34359738368" \
   --conn-params="tidb_broadcast_join_threshold_count=10000000" \
   --conn-params="tidb_broadcast_join_threshold_size=104857600" \
-  --queries "q1,q2,q3,q4,q5,q6,q7,q8,q9,q10,q11,q12,q13,q14,q15,q16,q17,q18,q19,q20,q21,q22"
+  --queries "q1,q2,q3,q5,q6,q7,q8,q9,q10,q11,q12,q13,q14,q15,q16,q18,q19,q20,q21,q22"
 
 
-
-
+####
+LIST="q1 q2 q3 q4 q5 q6 q7 q8 q9 q10 q11 q12 q13 q14 q15 q16 q17 q18 q19 q20 q21 q22"
+for i in $LIST; do
+  tiup bench tpch run \
+    --host ${tidb_host} --port ${tidb_port} \
+    --sf ${SF} \
+    --conn-params="tidb_isolation_read_engines = 'tiflash'" \
+    --conn-params="tidb_allow_mpp = 1" \
+    --conn-params="tidb_enforce_mpp = 1" \
+    --conn-params="tidb_mem_quota_query = 34359738368" \
+    --conn-params="tidb_broadcast_join_threshold_count=10000000" \
+    --conn-params="tidb_broadcast_join_threshold_size=104857600" \
+    --queries "$i" \
+    --count 1
+done
 
 
 #################################################################################################################
