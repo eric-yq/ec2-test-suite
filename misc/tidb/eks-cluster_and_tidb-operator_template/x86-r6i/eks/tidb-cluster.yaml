@@ -11,7 +11,7 @@ nodeGroups:
     desiredCapacity: 1
     privateNetworking: true
     availabilityZones: ["us-east-2a"]
-    instanceType: c6i.large
+    instanceType: c6i.xlarge
     labels:
       dedicated: admin
     iam:
@@ -35,7 +35,7 @@ nodeGroups:
     desiredCapacity: 1
     privateNetworking: true
     availabilityZones: ["us-east-2a"]
-    instanceType: c6i.large
+    instanceType: c6i.xlarge
     labels:
       dedicated: pd
     taints:
@@ -69,3 +69,5 @@ nodeGroups:
     iam:
       withAddonPolicies:
         ebs: true
+
+

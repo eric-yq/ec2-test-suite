@@ -26,6 +26,7 @@ spec:
       [replication]
         location-labels = ["topology.kubernetes.io/zone", "kubernetes.io/hostname"]
         max-replicas = 1
+        enable-placement-rules = true
     nodeSelector:
       dedicated: pd
     tolerations:
@@ -149,4 +150,5 @@ spec:
               values:
               - tiflash
           topologyKey: kubernetes.io/hostname
+
 

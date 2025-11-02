@@ -10,8 +10,8 @@ nodeGroups:
   - name: admin
     desiredCapacity: 1
     privateNetworking: true
-    availabilityZones: ["us-east-2a"]
-    instanceType: c8g.large
+    availabilityZones: ["us-east-2c"]
+    instanceType: c8g.xlarge
     labels:
       dedicated: admin
     iam:
@@ -21,7 +21,7 @@ nodeGroups:
   - name: tidb
     desiredCapacity: 2
     privateNetworking: true
-    availabilityZones: ["us-east-2a"]
+    availabilityZones: ["us-east-2c"]
     instanceType: c8g.2xlarge
     labels:
       dedicated: tidb
@@ -34,8 +34,8 @@ nodeGroups:
   - name: pd
     desiredCapacity: 1
     privateNetworking: true
-    availabilityZones: ["us-east-2a"]
-    instanceType: c8g.large
+    availabilityZones: ["us-east-2c"]
+    instanceType: c8g.xlarge
     labels:
       dedicated: pd
     taints:
@@ -47,7 +47,7 @@ nodeGroups:
   - name: tikv
     desiredCapacity: 3
     privateNetworking: true
-    availabilityZones: ["us-east-2a"]
+    availabilityZones: ["us-east-2c"]
     instanceType: r8g.2xlarge
     labels:
       dedicated: tikv
@@ -60,7 +60,7 @@ nodeGroups:
   - name: tiflash
     desiredCapacity: 3
     privateNetworking: true
-    availabilityZones: ["us-east-2a"]
+    availabilityZones: ["us-east-2c"]
     instanceType: r8g.2xlarge
     labels:
       dedicated: tiflash
@@ -69,3 +69,5 @@ nodeGroups:
     iam:
       withAddonPolicies:
         ebs: true
+
+
