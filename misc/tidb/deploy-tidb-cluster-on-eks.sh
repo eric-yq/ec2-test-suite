@@ -83,20 +83,23 @@ source /root/.bash_profile
 tiup install playground
 tiup install bench
 
-# 准备数据
-screen -R ttt -L
-sf=300
+#################################################################################################################
+# 准备数据：下面内容可以保存为 prepare-tpch500.sh , 然后执行。
+# screen -R ttt -L
+# sf=300
+sf=500
 tidb_host="a1d9f7f96cd3b4f919c8af2fbec68888-5ed09ee5e8020c5c.elb.us-east-2.amazonaws.com"
-tidb_port=4000
 tiup bench tpch prepare \
   --sf $sf --dropdata --threads 16 \
-  --host ${tidb_host} --port ${tidb_port} --db tpch${sf} \
+  --host ${tidb_host} --port 4000 --db tpch${sf} \
   --analyze \
   --tidb_build_stats_concurrency 4 \
   --tidb_distsql_scan_concurrency 15 \
   --tidb_index_serial_scan_concurrency 4 \
   --tiflash-replica 3
-  
+
+echo "[Info] Complete to prepare tpch${sf}." && sleep 60
+echo "[Info] Start to analyze tables..."
 # 分析表统计信息的单独 SQL
 mysql --comments -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.customer;"
 mysql --comments -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.lineitem;"
@@ -107,46 +110,33 @@ mysql --comments -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.par
 mysql --comments -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.region;"
 mysql --comments -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.supplier;"
 
+echo "[Info] Complete to prepare and analyze tpch${sf}, you can start to run benchmark."
 
 #################################################################################################################
-## 其他 EKS 常用操作，参考 eks-and-tidb-commands.sh 
+## 常用操作 eks-and-tidb-commands.sh
 #################################################################################################################
-
 
 #################################################################################################################
 # 运行 TPC-H 查询
-# 执行测试:q4,q17 这两条查询在 SF500 有点问题
-sf=300
+# 执行测试: q4 查询有点问题，先不执行
+# screen -R ttt -L
+sf=500
 tidb_host="a1d9f7f96cd3b4f919c8af2fbec68888-5ed09ee5e8020c5c.elb.us-east-2.amazonaws.com"
-tidb_port=4000
-tiup bench tpch run \
-  --host ${tidb_host} --port ${tidb_port} --db tpch${sf} \
-  --sf ${sf} \
-  --conn-params="tidb_isolation_read_engines = 'tiflash'" \
-  --conn-params="tidb_allow_mpp = 1" \
-  --conn-params="tidb_enforce_mpp = 0" \
-  --conn-params="tidb_mem_quota_query = 34359738368" \
-  --conn-params="tidb_broadcast_join_threshold_count=10000000" \
-  --conn-params="tidb_broadcast_join_threshold_size=104857600" \
-  --queries "q1,q2,q3,q4,q5,q6,q7,q8,q9,q10,q11,q12,q13,q14,q15,q16,q17,q18,q19,q20,q21,q22"
-
-####
-sf=300
-tidb_host="a1d9f7f96cd3b4f919c8af2fbec68888-5ed09ee5e8020c5c.elb.us-east-2.amazonaws.com"
-tidb_port=4000
 LIST="q1 q2 q3 q5 q6 q7 q8 q9 q10 q11 q12 q13 q14 q15 q16 q17 q18 q19 q20 q21 q22"
 for i in $LIST; do
   tiup bench tpch run \
-    --host ${tidb_host} --port ${tidb_port} --db tpch${sf} \
+    --host ${tidb_host} --port 4000 --db tpch${sf} \
     --conn-params="tidb_isolation_read_engines = 'tiflash'" \
     --conn-params="tidb_allow_mpp = 1" \
-    --conn-params="tidb_enforce_mpp = 0" \
-    --queries "$i" \
-    --count 3
-  
-  sleep 10
+    --conn-params="tidb_enforce_mpp = 1" \
+    --conn-params="tidb_opt_tiflash_concurrency_factor = 4" \
+    --conn-params="tidb_opt_mpp_outer_join_fixed_build_side = 0" \
+    --conn-params="tiflash_mpp_task_max_concurrency = 8" \
+    --conn-params="tidb_mem_quota_query = 137438953472" \
+    --conn-params="tidb_broadcast_join_threshold_count=10000000" \
+    --conn-params="tidb_broadcast_join_threshold_size=104857600" \
+    --count 3 \
+    --queries "$i"
+    
+  sleep 10  
 done
-
-    # --conn-params="tidb_mem_quota_query = 34359738368" \
-    # --conn-params="tidb_broadcast_join_threshold_count=10000000" \
-    # --conn-params="tidb_broadcast_join_threshold_size=104857600" \
