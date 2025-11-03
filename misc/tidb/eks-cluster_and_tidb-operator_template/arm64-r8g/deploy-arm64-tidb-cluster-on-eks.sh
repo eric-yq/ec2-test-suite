@@ -74,7 +74,7 @@ yum install -yq mysql
 # 测试 mysql 客户端远程访问
 # kubectl get svc basic-tidb -n tidb-cluster-arm64 -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
 tidb_host="a8a4039336bd04644a7bfe24b4b39286-74e2214757238f41.elb.us-east-2.amazonaws.com"
-mysql --comments -h ${tidb_host} -P 4000 -u root -e "show databases;"
+mysql -h ${tidb_host} -P 4000 -u root -e "show databases;"
 
 # 安装 TiUP
 cd /root/
@@ -101,14 +101,14 @@ tiup bench tpch prepare \
 echo "[Info] Complete to prepare tpch${sf}." && sleep 60
 echo "[Info] Start to analyze tables..."
 # 分析表统计信息的单独 SQL
-mysql --comments -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.customer;"
-mysql --comments -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.lineitem;"
-mysql --comments -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.nation;"
-mysql --comments -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.orders;"
-mysql --comments -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.part;"
-mysql --comments -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.partsupp;"
-mysql --comments -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.region;"
-mysql --comments -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.supplier;"
+mysql -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.customer;"
+mysql -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.lineitem;"
+mysql -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.nation;"
+mysql -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.orders;"
+mysql -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.part;"
+mysql -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.partsupp;"
+mysql -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.region;"
+mysql -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.supplier;"
 
 echo "[Info] Complete to prepare and analyze tpch${sf}, you can start to run benchmark."
 
@@ -120,7 +120,13 @@ echo "[Info] Complete to prepare and analyze tpch${sf}, you can start to run ben
 # 运行 TPC-H 查询
 # 执行测试: q4 查询有点问题，先不执行
 # screen -R ttt -L
-sf=500
+
+# sf=300 # 4利用率极低，无法完成。
+# LIST="q1 q2 q3 q5 q6 q7 q8 q9 q10 q11 q12 q13 q14 q15 q16 q17 q18 q19 q20 q21 q22"
+
+sf=500 # q4; q9,q17,q18(提示内存不足)
+LIST="q1 q2 q3 q5 q6 q7 q8 q10 q11 q12 q13 q14 q15 q16 q19 q20 q21 q22"
+
 tidb_host="a8a4039336bd04644a7bfe24b4b39286-74e2214757238f41.elb.us-east-2.amazonaws.com"
 LIST="q1 q2 q3 q5 q6 q7 q8 q9 q10 q11 q12 q13 q14 q15 q16 q17 q18 q19 q20 q21 q22"
 for i in $LIST; do

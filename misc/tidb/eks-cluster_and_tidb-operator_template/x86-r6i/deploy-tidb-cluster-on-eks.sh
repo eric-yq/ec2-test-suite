@@ -57,7 +57,7 @@ kubectl get pods -n tidb-cluster -o wide
 
 
 #################################################################################################################
-# TiDB TPC-H 测试脚本 , 在一台 tidb-client 实例上执行.
+# TiDB TPC-H / TPC-C 测试脚本 , 在一台 tidb-client 实例上执行.
 # 该实例和 tidb-node 在同一个 subnet 和 安全组，同时加入 default 安全组
 # vpc-04d912211c6bd7a62
 # subnet-0cdd03810ae987830
@@ -74,7 +74,7 @@ yum install -yq mysql
 # 测试 mysql 客户端远程访问
 # kubectl get svc basic-tidb -n tidb-cluster -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
 tidb_host="a1d9f7f96cd3b4f919c8af2fbec68888-5ed09ee5e8020c5c.elb.us-east-2.amazonaws.com"
-mysql --comments -h ${tidb_host} -P 4000 -u root -e "show databases;"
+mysql -h ${tidb_host} -P 4000 -u root -e "show databases;"
 
 # 安装 TiUP
 cd /root/
@@ -101,14 +101,14 @@ tiup bench tpch prepare \
 echo "[Info] Complete to prepare tpch${sf}." && sleep 60
 echo "[Info] Start to analyze tables..."
 # 分析表统计信息的单独 SQL
-mysql --comments -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.customer;"
-mysql --comments -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.lineitem;"
-mysql --comments -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.nation;"
-mysql --comments -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.orders;"
-mysql --comments -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.part;"
-mysql --comments -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.partsupp;"
-mysql --comments -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.region;"
-mysql --comments -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.supplier;"
+mysql -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.customer;"
+mysql -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.lineitem;"
+mysql -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.nation;"
+mysql -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.orders;"
+mysql -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.part;"
+mysql -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.partsupp;"
+mysql -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.region;"
+mysql -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.supplier;"
 
 echo "[Info] Complete to prepare and analyze tpch${sf}, you can start to run benchmark."
 
@@ -139,4 +139,56 @@ for i in $LIST; do
     --queries "$i"
     
   sleep 10  
+done
+
+
+
+#################################################################################################################
+# 准备数据：下面内容可以保存为 prepare-tpcc1000.sh , 然后执行。
+# screen -R ttt -L
+wares=1000
+tidb_host="a1d9f7f96cd3b4f919c8af2fbec68888-5ed09ee5e8020c5c.elb.us-east-2.amazonaws.com"
+tiup bench tpcc prepare \
+  --host ${tidb_host} --port 4000 \
+  --db tpcc${wares} --warehouses ${wares} --dropdata \
+  --threads 16 --parts 16 --isolation 2 \
+  --conn-params "tidb_batch_insert=1" \
+  --conn-params "tidb_batch_delete=1" \
+  --conn-params "tidb_enable_streaming=1" \
+  --conn-params "tidb_disable_txn_auto_retry=0" \
+  --conn-params "tidb_constraint_check_in_place=0" \
+  --conn-params "tidb_txn_mode=optimistic" \
+  --conn-params "tidb_enable_batch_dml=1" \
+  --conn-params "tidb_dml_batch_size=2000" \
+  --conn-params "tidb_distsql_scan_concurrency=16" \
+  --conn-params "tidb_index_serial_scan_concurrency=8" \
+  --conn-params "tidb_projection_concurrency=8" \
+  --conn-params "tidb_hashagg_partial_concurrency=8" \
+  --conn-params "tidb_hashagg_final_concurrency=8" \
+  --conn-params "tidb_init_chunk_size=1024" \
+  --conn-params "tidb_max_chunk_size=4096" \
+  --conn-params "tidb_mem_quota_query=8 << 30" 
+
+# 收集统计信息
+mysql -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpcc${wares}.customer;"
+mysql -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpcc${wares}.district;"
+mysql -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpcc${wares}.history;"
+mysql -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpcc${wares}.item;"
+mysql -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpcc${wares}.new_order;"
+mysql -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpcc${wares}.order_line;"
+mysql -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpcc${wares}.orders;"
+mysql -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpcc${wares}.stock;"
+mysql -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpcc${wares}.warehouse;"
+
+# 执行 TPCC 测试
+LIST="10 30 50 70 100"
+for i in $LIST; do
+  echo "[Info] Start to run tpcc test with ${i} threads."
+  tiup bench tpcc run \
+    --host ${tidb_host} --port 4000 \
+    --db tpcc${wares} --warehouses ${wares} \
+    --threads ${i} --time 1h \
+    > result_sumamry_tpcc${wares}_threads_${i}.txt 2>&1
+
+    sleep 60
 done
