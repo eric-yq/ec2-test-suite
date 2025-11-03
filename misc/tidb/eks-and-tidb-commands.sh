@@ -34,15 +34,14 @@ wares=1000
 EOF
 source ~/.bash_profile
 
-# r6i
-tidb_host="a1d9f7f96cd3b4f919c8af2fbec68888-5ed09ee5e8020c5c.elb.us-east-2.amazonaws.com"
+# r8g
+tidb_host="a8a4039336bd04644a7bfe24b4b39286-74e2214757238f41.elb.us-east-2.amazonaws.com"
 
 # r8i
 tidb_host="ac81a8793a79f44d9a560563d438b9c3-e050f6905097f21d.elb.us-east-2.amazonaws.com"
 
-# r8g
-tidb_host="a8a4039336bd04644a7bfe24b4b39286-74e2214757238f41.elb.us-east-2.amazonaws.com"
-
+# r6i
+tidb_host="a1d9f7f96cd3b4f919c8af2fbec68888-5ed09ee5e8020c5c.elb.us-east-2.amazonaws.com"
 
 #################################################################################################################
 # 查询 TPC-H 数据库和表的信息

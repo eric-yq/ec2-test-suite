@@ -142,10 +142,10 @@ for i in $LIST; do
 done
 
 
-
 #################################################################################################################
 # 准备数据：下面内容可以保存为 prepare-tpcc1000.sh , 然后执行。
 # screen -R ttt -L
+source .bash_profile
 wares=1000
 tidb_host="a1d9f7f96cd3b4f919c8af2fbec68888-5ed09ee5e8020c5c.elb.us-east-2.amazonaws.com"
 tiup bench tpcc prepare \
@@ -181,6 +181,7 @@ mysql -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpcc${wares}.stock;"
 mysql -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpcc${wares}.warehouse;"
 
 # 执行 TPCC 测试
+wares=1000
 LIST="10 30 50 70 100"
 for i in $LIST; do
   echo "[Info] Start to run tpcc test with ${i} threads."
