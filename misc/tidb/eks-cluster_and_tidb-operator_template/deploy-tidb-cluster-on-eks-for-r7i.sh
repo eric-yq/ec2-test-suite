@@ -1,13 +1,13 @@
 # 创建集群
-eksctl create cluster -f tidb-cluster.yaml 
+eksctl create cluster -f tidb-cluster-r7i.yaml 
 
 # 创建 IAM
-eksctl utils associate-iam-oidc-provider --region=us-east-2 --cluster=tidb-cluster --approve
+eksctl utils associate-iam-oidc-provider --region=us-east-2 --cluster=r7i-tidb-cluster --approve
 eksctl create iamserviceaccount \
         --name ebs-csi-controller-sa \
         --namespace kube-system \
-        --cluster tidb-cluster \
-        --role-name AmazonEKS_EBS_CSI_DriverRole \
+        --cluster r7i-tidb-cluster \
+        --role-name AmazonEKS_EBS_CSI_DriverRole-r7i \
         --role-only \
         --attach-policy-arn arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy \
         --approve
@@ -36,33 +36,37 @@ kubectl get pods --namespace tidb-admin -l app.kubernetes.io/instance=tidb-opera
 
 # 部署 TiDB 集群
 ## 创建 TiDB 集群命名空间
-kubectl create namespace tidb-cluster
+kubectl create namespace tidb-cluster-r7i
 ## 下载 TidbCluster 和 TidbMonitor CR 的配置文件。
-mkdir -p tidb-cluster-software-config
-cd tidb-cluster-software-config
-curl -O https://raw.githubusercontent.com/pingcap/tidb-operator/v1.6.3/examples/aws/tidb-cluster.yaml
-curl -O https://raw.githubusercontent.com/pingcap/tidb-operator/v1.6.3/examples/aws/tidb-monitor.yaml
-curl -O https://raw.githubusercontent.com/pingcap/tidb-operator/v1.6.3/examples/aws/tidb-dashboard.yaml
-###### 修改参数，参考 tidb-cluster-software-config/tidb-cluster.yaml ######
+mkdir -p tidb-deployment
+cd tidb-deployment
+# curl -O https://raw.githubusercontent.com/pingcap/tidb-operator/v1.6.3/examples/aws/tidb-cluster.yaml
+# curl -O https://raw.githubusercontent.com/pingcap/tidb-operator/v1.6.3/examples/aws/tidb-monitor.yaml
+# curl -O https://raw.githubusercontent.com/pingcap/tidb-operator/v1.6.3/examples/aws/tidb-dashboard.yaml
+###### 修改参数，参考 tidb-deployment/tidb-cluster.yaml ######
 # ......
 ## 执行部署 TiDB 集群
-kubectl apply -f tidb-cluster.yaml -n tidb-cluster
+kubectl apply -f tidb-cluster.yaml -n tidb-cluster-r7i
 ## 查看 TiDB 集群 Pod 状态
-kubectl get pvc  -n tidb-cluster -o wide
-kubectl get pods -n tidb-cluster -o wide
+kubectl get pvc  -n tidb-cluster-r7i -o wide
+kubectl get pods -n tidb-cluster-r7i -o wide
+
+# 查询 TiDB 访问地址
+kubectl get svc basic-tidb -n tidb-cluster-r7i -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
+tidb_host="ac9602833addd438f9d36d7b4d0316ee-f331a49525b23498.elb.us-east-2.amazonaws.com"
 
 
 ## 附加：删除 TiDB 集群
-# kubectl delete tc basic -n tidb-cluster
+# kubectl delete tc basic -n tidb-cluster-r7i
 
 
 #################################################################################################################
-# TiDB TPC-H / TPC-C 测试脚本 , 在一台 tidb-client 实例上执行.
+# TiDB TPC-H 测试脚本 , 在一台 tidb-client 实例上执行.
 # 该实例和 tidb-node 在同一个 subnet 和 安全组，同时加入 default 安全组
-# vpc-04d912211c6bd7a62
-# subnet-0cdd03810ae987830
-# sg-0b34e9daa975cd219
-# sg-0cd1e981530784bb6
+# vpc-0a74855a115a54f43
+# subnet-0f4ff004cd58b1083
+# sg-06f060c38b120516d
+# sg-08ac1fd7f0f1b56c1
 #################################################################################################################
 # 安装基础软件包
 yum update -yq
@@ -72,9 +76,19 @@ rpm -Uvh https://repo.mysql.com/mysql80-community-release-el9.rpm
 yum install -yq mysql
 
 # 测试 mysql 客户端远程访问
-# kubectl get svc basic-tidb -n tidb-cluster -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
-tidb_host="a1d9f7f96cd3b4f919c8af2fbec68888-5ed09ee5e8020c5c.elb.us-east-2.amazonaws.com"
+cat >> ~/.bash_profile << EOF
+alias ccc="clear"
+alias ddd="dool 1 10"
+alias sttt="screen -r ttt"
+alias tailf="tail ~/screenlog.0"
+export tidb_host="ac9602833addd438f9d36d7b4d0316ee-f331a49525b23498.elb.us-east-2.amazonaws.com"
+export sf=300
+export wares=1000
+EOF
+source ~/.bash_profile
+
 mysql -h ${tidb_host} -P 4000 -u root -e "show databases;"
+
 
 # 安装 TiUP
 cd /root/
@@ -86,9 +100,9 @@ tiup install bench
 #################################################################################################################
 # 准备数据：下面内容可以保存为 prepare-tpch500.sh , 然后执行。
 # screen -R ttt -L
-# sf=300
-sf=500
-tidb_host="a1d9f7f96cd3b4f919c8af2fbec68888-5ed09ee5e8020c5c.elb.us-east-2.amazonaws.com"
+#!/bin/bash
+sf=300
+tidb_host="ac9602833addd438f9d36d7b4d0316ee-f331a49525b23498.elb.us-east-2.amazonaws.com"
 tiup bench tpch prepare \
   --sf $sf --dropdata --threads 16 \
   --host ${tidb_host} --port 4000 --db tpch${sf} \
@@ -120,8 +134,8 @@ echo "[Info] Complete to prepare and analyze tpch${sf}, you can start to run ben
 # 运行 TPC-H 查询
 # 执行测试: q4 查询有点问题，先不执行
 # screen -R ttt -L
-sf=500
-tidb_host="a1d9f7f96cd3b4f919c8af2fbec68888-5ed09ee5e8020c5c.elb.us-east-2.amazonaws.com"
+sf=300
+tidb_host="ac9602833addd438f9d36d7b4d0316ee-f331a49525b23498.elb.us-east-2.amazonaws.com"
 LIST="q1 q2 q3 q5 q6 q7 q8 q9 q10 q11 q12 q13 q14 q15 q16 q17 q18 q19 q20 q21 q22"
 for i in $LIST; do
   tiup bench tpch run \
@@ -136,18 +150,19 @@ for i in $LIST; do
     --conn-params="tidb_broadcast_join_threshold_count=10000000" \
     --conn-params="tidb_broadcast_join_threshold_size=104857600" \
     --count 3 \
-    --queries "$i"
+    --queries "$i" >> result_tpch${sf}.txt 2>&1
     
   sleep 10  
 done
-
+echo "[Info] Complete to run tpch${sf} tests."
+grep Summary result_tpch${sf}.txt > result_summary_tpch${wares}_r7i.txt
 
 #################################################################################################################
 # 准备数据：下面内容可以保存为 prepare-tpcc1000.sh , 然后执行。
 # screen -R ttt -L
 source .bash_profile
 wares=1000
-tidb_host="a1d9f7f96cd3b4f919c8af2fbec68888-5ed09ee5e8020c5c.elb.us-east-2.amazonaws.com"
+tidb_host="ac9602833addd438f9d36d7b4d0316ee-f331a49525b23498.elb.us-east-2.amazonaws.com"
 tiup bench tpcc prepare \
   --host ${tidb_host} --port 4000 \
   --db tpcc${wares} --warehouses ${wares} --dropdata \
@@ -193,6 +208,7 @@ mysql -h ${tidb_host} -P 4000 -u root -e "SELECT COUNT(*) FROM tpcc${wares}.stoc
 mysql -h ${tidb_host} -P 4000 -u root -e "SELECT COUNT(*) FROM tpcc${wares}.warehouse;"
 
 echo "[Info] Complete to prepare and analyze tpcc${wares}, you can start to run benchmark."
+sleep 60
 
 # 执行 TPCC 测试
 wares=1000
@@ -203,9 +219,11 @@ for i in $LIST; do
     --host ${tidb_host} --port 4000 \
     --db tpcc${wares} --warehouses ${wares} \
     --threads ${i} --time 1h \
-    > result_sumamry_tpcc${wares}_threads_${i}.txt 2>&1
+    > result_summary_tpcc${wares}_threads_${i}.txt 2>&1
 
     sleep 60
 done
+
+tail -n 1 result_summary_tpcc*.txt > result_summary_tpcc${wares}_r7i.txt
 
 #################################################################################################################
