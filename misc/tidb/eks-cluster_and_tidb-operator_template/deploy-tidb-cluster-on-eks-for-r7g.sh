@@ -97,7 +97,7 @@ tiup install playground
 tiup install bench
 
 #################################################################################################################
-# 准备数据：下面内容可以保存为 prepare-tpch500.sh , 然后执行。
+# 准备数据：下面内容可以保存为 prepare-tpch300.sh , 然后执行。
 # screen -R ttt -L
 #!/bin/bash
 sf=300
@@ -154,7 +154,7 @@ for i in $LIST; do
   sleep 10  
 done
 echo "[Info] Complete to run tpch${sf} tests."
-grep Summary result_tpch${sf}.txt > result_summary_tpch${wares}_r7g.txt
+grep Summary result_tpch${sf}.txt > result_summary_tpch${sf}_r7g.txt
 
 #################################################################################################################
 # 准备数据：下面内容可以保存为 prepare-tpcc1000.sh , 然后执行。

@@ -98,7 +98,7 @@ tiup install playground
 tiup install bench
 
 #################################################################################################################
-# 准备数据：下面内容可以保存为 prepare-tpch500.sh , 然后执行。
+# 准备数据：下面内容可以保存为 prepare-tpch300.sh , 然后执行。
 # screen -R ttt -L
 #!/bin/bash
 sf=300
