@@ -12,7 +12,7 @@
 # cd ec2-test-suite/${SUT_NAME}
 # bash install-sut.sh ${SUT_NAME}
 
-set -e
+# set -e
 
 # 实例启动成功之后的首次启动 OS， /root/userdata.sh 不存在，创建该 userdata.sh 文件并设置开启自动执行该脚本。
 if [ ! -f "/root/userdata.sh" ]; then
@@ -51,7 +51,6 @@ fi
 ## functions
 install_public_tools(){
 	$PKGCMD update -y
-	$PKGCMD1 install -y epel
 	$PKGCMD install -y dmidecode net-tools htop git python3-pip
 	pip3 install dool
 }
