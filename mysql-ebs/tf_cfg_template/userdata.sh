@@ -12,9 +12,6 @@
 # cd ec2-test-suite/${SUT_NAME}
 # bash install-sut.sh ${SUT_NAME}
 
-
-#!/bin/bash
-
 set -e
 
 # 实例启动成功之后的首次启动 OS， /root/userdata.sh 不存在，创建该 userdata.sh 文件并设置开启自动执行该脚本。
@@ -49,10 +46,6 @@ EOF
     systemctl start userdata.service
     exit 0
 fi
-
-## 
-SUT_NAME=${1}
-echo "$0: Install SUT_NAME: ${SUT_NAME}"
 
 
 ## functions
