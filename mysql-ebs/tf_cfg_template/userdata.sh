@@ -1,4 +1,4 @@
-# #!/bin/bash
+#!/bin/bash
 
 # SUT_NAME="SUT_XXX"
 
