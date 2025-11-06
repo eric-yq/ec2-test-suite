@@ -4,8 +4,9 @@ sudo su - root
 
 ################################################################################
 ## 安装依赖包
-yum install -y awscli autoconf automake bzip2 bzip2-devel cmake freetype-devel zip \
+yum install -yq awscli autoconf automake bzip2 bzip2-devel cmake freetype-devel zip python3-pip \
   gcc gcc-c++ git libtool make pkgconfig zlib-devel nasm yasm p7zip htop git cmake screen
+pip3 install dool
 
 ## 使用 GCC 14 编译
 yum install -y gcc14 gcc14-c++
