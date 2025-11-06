@@ -28,16 +28,16 @@ aws_s3_bucket_name="s3://ec2-core-benchmark-ericyq"
 yum update -y
 
 # ## Corretto 11 --default
-# yum install -y java-11-amazon-corretto
-# JDK_VERSION='corretto11'
+yum install -y java-11-amazon-corretto
+JDK_VERSION='corretto11'
 
 ## Corretto 17
 # yum install java-17-amazon-corretto -y
 # JDK_VERSION='corretto17'
 
 # JDK 1.8
-yum install -y java-1.8.0-openjdk
-JDK_VERSION='openjdk8'
+# yum install -y java-1.8.0-openjdk
+# JDK_VERSION='openjdk8'
 
 ## JDK 1.11
 # amazon-linux-extras install  -y java-openjdk11
@@ -54,7 +54,8 @@ JDK_VERSION='openjdk8'
 # JDK_VERSION='dragonwell11'
 
 java -version
-yum install -y htop dmidecode
+yum install -y htop dmidecode python3-pip
+pip3 install dool
 
 ## 系统配置
 PN=$(cloud-init query ds.meta_data.instance_type)
