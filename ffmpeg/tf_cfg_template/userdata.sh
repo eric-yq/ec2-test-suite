@@ -161,4 +161,4 @@ aws s3 cp ${archive}.tar.gz s3://ec2-core-benchmark-ericyq/result_ffmpeg/
 # 停止实例
 INSTANCE_ID=$(ec2-metadata --quiet --instance-id)
 REGION_ID=$(ec2-metadata --quiet --region)
-aws ec2 stop-instances --instance-ids ${INSTANCE_ID} --region ${REGION_ID}
+aws ec2 stop-instances --instance-ids "${INSTANCE_ID}" --region "${REGION_ID}"
