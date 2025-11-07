@@ -40,6 +40,15 @@ fi
 # Reference：https://aws.amazon.com/cn/blogs/china/aws-graviton3-accelerates-spark-job-execution-benchmark/
 # Amazon Linux 2023, 使用 ec2-user 账号登录.
 
+## 配置 AWSCLI
+aws_ak_value="akxxx"
+aws_sk_value="skxxx"
+aws_region_name=$(cloud-init query region)
+aws configure set aws_access_key_id ${aws_ak_value}
+aws configure set aws_secret_access_key ${aws_sk_value}
+aws configure set default.region ${aws_region_name}
+aws_s3_bucket_name="s3://ec2-core-benchmark-ericyq"
+
 # 设置软件栈版本：
 echo "export HADOOP_VERSION=3.3.1" >> ~/.bashrc
 echo "export HIVE_VERSION=3.1.3" >> ~/.bashrc
@@ -75,7 +84,8 @@ java -version
 
 # 安装 Scala
 cd ~
-wget https://downloads.lightbend.com/scala/${SCALA_VERSION}/scala-${SCALA_VERSION}.tgz
+# wget https://downloads.lightbend.com/scala/${SCALA_VERSION}/scala-${SCALA_VERSION}.tgz
+aws s3 cp ${aws_s3_bucket_name}/software/spark-local/scala-${SCALA_VERSION}.tgz .
 tar zxf scala-${SCALA_VERSION}.tgz
 ln -s $HOME/scala-${SCALA_VERSION} scala
 echo "export SCALA_HOME=$HOME/scala" >> ~/.bashrc
@@ -135,7 +145,8 @@ else
 fi
 
 # 下载指定架构的 Hadoop 软件包：
-wget https://archive.apache.org/dist/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION$ARCH.tar.gz
+# wget https://archive.apache.org/dist/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION$ARCH.tar.gz
+aws s3 cp ${aws_s3_bucket_name}/software/spark-local/hadoop-$HADOOP_VERSION$ARCH.tar.gz .
 tar zxf hadoop-$HADOOP_VERSION$ARCH.tar.gz
 ln -s hadoop-$HADOOP_VERSION $HOME/hadoop 
 echo "export HADOOP_HOME=$HOME/hadoop" >> ~/.bashrc
@@ -248,7 +259,8 @@ jps
 # 安装和配置 Hive 软件
 # 下载和安装 Hive 软件：
 cd ~
-wget https://archive.apache.org/dist/hive/hive-$HIVE_VERSION/apache-hive-$HIVE_VERSION-bin.tar.gz
+# wget https://archive.apache.org/dist/hive/hive-$HIVE_VERSION/apache-hive-$HIVE_VERSION-bin.tar.gz
+aws s3 cp ${aws_s3_bucket_name}/software/spark-local/apache-hive-$HIVE_VERSION-bin.tar.gz .
 tar zxf apache-hive-$HIVE_VERSION-bin.tar.gz
 ln -s $HOME/apache-hive-$HIVE_VERSION-bin hive
 echo "export HIVE_HOME=$HOME/hive" >> ~/.bashrc
@@ -261,7 +273,8 @@ wget https://github.com/eric-yq/ec2-test-suite/raw/refs/heads/main/misc/spark-tp
 
 # 配置 MySQL Connector
 cd ~
-wget https://downloads.mysql.com/archives/get/p/3/file/mysql-connector-java-5.1.49.tar.gz
+# wget https://downloads.mysql.com/archives/get/p/3/file/mysql-connector-java-5.1.49.tar.gz
+aws s3 cp ${aws_s3_bucket_name}/software/spark-local/mysql-connector-java-5.1.49.tar.gz .
 tar zxf mysql-connector-java-5.1.49.tar.gz
 cp mysql-connector-java-5.1.49/mysql-connector-java-5.1.49.jar $HIVE_HOME/lib/
 sudo ln -s $HIVE_HOME/lib/mysql-connector-java-5.1.49.jar /usr/share/java/mysql-connector-java.jar
@@ -277,7 +290,8 @@ hive -e "show databases;"
 
 # 安装和配置 Spark 软件
 cd ~
-wget https://archive.apache.org/dist/spark/spark-$SPARK_VERSION/spark-$SPARK_VERSION-bin-hadoop3.tgz
+# wget https://archive.apache.org/dist/spark/spark-$SPARK_VERSION/spark-$SPARK_VERSION-bin-hadoop3.tgz
+aws s3 cp ${aws_s3_bucket_name}/software/spark-local/spark-$SPARK_VERSION-bin-hadoop3.tgz .
 tar zxf spark-$SPARK_VERSION-bin-hadoop3.tgz
 ln -s spark-$SPARK_VERSION-bin-hadoop3 spark
 echo "export SPARK_HOME=$HOME/spark" >> ~/.bashrc
@@ -307,7 +321,8 @@ cd $HOME/hive-testbench
 
 ## 方法 2： 如果上述方法有问题，可能是  tpcds_kit.zip 下载失败导致的，可以尝试下面的方法
 cd $HOME/hive-testbench/tpcds-gen
-sed -i '/^tpcds_kit\.zip:/,+2 s/^/#/' Makefile
+sed -i.bak '/^tpcds_kit\.zip:/,+2 s/^/#/' Makefile
+cat Makefile
 # （1）将 Makefile 中的下面 3 行注释掉
 #tpcds_kit.zip:
 #       curl https://public-repo-1.hortonworks.com/hive-testbench/tpcds/README
@@ -316,28 +331,24 @@ sed -i '/^tpcds_kit\.zip:/,+2 s/^/#/' Makefile
 wget https://github.com/eric-yq/ec2-test-suite/raw/refs/heads/main/misc/spark-tpcds/tpcds_kit.zip
 
 ## gcc 10 以上版本，需要做如下修改
-# sudo su - root
 sudo mv /usr/bin/gcc /usr/bin/gcc-impl
 ARCH=$(arch)
 if [[ "$ARCH" == "aarch64" ]]; then
-    sudo cat > /usr/bin/gcc  << EOF
+    sudo tee /usr/bin/gcc > /dev/null << EOF
 #! /bin/sh  
 /usr/bin/gcc-impl -fsigned-char -fcommon \$@
 EOF
 elif [[ "$ARCH" == "x86_64" ]]; then
-    sudo cat > /usr/bin/gcc  << EOF
+    sudo tee /usr/bin/gcc > /dev/null << EOF
 #! /bin/sh  
 /usr/bin/gcc-impl -fcommon \$@
 EOF
 else
     echo "$ARCH not supported"
     exit 1
-fi
+fi  
 sudo chmod +x /usr/bin/gcc
-## 退出root 用户
-# exit
 
-## 回到 ec2-user 用户操作
 cd $HOME/hive-testbench/
 bash ./tpcds-build.sh
 
@@ -351,7 +362,7 @@ sed -i.bak "s/hive.optimize.sort.dynamic.partition.threshold=0/hive.optimize.sor
 # 通过指定 SF 的值，设置程序需要生成的数据量，本文中 SF=100 表示生成 100GB 的数据量。
 # 根据生成的数据量大小差异，此过程可能会持续数分钟到数小时不等。
 cd $HOME/hive-testbench
-SF=600
+SF=3
 ./tpcds-setup.sh $SF
 
 echo "[Info] Complete to generate $SF GB data for TPC-DS benchmark."
@@ -375,7 +386,8 @@ RESULT_SUMMARY="$RESULT_PATH/result_summary_spark_tpc-ds.txt"
 # 逐个执行 *.sql 文件的方式执行 Benchmark：
 echo "[$TIMESTAMP] Start Spark TPC-DS Benchmark(SF=$SF) on $PN ...... " > $RESULT_SUMMARY
 cd $HOME/hive-testbench/spark-queries-tpcds
-LIST=$(ls *.sql)
+# LIST=$(ls *.sql)
+LIST="q1.sql q2.sql q3.sql"
 for i in $LIST; do
     RESULT_LOG="$RESULT_PATH/$i.log"
     RESULT_OUT="$RESULT_PATH/$i.out"
