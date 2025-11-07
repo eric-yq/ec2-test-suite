@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+# set -e
 
 ## 命令行参数
 while getopts 's:t:o:e:' OPT; do
@@ -72,7 +72,10 @@ sed -i "s/USERDATA_FILE_XXX/userdata.sh/g" variables.tf
 
 ## 修改 userdata.sh 
 sed -i "s/SUT_XXX/${SUT_NAME}/g" userdata.sh
-
+if grep -q "akxxx" userdata.sh && grep -q "skxxx" userdata.sh; then
+    sed -i "s/akxxx/$(aws configure get aws_access_key_id)/g" userdata.sh
+    sed -i "s/skxxx/$(aws configure get aws_secret_access_key)/g" userdata.sh
+fi
 
 ## 使用 terraform 启动实例
 terraform init
