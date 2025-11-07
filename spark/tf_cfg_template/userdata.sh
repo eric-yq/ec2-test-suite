@@ -1,6 +1,7 @@
 #!/bin/bash
 
-set -e
+# set -e
+# 因为 q30.sql 会报错退出，导致整个脚本退出，所以这里不使用 set -e 选项。
 
 # 实例启动成功之后的首次启动 OS， /home/ec2-user/userdata.sh 不存在，创建该 userdata.sh 文件并设置开启自动执行该脚本。
 # !!! Spark 比较特殊，需要使用 ec2-user 执行。
