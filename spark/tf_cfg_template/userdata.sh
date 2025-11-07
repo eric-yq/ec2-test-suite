@@ -363,7 +363,7 @@ sed -i.bak "s/hive.optimize.sort.dynamic.partition.threshold=0/hive.optimize.sor
 # 通过指定 SF 的值，设置程序需要生成的数据量，本文中 SF=100 表示生成 100GB 的数据量。
 # 根据生成的数据量大小差异，此过程可能会持续数分钟到数小时不等。
 cd $HOME/hive-testbench
-SF=3
+SF=600
 ./tpcds-setup.sh $SF
 
 echo "[Info] Complete to generate $SF GB data for TPC-DS benchmark."
@@ -387,8 +387,8 @@ RESULT_SUMMARY="$RESULT_PATH/result_summary_spark_tpc-ds.txt"
 # 逐个执行 *.sql 文件的方式执行 Benchmark：
 echo "[$TIMESTAMP] Start Spark TPC-DS Benchmark(SF=$SF) on $PN ...... " > $RESULT_SUMMARY
 cd $HOME/hive-testbench/spark-queries-tpcds
-# LIST=$(ls *.sql)
-LIST="q1.sql q2.sql q3.sql"
+LIST=$(ls *.sql)
+# LIST="q1.sql q2.sql q3.sql"
 for i in $LIST; do
     RESULT_LOG="$RESULT_PATH/$i.log"
     RESULT_OUT="$RESULT_PATH/$i.out"
