@@ -94,8 +94,8 @@ ffmpeg -hide_banner -codecs |grep 264
 ################################################################################
 ## 测试 ffmpeg 编码性能
 # 配置 AWS CLI
-aws_ak_value="xxx"
-aws_sk_value="+xxx"
+aws_ak_value="akxxx"
+aws_sk_value="skxxx"
 aws_region_name=$(cloud-init query region)
 aws configure set aws_access_key_id ${aws_ak_value}
 aws configure set aws_secret_access_key ${aws_sk_value}
