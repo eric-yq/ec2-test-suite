@@ -183,13 +183,13 @@ java -showversion -server \
 cd /root/
 grep "RUN RESULT: hbIR" ~/specjbb/composite.out >> ${RESULT_SUMMARY_FILE}
 cp -r result specjbb/
-tar czf specjbb15-${JDK_VERSION}-${PN}.tar.gz specjbb/
-aws s3 cp specjbb15-${JDK_VERSION}-${PN}.tar.gz ${aws_s3_bucket_name}/result_specjbb15/
+DATATIME=$(date +%Y%m%d%H%M%S)
+tar czf specjbb15-${JDK_VERSION}-${PN}-${DATATIME}.tar.gz specjbb/
+aws s3 cp sspecjbb15-${JDK_VERSION}-${PN}-${DATATIME}.tar.gz ${aws_s3_bucket_name}/result_specjbb15/
 aws s3 ls ${aws_s3_bucket_name}
-echo "Upload specjbb15-${JDK_VERSION}-${PN}.tar.gz to ${aws_s3_bucket_name} ."
+echo "Upload specjbb15-${JDK_VERSION}-${PN}-${DATATIME}.tar.gz to ${aws_s3_bucket_name} ."
 
-# sleep 30
-# 
-# ## 终止实例
+sleep 30
+# 终止实例
 INSTANCE_ID=$(ls /var/lib/cloud/instances/)
 aws ec2 stop-instances --instance-ids "${INSTANCE_ID}" --region $(cloud-init query region)
