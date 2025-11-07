@@ -191,5 +191,5 @@ echo "Upload specjbb15-${JDK_VERSION}-${PN}.tar.gz to ${aws_s3_bucket_name} ."
 # sleep 30
 # 
 # ## 终止实例
-# INSTANCE_ID=$(ls /var/lib/cloud/instances/)
-# aws ec2 stop-instances --instance-ids "${INSTANCE_ID}"
+INSTANCE_ID=$(ls /var/lib/cloud/instances/)
+aws ec2 stop-instances --instance-ids "${INSTANCE_ID}" --region $(cloud-init query region)
