@@ -8,7 +8,7 @@ if [ ! -f "/home/ec2-user/userdata.sh" ]; then
     echo "首次启动 OS, 未找到 /root/userdata.sh, 准备创建..."
     # 复制文件
     cp /var/lib/cloud/instance/scripts/part-001 /home/ec2-user/userdata.sh
-    chmod +x /home/ec2-user/userdata.sh
+    chmod 755 /home/ec2-user/userdata.sh
     # 创建 systemd 服务单元
     cat > /etc/systemd/system/userdata.service << EOF
 [Unit]
