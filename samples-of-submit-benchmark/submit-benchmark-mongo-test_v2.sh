@@ -12,6 +12,12 @@ do
 		## 创建实例、安装软件
 		echo "$0: OS_TYPE=${os}, INSTANCE_TYPE=${ins}"
 		bash launch-instances-single.sh -s mongo -t ${ins} -o ${os}
+		# 检查实例启动状态：如果失败则跳过后续测试。
+		launch_status=$?
+		if [ $launch_status -ne 0 ]; then
+			echo "\$0: [$(date +%Y%m%d.%H%M%S)] Instance launch failed for OS_TYPE=${os}, INSTANCE_TYPE=${ins}. Continuing with next configuration..."
+			continue
+		fi
 		
 		echo "$0: [$(date +%Y%m%d.%H%M%S)] Sleep 300 seconds..."
 		sleep 300
