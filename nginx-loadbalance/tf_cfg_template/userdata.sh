@@ -46,4 +46,3 @@ git clone https://github.com/eric-yq/ec2-test-suite.git
 
 cd ec2-test-suite/${SUT_NAME}
 bash install-sut.sh ${SUT_NAME} ${INSTANCE_IP_WEB1} ${INSTANCE_IP_WEB2}
- 

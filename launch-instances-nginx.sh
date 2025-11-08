@@ -45,7 +45,7 @@ bash search_latest_ami.sh
 
 source /tmp/temp-setting
 
-
+###################################################################################################
 # 1. 创建 2 台 nginx-webserver
 ## 创建对应的 terraform 配置文件目录
 echo "$0: Launch 2 nginx webserver..."
@@ -106,6 +106,7 @@ cp /tmp/temp-setting tf_cfg_${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_I
 echo "$0: [$(date +%Y%m%d.%H%M%S)] Start waiting 180 seconds for NGINX WEBSERVER UserData completed."
 sleep 180
 
+###################################################################################################
 # 2. 创建 1 台 nginx-loadbalance
 ## 创建对应的 terraform 配置文件目录
 cd ..
