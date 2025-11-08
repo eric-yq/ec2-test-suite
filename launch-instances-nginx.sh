@@ -103,8 +103,8 @@ cd ..
 mv tf_cfg_${SUT_NAME}  tf_cfg_${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_WEB1}
 cp /tmp/temp-setting tf_cfg_${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_WEB1}/temp-setting
 
-echo "$0: [$(date +%Y%m%d.%H%M%S)] Start waiting 180 seconds for NGINX WEBSERVER UserData completed."
-sleep 180
+echo "$0: [$(date +%Y%m%d.%H%M%S)] Start waiting 300 seconds for NGINX WEBSERVER UserData completed."
+sleep 300
 
 ###################################################################################################
 # 2. 创建 1 台 nginx-loadbalance
@@ -152,7 +152,7 @@ cp /tmp/temp-setting tf_cfg_${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_I
 
 # exit 0
 
-echo "$0: [$(date +%Y%m%d.%H%M%S)] Start waiting 180 seconds for NGINX LOAD-BALANCE UserData completed."
-sleep 180
+echo "$0: [$(date +%Y%m%d.%H%M%S)] Start waiting 300 seconds for NGINX LOAD-BALANCE UserData completed."
+sleep 300
 
 echo "$0: [$(date +%Y%m%d.%H%M%S)] Complete to set up NGINX 1 loadbalancer + 2 webservers."
