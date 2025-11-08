@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ## 样例
-## bash launch-instances-nginx.sh -s nginx -t t4g.small -o ubuntu2204
+## bash launch-instances-nginx.sh -s nginx -t c8g.2xlarge -o al2023
 
 ## 命令行参数
 while getopts 's:t:o:' OPT; do
@@ -30,7 +30,6 @@ then
     echo "$0: You do not specify OS Type with option -o, So we will use OS(Amazon Linux 2023) by default. "
     OS_TYPE=al2023
 fi
-
 
 REGION_NAME=$(cloud-init query region)
 echo "" > /tmp/temp-setting
@@ -82,7 +81,7 @@ sed -i "s/SUT_XXX/${SUT_NAME}/g" userdata.sh
 ## 使用 terraform 启动实例
 terraform init
 terraform plan
-terraform apply --auto-approve
+terraform apply --auto-approve || exit 128
 
 echo "$0: Terraform completed."
 
@@ -135,7 +134,7 @@ sed -i "s/INSTANCE_IP_WEB2_XXX/${INSTANCE_IP_WEB2}/g" userdata.sh
 ## 使用 terraform 启动实例
 terraform init
 terraform plan
-terraform apply --auto-approve
+terraform apply --auto-approve || exit 128
 
 echo "$0: Terraform completed."
 
