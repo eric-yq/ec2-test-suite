@@ -14,7 +14,7 @@ provider "aws" {
 }
 
 resource "aws_instance" "sut_server" {
-#   tenancy                   = var.tenancy_type
+  # tenancy                   = var.tenancy_type
   instance_type 			= var.instance_type
   count 					= var.number_of_instances
   ami 						= var.ami_id
