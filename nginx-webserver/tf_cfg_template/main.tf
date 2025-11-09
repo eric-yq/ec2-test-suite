@@ -14,15 +14,15 @@ provider "aws" {
 }
 
 resource "aws_instance" "sut_server" {
-#   tenancy                   = var.tenancy_type
-  instance_type 			= var.instance_type
-  count 					= var.number_of_instances
-  ami 						= var.ami_id
-  subnet_id					= var.subnet_id
+  # tenancy               = var.tenancy_type
+  instance_type 			    = var.instance_type
+  count 					        = var.number_of_instances
+  ami 						        = var.ami_id
+  subnet_id					      = var.subnet_id
   vpc_security_group_ids 	= var.vpc_security_group_ids
-  # placement_group           = var.placement_group_name
-  key_name 					= var.ami_key_pair_name
-  user_data 				= file(var.userdata_file)
+  # placement_group       = var.placement_group_name
+  key_name 					      = var.ami_key_pair_name
+  user_data 				      = file(var.userdata_file)
 
   root_block_device {
     volume_type           	= var.root_block_volume_type
@@ -37,14 +37,15 @@ resource "aws_instance" "sut_server" {
 }
 
 resource "aws_instance" "sut_server_1" {
-  instance_type 			= var.instance_type
-  count 					= var.number_of_instances
-  ami 						= var.ami_id
-  subnet_id					= var.subnet_id_1
+  # tenancy               = var.tenancy_type
+  instance_type 			    = var.instance_type
+  count 					        = var.number_of_instances
+  ami 						        = var.ami_id
+  subnet_id					      = var.subnet_id_1
   vpc_security_group_ids 	= var.vpc_security_group_ids
-  placement_group           = var.placement_group_name
-  key_name 					= var.ami_key_pair_name
-  user_data 				= file(var.userdata_file)
+  # placement_group       = var.placement_group_name
+  key_name 					      = var.ami_key_pair_name
+  user_data 				      = file(var.userdata_file)
 
   root_block_device {
     volume_type           	= var.root_block_volume_type
