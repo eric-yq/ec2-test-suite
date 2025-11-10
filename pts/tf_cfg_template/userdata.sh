@@ -194,11 +194,13 @@ export TEST_RESULTS_NAME=${PN}
 
 ## 执行基准测试(标准)
 echo "[INFO] Step1: Start to perform standard PTS tests related to CPU/Memory/Cache and some simple workloads..."
-tests="\
-compress-zstd compress-lz4 openssl botan john-the-ripper pyperformance cython-bench cpp-perf-bench \
-x264 x265 graphics-magick smallpt c-ray draco renaissance dacapobench java-scimark2 scimark2 \
-stockfish lczero cassandra scylladb rocksdb clickhouse influxdb tjbench vvenc opencv \
-"
+
+tests="byte sysbench gmpbench primesieve stream intel-mlc cachebench ramspeed \
+compress-zstd compress-lz4 blosc openssl botan john-the-ripper pyperformance cython-bench cpp-perf-bench \
+x264 x265 graphics-magick smallpt c-ray draco renaissance dacapobench java-scimark2 scimark2 arrayfire \
+quantlib stockfish lczero blogbench nginx rabbitmq memtier-benchmark mariadb cassandra scylladb \
+spark rocksdb clickhouse influxdb tjbench vvenc libxsmm opencv"
+
 for testname in ${tests} 
 do
     phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
