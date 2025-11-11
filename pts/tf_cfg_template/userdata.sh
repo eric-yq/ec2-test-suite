@@ -2,6 +2,41 @@
 
 # 作为 cloud-init 脚本时，使用 root 用户执行
 
+# 实例启动成功之后的首次启动 OS， /root/userdata.sh 不存在，创建该 userdata.sh 文件并设置开启自动执行该脚本。
+if [ ! -f "/root/userdata.sh" ]; then
+    echo "首次启动 OS, 未找到 /root/userdata.sh，准备创建..."
+    # 复制文件
+    cp /var/lib/cloud/instance/scripts/part-001 /root/userdata.sh
+    chmod +x /root/userdata.sh
+    # 创建 systemd 服务单元
+    cat > /etc/systemd/system/userdata.service << EOF
+[Unit]
+Description=Execute userdata script at boot
+After=network.target
+
+[Service]
+Type=oneshot
+User=root
+ExecStart=/root/userdata.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+    # 启用服务
+    systemctl daemon-reload
+    systemctl enable userdata.service
+    
+    echo "已创建并启用 systemd 服务 userdata.service"
+
+    ### 如果 3 分钟之后，实例没有重启，或者也有可能不需要重启，则开始启动服务执行后续安装过程。
+    sleep 180
+    systemctl start userdata.service
+    exit 0
+fi
+
+########################################################################################################################
+
 install_al2023_dependencies () {
   echo "------ INSTALLING UTILITIES ------"
   yum clean metadata
@@ -11,6 +46,7 @@ install_al2023_dependencies () {
   yum install -y -q glibc blas blas-devel openssl-devel libXext-devel libX11-devel libXaw libXaw-devel mesa-libGL-devel 
   yum install -y -q python3 python3-pip python3-devel cargo java-11-amazon-corretto java-11-amazon-corretto-devel
   yum install -y -q php php-cli php-json php-xml perl-IPC-Cmd
+  pip3 install dool
 
   echo "------ INSTALLING HIGH LEVEL PERFORMANCE TOOLS ------"
   yum install -y -q sysstat  hwloc hwloc-gui util-linux numactl tcpdump htop iotop iftop 
@@ -39,7 +75,7 @@ aws --version
 
 aws_ak_value="akxxx"
 aws_sk_value="skxxx"
-aws_region_name="us-west-2"
+aws_region_name=$(cloud-init query region)
 aws_s3_bucket_name="s3://ec2-core-benchmark-ericyq"
 aws configure set aws_access_key_id ${aws_ak_value}
 aws configure set aws_secret_access_key ${aws_sk_value}
@@ -193,14 +229,13 @@ export TEST_RESULTS_DESCRIPTION=${PN}
 export TEST_RESULTS_NAME=${PN}
 
 ## 执行基准测试(标准)
-echo "[INFO] Step1: Start to perform standard PTS tests related to CPU/Memory/Cache and some simple workloads..."
+echo "[INFO] Step1: Start to perform PTS tests ..."
 
-tests="byte sysbench gmpbench primesieve stream intel-mlc cachebench ramspeed \
-compress-zstd compress-lz4 blosc openssl botan john-the-ripper pyperformance cython-bench cpp-perf-bench \
-x264 x265 graphics-magick smallpt c-ray draco renaissance dacapobench java-scimark2 scimark2 arrayfire \
-quantlib stockfish lczero blogbench nginx rabbitmq memtier-benchmark mariadb cassandra scylladb \
-spark rocksdb clickhouse influxdb tjbench vvenc libxsmm opencv"
-
+tests="gmpbench primesieve stream intel-mlc cachebench ramspeed compress-zstd compress-lz4 blosc \
+openssl botan john-the-ripper pyperformance cython-bench cpp-perf-bench x264 x265 graphics-magick \
+smallpt c-ray draco renaissance dacapobench java-scimark2 scimark2 arrayfire stockfish lczero \
+blogbench nginx cassandra scylladb rocksdb clickhouse influxdb tjbench vvenc opencv"
+# tests="byte"
 for testname in ${tests} 
 do
     phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
@@ -215,13 +250,13 @@ phoronix-test-suite list-installed-tests > ${DATA_DIR}/pts-list-installed-tests.
 ls -ltr ${PTS_RESULT_DIR} >> ${DATA_DIR}/pts-list-installed-tests.txt
 df -h  >> ${DATA_DIR}/pts-list-installed-tests.txt
 rm -rf ${LOG_DIR}/*
-cp -r /var/log/messages /var/log/cloud-init*.log /var/log/phoronix-test-suite-*.log /var/lib/cloud ${LOG_DIR}
+cp -r /var/log/cloud-init*.log /var/log/phoronix-test-suite-*.log /var/lib/cloud/ /root/userdata.sh ${LOG_DIR}
 tar czfP ${DATA_DIR}-all.tar.gz ${DATA_DIR}
 aws s3 cp ${DATA_DIR}-all.tar.gz ${aws_s3_bucket_name}/result_pts/ && \
 echo "[INFO] Step3: Result files have been uploaded to s3 bucket. BYE BYE."
 
 ## 停止实例
-INSTANCE_ID=$(ls /var/lib/cloud/instances/)
+INSTANCE_ID=$(ec2-metadata --quiet --instance-id )
 aws ec2 stop-instances --instance-ids "${INSTANCE_ID}"
 
 
@@ -231,4 +266,3 @@ aws ec2 stop-instances --instance-ids "${INSTANCE_ID}"
 # cachebench,primesieve,stream,ramspeed,blosc,spark, \
 # "
 #############################################################################################################
-
