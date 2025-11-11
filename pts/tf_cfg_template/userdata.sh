@@ -9,7 +9,7 @@ install_al2023_dependencies () {
   yum install -y -q dmidecode vim unzip git screen wget p7zip
   yum -y -q groupinstall "Development Tools"
   yum install -y -q glibc blas blas-devel openssl-devel libXext-devel libX11-devel libXaw libXaw-devel mesa-libGL-devel 
-  yum install -y -q python3 python3-pip python3-devel cargo
+  yum install -y -q python3 python3-pip python3-devel cargo java-11-amazon-corretto java-11-amazon-corretto-devel
   yum install -y -q php php-cli php-json php-xml perl-IPC-Cmd
 
   echo "------ INSTALLING HIGH LEVEL PERFORMANCE TOOLS ------"
