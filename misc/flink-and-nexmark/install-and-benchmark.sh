@@ -1,30 +1,29 @@
 #!/bin/bash
 
 # Reference: https://aws.amazon.com/cn/blogs/china/aws-graviton3-accelerates-flink-job-execution-benchmark/
-
-# for Amazon Linux 2023
+# for Amazon Linux 2023，使用 ec2-user 用户登录执行
 
 # 部署 Flink Standalone 集群环境
 #####################################################################
 ## 通过 SSH 登录到 3 台 EC2 实例，分别执行下面命令，安装必要的基础软件
 #####################################################################
 ## 生成密钥
-sudo su - root
 ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
 chmod 0600 ~/.ssh/authorized_keys
 ## 安装 JDK
-yum install -y java-1.8.0-amazon-corretto java-1.8.0-amazon-corretto-devel git htop screen 
+sudo yum install -yq java-1.8.0-amazon-corretto java-1.8.0-amazon-corretto-devel git htop screen python3-pip
+sudo pip3 install dool
 echo "export JAVA_HOME=$(ls -d /usr/lib/jvm/java)" >> ~/.bash_profile
-echo "export FLINK_HOME=/root/flink-benchmark/flink-1.17.2" >> ~/.bash_profile
+echo "export FLINK_HOME=~/flink-benchmark/flink-1.17.2" >> ~/.bash_profile
 source ~/.bash_profile
 java -version
 
 ## 安装 maven
-cd /root/
+cd ~
 wget https://archive.apache.org/dist/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz
 tar zxf apache-maven-3.9.6-bin.tar.gz
-echo "export PATH=$PATH:/root/apache-maven-3.9.6/bin" >> ~/.bashrc
-source /root/.bashrc
+echo "export PATH=$PATH:~/apache-maven-3.9.6/bin" >> ~/.bashrc
+source ~/.bashrc
 mvn -v
 
 # for 阿里云国内：
@@ -35,7 +34,7 @@ mvn -v
 IPADDR_MASTER="172.31.40.95"
 IPADDR_WORKER1="172.31.46.37"
 IPADDR_WORKER2="172.31.41.52"
-cat << EOF >> /etc/hosts
+cat << EOF | sudo tee -a /etc/hosts
 $IPADDR_MASTER  master
 $IPADDR_WORKER1 worker1
 $IPADDR_WORKER2 worker2
@@ -50,8 +49,8 @@ vim authorized_keys
 ## 在 Master 节点继续执行下面操作：完成 Flink 和 Nexmark 安装。
 #####################################################################
 ## 下载和解压缩 Flink 软件包：
-mkdir /root/flink-benchmark
-cd /root/flink-benchmark
+mkdir ~/flink-benchmark
+cd ~/flink-benchmark
 wget https://dlcdn.apache.org/flink/flink-1.17.2/flink-1.17.2-bin-scala_2.12.tgz
 tar zxf flink-1.17.2-bin-scala_2.12.tgz
 
@@ -61,22 +60,22 @@ echo worker1 >> flink-1.17.2/conf/workers
 echo worker2 >> flink-1.17.2/conf/workers
 
 ## 下载 Nexmark 源码并完成构建, 使用 nexmark 在 20240415 之前的那个 commit
-cd /root/flink-benchmark && git clone https://github.com/nexmark/nexmark.git
+cd ~/flink-benchmark && git clone https://github.com/nexmark/nexmark.git
 cd nexmark && git checkout b5e45d762f38f1c67e59bd73c02f15933a750d70
 cd .. && mv nexmark nexmark-src && cd nexmark-src/nexmark-flink
 ./build.sh
-mv nexmark-flink.tgz /root/flink-benchmark
-cd /root/flink-benchmark && tar xzf nexmark-flink.tgz
-cp /root/flink-benchmark/nexmark-flink/lib/*.jar /root/flink-benchmark/flink-1.17.2/lib
+mv nexmark-flink.tgz ~/flink-benchmark
+cd ~/flink-benchmark && tar xzf nexmark-flink.tgz
+cp ~/flink-benchmark/nexmark-flink/lib/*.jar ~/flink-benchmark/flink-1.17.2/lib
 
 ## 编辑 Nexmark 配置文件 nexmark-flink/conf/flink-conf.yaml
 sed -i "s/jobmanager.rpc.address: localhost/jobmanager.rpc.address: master/g" nexmark-flink/conf/flink-conf.yaml
 sed -i "s/taskmanager.numberOfTaskSlots: 1/taskmanager.numberOfTaskSlots: 8/g" nexmark-flink/conf/flink-conf.yaml
 sed -i "s/taskmanager.memory.process.size: 8G/taskmanager.memory.process.size: 48G/g" nexmark-flink/conf/flink-conf.yaml
 sed -i "s/parallelism.default: 8/parallelism.default: 24/g" nexmark-flink/conf/flink-conf.yaml
-sed -i "s/file:\/\/\/path\/to\/checkpoint/file:\/\/\/root\/checkpoint/g" nexmark-flink/conf/flink-conf.yaml
+sed -i "s/file:\/\/\/path\/to\/checkpoint/file:\/\/\/home\/ec2-user\/checkpoint/g" nexmark-flink/conf/flink-conf.yaml
 sed -i "s/-XX:ParallelGCThreads=4/-XX:ParallelGCThreads=4 -XX:+IgnoreUnrecognizedVMOptions/g" nexmark-flink/conf/flink-conf.yaml
-mv /root/flink-benchmark/flink-1.17.2/conf/flink-conf.yaml /root/flink-benchmark/flink-1.17.2/conf/flink-conf.yaml.bak
+mv ~/flink-benchmark/flink-1.17.2/conf/flink-conf.yaml ~/flink-benchmark/flink-1.17.2/conf/flink-conf.yaml.bak
 cp -f nexmark-flink/conf/flink-conf.yaml flink-1.17.2/conf/
 cp -f nexmark-flink/conf/sql-client-defaults.yaml flink-1.17.2/conf/
 
@@ -84,8 +83,8 @@ cp -f nexmark-flink/conf/sql-client-defaults.yaml flink-1.17.2/conf/
 sed -i "s/nexmark.metric.reporter.host: localhost/nexmark.metric.reporter.host: master/g" nexmark-flink/conf/nexmark.yaml
 
 ## 将 master 节点已安装的软件包通过 scp 命令传输到 worker1/2 节点
-scp -r ~/flink-benchmark root@worker1:~/
-scp -r ~/flink-benchmark root@worker2:~/
+scp -r ~/flink-benchmark ec2-user@worker1:~/
+scp -r ~/flink-benchmark ec2-user@worker2:~/
 
 # 启动 Flink Standalone 集群
 #####################################################################
