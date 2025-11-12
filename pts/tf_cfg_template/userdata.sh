@@ -231,10 +231,10 @@ export TEST_RESULTS_NAME=${PN}
 ## 执行基准测试(标准)
 echo "[INFO] Step1: Start to perform PTS tests ..."
 
-tests="gmpbench primesieve stream intel-mlc cachebench ramspeed compress-zstd compress-lz4 blosc \
-openssl botan john-the-ripper pyperformance cython-bench cpp-perf-bench x264 x265 graphics-magick \
-smallpt c-ray draco renaissance dacapobench java-scimark2 scimark2 arrayfire stockfish lczero \
-blogbench nginx cassandra scylladb rocksdb clickhouse influxdb tjbench vvenc opencv"
+tests="gmpbench primesieve stream cachebench ramspeed compress-zstd compress-lz4 blosc openssl botan john-the-ripper \
+pyperformance cython-bench cpp-perf-bench ffmpeg x264 x265 graphics-magick smallpt c-ray draco renaissance dacapobench \
+java-scimark2 scimark2 arrayfire stockfish lczero blogbench nginx cassandra scylladb rocksdb clickhouse influxdb tjbench \
+vvenc opencv"
 # tests="byte"
 for testname in ${tests} 
 do
