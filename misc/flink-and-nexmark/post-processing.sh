@@ -14,9 +14,9 @@ vim ~/.ssh/authorized_keys
 ### 保存退出
 
 ## 将 下列 3 个 IPADDR_xxx 变量设置为 3 台 EC2 实例的 VPC IP 地址，并保存在 /etc/hosts 文件中
-IPADDR_MASTER="172.31.15.14"
-IPADDR_WORKER1="172.31.3.76"
-IPADDR_WORKER2="172.31.1.49"
+IPADDR_MASTER="172.31.23.209"
+IPADDR_WORKER1="172.31.18.121"
+IPADDR_WORKER2="172.31.30.234"
 cat << EOF | sudo tee -a /etc/hosts
 $IPADDR_MASTER  master
 $IPADDR_WORKER1 worker1
@@ -26,13 +26,16 @@ EOF
 #####################################################################
 ## 在 Master 节点继续执行下面操作
 #####################################################################
-bash ~/flink-benchmark/flink-1.17.2/bin/start-cluster.sh
+bash ~/flink-benchmark/flink/bin/start-cluster.sh
 bash ~/flink-benchmark/nexmark-flink/bin/setup_cluster.sh
 
 # 开始执行 Benchmark
 #####################################################################
 ## 在 Master 节点继续执行下面操作
 #####################################################################
+# 先单独跑一个查询
+bash ~/flink-benchmark/nexmark-flink/bin/run_query.sh q10
+
 ## 方法 1: 运行 benchmark 的所有 SQL
 cd ~
 screen -R ttt -L
@@ -42,7 +45,7 @@ bash ~/flink-benchmark/nexmark-flink/bin/run_query.sh all
 for i in `seq 0 22` 
 do
     bash ~/flink-benchmark/nexmark-flink/bin/run_query.sh q$i
-    sleep 5
+    sleep 10
 done
 
 ## 结果上传到 S3
