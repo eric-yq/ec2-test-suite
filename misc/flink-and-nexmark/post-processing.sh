@@ -33,26 +33,29 @@ bash ~/flink-benchmark/nexmark-flink/bin/setup_cluster.sh
 #####################################################################
 ## 在 Master 节点继续执行下面操作
 #####################################################################
-# 先单独跑一个查询
+# 试跑一个查询:
 bash ~/flink-benchmark/nexmark-flink/bin/run_query.sh q10
+
+# 这是一个结果文件
+instance_type=$(ec2-metadata --quiet --instance-type)
+timestamp=$(date +%Y%m%d%H%M%S)
+RESULT_FILE="~/flink-nexmark-result-$instance_type-$timestamp.txt"
 
 ## 方法 1: 运行 benchmark 的所有 SQL
 cd ~
 screen -R ttt -L
-bash ~/flink-benchmark/nexmark-flink/bin/run_query.sh all
+bash ~/flink-benchmark/nexmark-flink/bin/run_query.sh all >> $RESULT_FILE
 
 ## 方法 2: 执行单独的 SQL， q6 有问题无法执行
 for i in `seq 0 22` 
 do
-    bash ~/flink-benchmark/nexmark-flink/bin/run_query.sh q$i
+    bash ~/flink-benchmark/nexmark-flink/bin/run_query.sh q$i >> $RESULT_FILE
     sleep 10
 done
 
 ## 结果上传到 S3
 cd ~
-mv screenlog.0 flink-nexmark-screenlog-$(ec2-metadata --quiet --instance-type).txt
-aws s3 cp flink-nexmark-screenlog-$(ec2-metadata --quiet --instance-type).txt \
-  s3://ec2-core-benchmark-ericyq/result_flink/
+aws s3 cp $RESULT_FILE s3://ec2-core-benchmark-ericyq/result_flink/
 
 
 #####################################################################
