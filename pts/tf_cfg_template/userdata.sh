@@ -255,6 +255,9 @@ tar czfP ${DATA_DIR}-all.tar.gz ${DATA_DIR}
 aws s3 cp ${DATA_DIR}-all.tar.gz ${aws_s3_bucket_name}/result_pts/ && \
 echo "[INFO] Step3: Result files have been uploaded to s3 bucket. BYE BYE."
 
+## Disable 服务，这样 reboot 后不会再次执行
+systemctl disable userdata
+
 ## 停止实例
 INSTANCE_ID=$(ec2-metadata --quiet --instance-id )
 aws ec2 stop-instances --instance-ids "${INSTANCE_ID}"
