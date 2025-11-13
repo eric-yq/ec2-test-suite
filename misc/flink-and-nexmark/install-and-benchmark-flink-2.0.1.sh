@@ -46,7 +46,7 @@ vim authorized_keys
 ### 保存退出
 
 #####################################################################
-## 在 Master 节点继续执行下面操作：完成 Flink 和 Nexmark 安装。
+## 在 Master 节点继续执行下面操作：完成 Flink 和 Nexmark 安装与配置。
 #####################################################################
 ## 下载和解压缩 Flink 软件包：
 mkdir ~/flink-benchmark
@@ -86,6 +86,8 @@ cp -f nexmark-flink/conf/config.yaml flink/conf/
 
 ## 编辑 Nexmark 配置文件 nexmark-flink/conf/nexmark.yaml
 sed -i "s/nexmark.metric.reporter.host: localhost/nexmark.metric.reporter.host: master/g" nexmark-flink/conf/nexmark.yaml
+sed -i "s/nexmark.workload.suite.100m.events.num: 100000000/nexmark.workload.suite.100m.events.num: 200000000/g" nexmark-flink/conf/nexmark.yaml
+sed -i "s/#nexmark.metric.monitor.delay: 3min/nexmark.metric.monitor.delay: 3s/g" nexmark-flink/conf/nexmark.yaml
 
 ## 将 master 节点已安装的软件包通过 scp 命令传输到 worker1/2 节点
 scp -r ~/flink-benchmark ec2-user@worker1:~/
