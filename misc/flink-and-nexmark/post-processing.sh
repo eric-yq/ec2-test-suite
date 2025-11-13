@@ -39,7 +39,7 @@ bash ~/flink-benchmark/nexmark-flink/bin/run_query.sh q10
 # 这是一个结果文件
 instance_type=$(ec2-metadata --quiet --instance-type)
 timestamp=$(date +%Y%m%d%H%M%S)
-RESULT_FILE="~/flink-nexmark-result-$instance_type-$timestamp.txt"
+RESULT_FILE="/flink-nexmark-result-$instance_type-$timestamp.txt"
 
 ## 方法 1: 运行 benchmark 的所有 SQL
 cd ~
@@ -69,4 +69,4 @@ grep -E "query|Exception|Summary" screenlog.0
  
 ## 停止集群 和 benchmark
 bash ~/flink-benchmark/nexmark-flink/bin/shutdown_cluster.sh
-bash ~/flink-benchmark/flink-1.17.2/bin/stop-cluster.sh
+bash ~/flink-benchmark/flink/bin/stop-cluster.sh
