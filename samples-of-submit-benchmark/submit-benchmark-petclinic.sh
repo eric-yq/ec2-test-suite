@@ -4,7 +4,7 @@ set -e
 
 ## 待测 EC2 规格和 OS
 os_types="al2023"
-instance_types="r8g.2xlarge r8i.2xlarge r7a.2xlarge r7g.2xlarge r7i.2xlarge r6a.2xlarge r6g.2xlarge r6i.2xlarge" 
+instance_types="r8a.2xlarge r8g.2xlarge r8i.2xlarge r7a.2xlarge r7g.2xlarge r7i.2xlarge r6a.2xlarge r6g.2xlarge r6i.2xlarge"
 # instance_types="r8g.2xlarge" 
 
 
