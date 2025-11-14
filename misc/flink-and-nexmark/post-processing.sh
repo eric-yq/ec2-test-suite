@@ -5,23 +5,23 @@
 # 在使用 flink-nexmark AMI 启动 3 台实例后，
 # 分别通过 SSH 登录到 Master 和 2 个 Worker 节点，执行下面命令完成 Flink 和 Nexmark 的安装与基准测试。
 
-## 生成密钥
-ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
-chmod 0600 ~/.ssh/authorized_keys
-## 将 master 和 worker1,2 节点的【cat ~/.ssh/id_rsa.pub】 的输出结果添加到所有节点的 authorized_keys 文件
-cat ~/.ssh/id_rsa.pub 
-vim ~/.ssh/authorized_keys
-### 保存退出
-
 ## 将 下列 3 个 IPADDR_xxx 变量设置为 3 台 EC2 实例的 VPC IP 地址，并保存在 /etc/hosts 文件中
-IPADDR_MASTER="172.31.23.209"
-IPADDR_WORKER1="172.31.18.121"
-IPADDR_WORKER2="172.31.30.234"
+IPADDR_MASTER="172.31.4.38"
+IPADDR_WORKER1="172.31.8.99"
+IPADDR_WORKER2="172.31.4.18"
 cat << EOF | sudo tee -a /etc/hosts
 $IPADDR_MASTER  master
 $IPADDR_WORKER1 worker1
 $IPADDR_WORKER2 worker2
 EOF
+
+## 生成密钥, 将 master 和 worker1,2 节点的 
+## id_rsa.pub 添加到所有节点的 authorized_keys 文件
+ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
+chmod 0600 ~/.ssh/authorized_keys
+cat ~/.ssh/id_rsa.pub 
+vim ~/.ssh/authorized_keys
+### 保存退出
 
 #####################################################################
 ## 在 Master 节点继续执行下面操作
@@ -39,6 +39,7 @@ bash ~/flink-benchmark/nexmark-flink/bin/run_query.sh q10
 # screen -R ttt -L
 # 执行任务
 bash ~/flink-benchmark/nexmark-flink/bin/run_query.sh all
+sleep 10
 
 # 设置一个结果文件
 cd ~
