@@ -11,7 +11,7 @@ do
 	do
 		## 创建实例、安装软件
 		echo "$0: OS_TYPE=${os}, INSTANCE_TYPE=${ins}"
-		bash launch-instances-single.sh -s redis -t ${ins} -o ${os}
+		bash launch-instances-single.sh -s milvus -t ${ins} -o ${os}
 		# 检查实例启动状态：如果失败则跳过后续测试。
 		launch_status=$?
 		if [ $launch_status -ne 0 ]; then
@@ -19,19 +19,16 @@ do
 			continue
 		fi
 		
-		echo "$0: [$(date +%Y%m%d.%H%M%S)] Sleep 300 seconds..."
-		sleep 300
+		echo "$0: [$(date +%Y%m%d.%H%M%S)] Sleep 500 seconds..."
+		sleep 500
 		
 		## 执行 Benchmark 测试
 		echo "$0: Star to run benchmark"
 		source /tmp/temp-setting
-		bash benchmark/redis-benchmark_v1.sh ${INSTANCE_IP_MASTER} 6379 180
-		# bash benchmark/redis-benchmark_v1.sh ${INSTANCE_IP_MASTER} 8003 180
-		bash benchmark/redis-benchmark_v1.sh ${INSTANCE_IP_MASTER} 8005 180
-		# bash benchmark/redis-benchmark_v1.sh ${INSTANCE_IP_MASTER} 8007 180
+		bash benchmark/milvus-benchmark.sh ${INSTANCE_IP_MASTER}
 		
 		## 停止实例
-		aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region) &
+		aws ec2 stop-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region) &
 	done
 done
 
