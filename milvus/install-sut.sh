@@ -1,6 +1,7 @@
 #!/bin/bash
 
-yum install -y docker git htop
+yum install -y docker git htop python3-pip
+pip3 install dool
 sleep 10
 
 systemctl enable docker
