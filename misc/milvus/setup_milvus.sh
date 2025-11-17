@@ -13,7 +13,7 @@ chmod +x /usr/bin/docker-compose
 
 mkdir /root/milvus
 cd /root/milvus
-wget https://github.com/milvus-io/milvus/releases/download/v2.4.5/milvus-standalone-docker-compose.yml -O docker-compose.yml
+wget https://github.com/milvus-io/milvus/releases/download/v2.6.5/milvus-standalone-docker-compose.yml -O docker-compose.yml
 
 ## 启动 milvus 容器
 docker-compose up -d
@@ -22,9 +22,7 @@ docker-compose up -d
 docker-compose ps
 
 #（可选）安装 Web 管理工具
-docker run -d -p 8000:3000 -e MILVUS_URL=$(hostname -i):19530 zilliz/attu:v2.4
-
-
+# docker run -d -p 8000:3000 -e MILVUS_URL=$(hostname -i):19530 zilliz/attu:v2.4
 
 ###############################################################################################
 # 安装 vdbbench, m6i.2xlarge + AL2023
@@ -48,11 +46,12 @@ ln -s /root/vectordb_bench /tmp/vectordb_bench
 
 ## 通过命令行进行测试
 # screen -R ttt -L
-instance_type="r8i.2xlarge"
+instance_type="r8a.2xlarge"
 ipaddr="172.31.11.93"
+timestamp="$(date +%Y%m%d%H%M%S)"
 vectordbbench milvushnsw \
   --case-type Performance768D1M \
   --m 30 --ef-construction 360 --ef-search 100 \
-  --task-label milvus-$instance_type \
+  --task-label milvus-$instance_type-$timestamp \
   --uri http://$ipaddr:19530 
   
