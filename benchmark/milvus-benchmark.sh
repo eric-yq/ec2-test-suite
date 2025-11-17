@@ -34,6 +34,6 @@ vectordbbench milvushnsw \
   --case-type Performance768D1M \
   --m 30 --ef-construction 360 --ef-search 100 \
   --task-label milvus-${INSTANCE_TYPE}-${timestamp} \
-  --uri http://$ipaddr:19530 >> ${RESULT_FILE}
+  --uri http://${INSTANCE_IP_MASTER}:19530 >> ${RESULT_FILE}
   
 echo "Test End on $(date)====================================================================================" >> ${RESULT_FILE}
