@@ -7,7 +7,8 @@ all: install
 # List of packages to install
 PACKAGES = \
 	cmake \
-	maven 
+	maven \
+	python3.13
 
 # List of additional packages for development tool
 LIBRARIES = \
@@ -18,7 +19,8 @@ LIBRARIES = \
 	libevent-devel \
 	openssl-devel \
 	libaio-devel \
-	mariadb105-devel
+	mariadb105-devel \
+	python3.13-devel
 
 # Install the required packages, libraries, and tools
 # This target will be executed when you run 'make install'

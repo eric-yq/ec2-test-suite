@@ -1,0 +1,39 @@
+#!/bin/bash
+
+## 使用方法： bash milvus-benchmark_v2_run.sh <IP地址>
+
+# set -e
+
+SUT_IP_ADDR=${1}
+SUT_NAME="milvus"
+
+## 执行 benchmark 测试
+source /tmp/temp-setting
+
+if [[ x"$INSTANCE_IP_MASTER" == x ]]; then
+    INSTANCE_IP_MASTER=$SUT_IP_ADDR
+fi
+
+RESULT_PATH="/root/ec2-test-suite/benchmark-result-files"
+mkdir -p ${RESULT_PATH}
+RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}.txt"
+
+## 启动一个后台进程，执行dool命令，获取系统性能信息
+## Note: prepare: 按 38 分钟计算;  run: 按 64*8=512 分钟计算 ，总计打印 550 分钟的监控信息。
+DOOL_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}_dool.txt"
+ssh -o StrictHostKeyChecking=no -i ~/ericyq-global.pem ec2-user@${SUT_IP_ADDR} \
+  "dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 360" \
+  1> ${DOOL_FILE} 2>&1 &
+
+echo "Test Detail on $(date)====================================================================================" >> ${RESULT_FILE}
+echo "Start to perform test: SUT_IP_ADDR=${1}" >> ${RESULT_FILE}
+
+## 执行 benchmark
+timestamp="$(date +%Y%m%d%H%M%S)"
+vectordbbench milvushnsw \
+  --case-type Performance768D1M \
+  --m 30 --ef-construction 360 --ef-search 100 \
+  --task-label milvus-${INSTANCE_TYPE}-${timestamp} \
+  --uri http://$ipaddr:19530 >> ${RESULT_FILE}
+  
+echo "Test End on $(date)====================================================================================" >> ${RESULT_FILE}
