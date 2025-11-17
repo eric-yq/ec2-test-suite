@@ -8,7 +8,8 @@ all: install
 PACKAGES = \
 	cmake \
 	maven \
-	python3.13
+	python3.13 \
+	python3.13-pip
 
 # List of additional packages for development tool
 LIBRARIES = \
@@ -31,6 +32,7 @@ install:
 	sudo yum -yq groupinstall "Development Tools"
 	sudo yum -yq install $(PACKAGES)
 	sudo yum -yq install $(LIBRARIES)
+	sudo pip3.13 install dool
 	@echo "Installation complete!"
 	
 	@echo "Installing Terraform..."
@@ -82,6 +84,11 @@ install:
 	cd /root/ && \
 	wget https://github.com/brianfrankcooper/YCSB/releases/download/0.17.0/ycsb-0.17.0.tar.gz && \
 	tar zxf ycsb-0.17.0.tar.gz && rm -rf ycsb-0.17.0.tar.gz
+	@echo "YCSB installation complete!"
+
+	@echo "Installing VDBBench for Milvus benchmark ..."
+	cd /root/ && \
+	pip3.11 install vectordb-bench ujson
 	@echo "YCSB installation complete!"
 
 # Clean yum cache
