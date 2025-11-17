@@ -33,6 +33,8 @@ timestamp="$(date +%Y%m%d%H%M%S)"
 vectordbbench milvushnsw \
   --case-type Performance768D1M \
   --m 30 --ef-construction 360 --ef-search 100 \
+  --db-label milvusdb \
+  --concurrency-duration 300 \
   --task-label milvus-${INSTANCE_TYPE}-${timestamp} \
   --uri http://${INSTANCE_IP_MASTER}:19530 >> ${RESULT_FILE}
   
