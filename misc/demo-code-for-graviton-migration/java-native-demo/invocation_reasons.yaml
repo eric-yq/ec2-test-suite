@@ -1,0 +1,24 @@
+---
+id: c1fc4765-2324-4e6e-8263-31bd877c1f01
+timestamp: '2025-11-18T02:11:52.496378+00:00'
+tool: migrate_ease_scan
+args:
+  scanner: java
+  arch: armv8-a
+  git_repo: null
+  output_format: json
+  extra_args: null
+reason: Scanning workspace code with Java scanner to identify ARM migration issues
+  and recommendations
+---
+id: 95e390c9-8327-4488-a7b2-b54bb6e9af2c
+timestamp: '2025-11-18T02:11:57.649722+00:00'
+tool: migrate_ease_scan
+args:
+  scanner: cpp
+  arch: armv8-a
+  git_repo: null
+  output_format: json
+  extra_args: null
+reason: Scanning workspace code with C++ scanner to identify ARM migration issues
+  and recommendations

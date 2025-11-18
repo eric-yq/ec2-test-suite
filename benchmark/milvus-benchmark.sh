@@ -1,6 +1,6 @@
 #!/bin/bash
 
-## 使用方法： bash milvus-benchmark_v2_run.sh <IP地址>
+## 使用方法： bash milvus-benchmark.sh <IP地址>
 
 # set -e
 
@@ -36,6 +36,6 @@ vectordbbench milvushnsw \
   --db-label milvusdb \
   --concurrency-duration 300 \
   --task-label milvus-${INSTANCE_TYPE}-${timestamp} \
-  --uri http://${INSTANCE_IP_MASTER}:19530 >> ${RESULT_FILE}
+  --uri http://${INSTANCE_IP_MASTER}:19530 1>>${RESULT_FILE} 2>&1
   
 echo "Test End on $(date)====================================================================================" >> ${RESULT_FILE}
