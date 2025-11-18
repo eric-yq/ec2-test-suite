@@ -22,3 +22,17 @@ args:
   extra_args: null
 reason: Scanning workspace code with C++ scanner to identify ARM migration issues
   and recommendations
+---
+id: 416d9ab1-ac24-40e3-a49f-5c4dbb276aa9
+timestamp: '2025-11-18T04:26:57.795283+00:00'
+tool: knowledge_base_search
+args:
+  query: minimum JDK version ARM64 aarch64 support
+reason: User is asking for the minimum JDK version that supports ARM64/aarch64 architecture
+---
+id: f750ba47-42e4-43fb-8293-4719c6eb2791
+timestamp: '2025-11-18T04:28:04.087277+00:00'
+tool: knowledge_base_search
+args:
+  query: Oracle JDK 8 ARM64 aarch64 minor version support
+reason: User is asking specifically about Oracle JDK 8 minor version support for ARM64/aarch64
