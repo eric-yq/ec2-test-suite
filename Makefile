@@ -45,7 +45,9 @@ install:
 	cd /root/ && \
 	wget https://github.com/TPC-Council/HammerDB/releases/download/v4.4/HammerDB-4.4-Linux.tar.gz && \
 	tar zxf HammerDB-4.4-Linux.tar.gz && \
-	rm -rf HammerDB-4.4-Linux.tar.gz
+	rm -rf HammerDB-4.4-Linux.tar.gz && \
+	rpm -Uvh https://repo.mysql.com//mysql80-community-release-el9.rpm  && \
+    yum install -y mysql mysql-server mysql-devel --nogpgcheck
 	@echo "HammerDB installation complete!"
 	
 	@echo "Installing memtier_benchmark for Redis/Valky benchmark..."
