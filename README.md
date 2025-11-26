@@ -34,7 +34,7 @@ Take redis benchmark for example:
 ```bash
 cd ~/ec2-test-suite
 cp samples-of-submit-benchmark/submit-benchmark-redis-test_v1.sh .
-vi instance_types="r6i.2xlarge r7g.2xlarge"
+instance_types="r6i.2xlarge r7g.2xlarge"
 ```
 Modify the value of `variable instance_types`, for example:
 ```bash
