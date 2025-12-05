@@ -210,6 +210,8 @@ java -showversion -server \
 # 停止 dstat
 # kill -9 $(cat pid_file.txt)
 
+
+
 ## 保存结果并上传到 S3 bucket
 cd /root/
 grep "RUN RESULT: hbIR" ~/specjbb/composite.out >> ${RESULT_SUMMARY_FILE}
@@ -221,8 +223,10 @@ aws s3 ls ${aws_s3_bucket_name}
 echo "Upload specjbb15-${JDK_VERSION}-${PN}-${DATATIME}.tar.gz to ${aws_s3_bucket_name} ."
 
 sleep 30
+
+systemctl disable userdata.service
+
 # 停止实例
 INSTANCE_ID=$(ec2-metadata --quiet --instance-id)
 REGION_ID=$(ec2-metadata --quiet --region)
 aws ec2 stop-instances --instance-ids "${INSTANCE_ID}" --region "${REGION_ID}"
-
