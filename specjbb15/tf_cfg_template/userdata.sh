@@ -2,7 +2,7 @@
 
 # 实例启动成功之后的首次启动 OS， /root/userdata.sh 不存在，创建该 userdata.sh 文件并设置开启自动执行该脚本。
 if [ ! -f "/root/userdata.sh" ]; then
-    echo "首次启动 OS, 未找到 /root/userdata.sh，准备创建..."
+    echo "首次启动 OS, 未找到 /root/userdata.sh, 准备创建..."
     # 复制文件
     cp /var/lib/cloud/instance/scripts/part-001 /root/userdata.sh
     chmod +x /root/userdata.sh
@@ -33,14 +33,7 @@ EOF
     exit 0
 fi
 
-############## 
-
-if [[ X"$1" == X"" ]]; then
-	let THREADS_PROBE=64
-else
-	let THREADS_PROBE=${1}
-fi
-
+############## 开始执行 benchmark 安装和测试 #################
 ## 配置 AWSCLI
 aws_ak_value="akxxx"
 aws_sk_value="skxxx"
@@ -50,17 +43,55 @@ aws configure set aws_secret_access_key ${aws_sk_value}
 aws configure set default.region ${aws_region_name}
 aws_s3_bucket_name="s3://ec2-core-benchmark-ericyq"
 
-## 安装 Java
 yum update -y
 
-# ## Corretto 11 --default
-yum install -y java-11-amazon-corretto
-JDK_VERSION='corretto11'
+## 安装所有 Corretto 版本
+yum install -yq java-1.8.0-amazon-corretto-devel \
+  java-11-amazon-corretto-devel \
+  java-17-amazon-corretto-devel \
+  java-21-amazon-corretto-devel
 
-## Corretto 17
-# yum install java-17-amazon-corretto -y
-# JDK_VERSION='corretto17'
+## 设置默认 JDK 版本为 Corretto 11
+if [[ X"$1" == X"" ]]; then
+	version=8
+else
+	version=${1}
+fi
+if [[ ! "$version" =~ ^(8|11|17|21)$ ]]; then
+    echo "错误: 不支持的版本号 '$version'"
+    echo "用法: install_and_switch_corretto <8|11|17|21>"
+    return 1
+fi
+case $version in
+    8)
+        JDK_VERSION="corretto8"
+        JAVA_PATH="/usr/lib/jvm/java-1.8.0-amazon-corretto.$(arch)/jre"
+        JAVAC_PATH="/usr/lib/jvm/java-1.8.0-amazon-corretto.$(arch)/"
+        ;;
+    11)
+        JDK_VERSION="corretto11"
+        JAVA_PATH="/usr/lib/jvm/java-11-amazon-corretto.$(arch)"
+        JAVAC_PATH="/usr/lib/jvm/java-11-amazon-corretto.$(arch)"
+        ;;
+    17)
+        JDK_VERSION="corretto17"
+        JAVA_PATH="/usr/lib/jvm/java-17-amazon-corretto.$(arch)"
+        JAVAC_PATH="/usr/lib/jvm/java-11-amazon-corretto.$(arch)"
+        ;;
+    21)
+        JDK_VERSION="corretto21"
+        JAVA_PATH="/usr/lib/jvm/java-21-amazon-corretto.$(arch)"
+        JAVAC_PATH="/usr/lib/jvm/java-11-amazon-corretto.$(arch)"
+        ;;
+esac
 
+# 切换到新安装的版本
+alternatives --set java  "${JAVA_PATH}/bin/java" && \
+alternatives --set javac "${JAVAC_PATH}/bin/javac" && \
+echo "✓ 已切换到 Corretto $version"  && \
+java -version
+
+#####################################################################################
 # JDK 1.8
 # yum install -y java-1.8.0-openjdk
 # JDK_VERSION='openjdk8'
@@ -78,9 +109,9 @@ JDK_VERSION='corretto11'
 ## alibaba dragonwell 11
 # yum install -y java-11-alibaba-dragonwell
 # JDK_VERSION='dragonwell11'
+#####################################################################################
 
-java -version
-yum install -y htop dmidecode python3-pip
+yum  install -y htop dmidecode python3-pip
 pip3 install dool
 
 ## 系统配置
@@ -125,13 +156,13 @@ CPU_CORES=$(nproc)
 MEM_TOTAL_MB=$(free -m |grep Mem | awk -F " " '{print $2}')
 
 ## 变量计算
+let THREADS_PROBE=64
 let XMS=${MEM_TOTAL_MB}*90/100
 let XMX=${MEM_TOTAL_MB}*90/100
 let XMN=${MEM_TOTAL_MB}*80/100
 let GC_THREADS=${CPU_CORES}
 let WORKERS_TIER1=${CPU_CORES}
 let WORKERS_TIER3=${CPU_CORES}/4
-
 
 ## 执行 Benchmark
 RESULT_SUMMARY_FILE="/root/specjbb/specjbb_results.txt"
