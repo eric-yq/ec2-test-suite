@@ -44,7 +44,7 @@ install_al2023_dependencies () {
   yum install -y -q dmidecode vim unzip git screen wget p7zip
   yum -y -q groupinstall "Development Tools"
   yum install -y -q glibc blas blas-devel openssl-devel libXext-devel libX11-devel libXaw libXaw-devel mesa-libGL-devel 
-  yum install -y -q python3 python3-pip python3-devel cargo java-11-amazon-corretto java-11-amazon-corretto-devel
+  yum install -y -q python3 python3-pip python3-devel cargo java-17-amazon-corretto java-17-amazon-corretto-devel
   yum install -y -q php php-cli php-json php-xml perl-IPC-Cmd
   pip3 install dool
 
@@ -238,7 +238,7 @@ vvenc opencv"
 # tests="byte"
 for testname in ${tests} 
 do
-    phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
+    FORCE_TIMES_TO_RUN=1 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
     echo "${testname}.txt:" >> ${DATA_DIR}/pts-result-url-summary.txt
     grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/pts-result-url-summary.txt
     sleep 5
