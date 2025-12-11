@@ -41,3 +41,21 @@ python3 run_benchmark.py cpu --model nvidia_deeprecommender \
 # 查看结果
 cd /benchmark/.userbenchmark/cpu
 ls -tr metric*.json
+
+#########################################################################################################
+
+# on the host machine
+
+# ARM
+python3 run_full_benchmark.py --arm64 --model nvidia_deeprecommender \
+    --batch-sizes "1,2,4,8,16,32,64,128,256,512,1024" \
+    --niter 30 --test eval --metrics="latencies,cpu_peak_mem"
+
+# Intel
+python3 run_full_benchmark.py --model nvidia_deeprecommender \
+    --batch-sizes "1,2,4,8,16,32,64,128,256,512,1024" \
+    --niter 30 --test eval --metrics="latencies,cpu_peak_mem"
+
+# 其他可以使用的选项： --force-setup
+
+# 原始结果在 /benchmark/.userbenchmark/cpu 目录下
