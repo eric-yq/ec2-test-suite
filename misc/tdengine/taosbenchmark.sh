@@ -20,7 +20,7 @@ sh cmake-${VER}-linux-${ARCH}.sh --skip-license --prefix=/usr
 cmake -version
 # 更新 maven
 cd /root/
-VER=3.9.8
+VER=3.9.11
 wget https://dlcdn.apache.org/maven/maven-3/${VER}/binaries/apache-maven-${VER}-bin.tar.gz
 tar zxf apache-maven-${VER}-bin.tar.gz -C /usr/ --strip-components 1
 mvn -v
