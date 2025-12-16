@@ -53,7 +53,7 @@ yum install -yq java-1.8.0-amazon-corretto-devel \
 
 ## 设置默认 JDK 版本为 Corretto 11
 if [[ X"$1" == X"" ]]; then
-	version=8
+	version=11
 else
 	version=${1}
 fi
