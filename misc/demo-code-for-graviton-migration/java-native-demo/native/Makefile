@@ -22,6 +22,7 @@ clean:
 
 # Install rule (copy to parent resources directory)
 install: $(TARGET)
+	@mkdir -p ../src/main/resources/
 	cp $(TARGET) ../src/main/resources/
 
 .PHONY: clean install
