@@ -228,21 +228,57 @@ export TEST_RESULTS_IDENTIFIER=${PN}
 export TEST_RESULTS_DESCRIPTION=${PN}
 export TEST_RESULTS_NAME=${PN}
 
+# 安装新测试项目需要的软件包
+yum install -yq lz4-devel lzo-devel
+pip3 install sklearn scons
+DOWNLOAD_FILE="ffmpeg-master-latest-linux$([ "$(uname -m)" = "aarch64" ] && echo "arm" || echo "")64-gpl"
+DOWNLOAD_URL="https://github.com/BtbN/FFmpeg-Builds/releases/download/latest"
+wget ${DOWNLOAD_URL}/${DOWNLOAD_FILE}.tar.xz
+tar xf ${DOWNLOAD_FILE}.tar.xz
+cp ${DOWNLOAD_FILE}/bin/ffmpeg /usr/local/bin/ && rm -rf ${DOWNLOAD_FILE}*
+
+# 启动一个监控
+DOOL_FILE="${DATA_DIR}/dool.txt"
+dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 1> ${DOOL_FILE} 2>&1 &
+
 ## 执行基准测试(标准)
 echo "[INFO] Step1: Start to perform PTS tests ..."
 
-tests="gmpbench primesieve stream cachebench ramspeed compress-zstd compress-lz4 blosc openssl botan john-the-ripper \
-pyperformance cython-bench cpp-perf-bench ffmpeg x264 x265 graphics-magick smallpt c-ray draco renaissance dacapobench \
-java-scimark2 scimark2 arrayfire stockfish lczero blogbench nginx cassandra scylladb rocksdb clickhouse influxdb tjbench \
-vvenc opencv"
-# tests="byte"
+tests="gmpbench primesieve stream cachebench ramspeed compress-zstd compress-lz4 blosc \
+  botan john-the-ripper cython-bench ffmpeg x264 x265 tjbench vvenc \
+  graphics-magick smallpt draco renaissance dacapobench java-scimark2 scimark2 \
+  arrayfire stockfish lczero blogbench nginx cassandra scylladb rocksdb influxdb \
+  mt-dgemm perf-bench cassandra duckdb pogocache leveldb \
+  mlpack mnn whisper-cpp whisperfile opencv \
+  "
 for testname in ${tests} 
+do
+    FORCE_TIMES_TO_RUN=3 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
+    echo "${testname}.txt:" >> ${DATA_DIR}/pts-result-url-summary.txt
+    grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/pts-result-url-summary.txt
+    sleep 5
+done
+
+## 执行时间太长的，设置为只执行 1 次的tests:
+tests1="openssl pyperformance cpp-perf-bench c-ray clickhouse hpcg quantlib"
+for testname in ${tests1} 
 do
     FORCE_TIMES_TO_RUN=1 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
     echo "${testname}.txt:" >> ${DATA_DIR}/pts-result-url-summary.txt
     grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/pts-result-url-summary.txt
     sleep 5
 done
+
+## 特殊任务：执行2次的tests。
+tests2="scikit-learn"
+for testname in ${tests2} 
+do
+    FORCE_TIMES_TO_RUN=2 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
+    echo "${testname}.txt:" >> ${DATA_DIR}/pts-result-url-summary.txt
+    grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/pts-result-url-summary.txt
+    sleep 5
+done
+
 echo "[INFO] Step: Complete ALL PTS TESTS."
 
 # 所有结果打包并上传到 S3 bucket
@@ -261,11 +297,3 @@ systemctl disable userdata
 ## 停止实例
 INSTANCE_ID=$(ec2-metadata --quiet --instance-id )
 aws ec2 stop-instances --instance-ids "${INSTANCE_ID}"
-
-
-#############################################################################################################
-## 其他备选的测试项目
-# tests="\
-# cachebench,primesieve,stream,ramspeed,blosc,spark, \
-# "
-#############################################################################################################
