@@ -61,6 +61,14 @@ install:
 	sudo make install && \
 	memtier_benchmark --version
 	@echo "memtier_benchmark installation complete!"
+
+	@echo "Installing redis cli for Redis/Valky benchmark..."
+	cd /root/  && \
+	wget https://download.redis.io/releases/redis-7.2.4.tar.gz && \
+	tar xzf redis-7.2.4.tar.gz && cd redis-7.2.4 && \
+	make && make install  && \
+	redis-cli -v && \
+	@echo "redis cli installation complete!"
 	
 	@echo "Installing sysbench ..."
 	cd /root/ && \
