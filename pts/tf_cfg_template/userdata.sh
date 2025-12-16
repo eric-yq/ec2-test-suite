@@ -245,11 +245,10 @@ dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bit
 echo "[INFO] Step1: Start to perform PTS tests ..."
 
 tests="gmpbench primesieve stream cachebench ramspeed compress-zstd compress-lz4 blosc \
-  botan john-the-ripper cython-bench ffmpeg x264 x265 tjbench vvenc \
+  botan john-the-ripper cython-bench ffmpeg x264 x265 tjbench vvenc blogbench nginx \
   graphics-magick smallpt draco renaissance dacapobench java-scimark2 scimark2 \
-  arrayfire stockfish lczero blogbench nginx cassandra scylladb rocksdb influxdb \
-  mt-dgemm perf-bench cassandra duckdb pogocache leveldb \
-  mlpack mnn whisper-cpp whisperfile opencv \
+  cassandra scylladb rocksdb influxdb clickhouse duckdb pogocache leveldb \
+  stockfish mt-dgemm perf-bench mlpack mnn whisper-cpp whisperfile opencv \
   "
 for testname in ${tests} 
 do
@@ -260,7 +259,7 @@ do
 done
 
 ## 执行时间太长的，设置为只执行 1 次的tests:
-tests1="openssl pyperformance cpp-perf-bench c-ray clickhouse hpcg quantlib"
+tests1="openssl pyperformance cpp-perf-bench c-ray lczero arrayfire hpcg quantlib"
 for testname in ${tests1} 
 do
     FORCE_TIMES_TO_RUN=1 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
