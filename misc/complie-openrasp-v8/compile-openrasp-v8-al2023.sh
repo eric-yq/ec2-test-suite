@@ -5,7 +5,7 @@ yum install -y java-11-amazon-corretto java-11-amazon-corretto-devel java-11-ama
 yum install -y cmake openssl-devel
 
 cd /root/
-VER=3.9.8
+VER=3.9.11
 wget https://dlcdn.apache.org/maven/maven-3/${VER}/binaries/apache-maven-${VER}-bin.tar.gz
 tar zxf apache-maven-${VER}-bin.tar.gz -C /usr/ --strip-components 1
 mvn -v
