@@ -46,7 +46,6 @@ sysctl -p
 logout
 sudo su - root
 
-
 # root密码
 # echo "export ROOT_PASSWORD=gv2mysql" >> ~/.bash_profile
 # source ~/.bash_profile
@@ -78,7 +77,7 @@ obd pref
 ##########################################################################################
 # TPCH 参考：https://www.oceanbase.com/docs/common-oceanbase-cloud-1000000001713939
 # 数据库配置
-obclient -h127.0.0.1 -P2881 -uroot@sys -p'dBdlaKRchufYZBxBiS9x' -Doceanbase -A
+obclient -h127.0.0.1 -P2883 -uroot@sys -p'GH7GM1wVfjUiMSmrpyFy' -Doceanbase -A 
 # 执行...
 # obclient(root@sys)[oceanbase]> 
 SET GLOBAL ob_sql_work_area_percentage = 80;
@@ -115,6 +114,8 @@ EOF
 
 # 构建数据生成工具
 yum group install -yq "Development Tools"
+yum install -yq python3-pip htop
+pip3 install dool
 make
 
 # 生成数据,例如生成 50GB 的数据：
@@ -123,13 +124,56 @@ SF=50
 mkdir tpch$SF
 mv *.tbl tpch$SF
 
-# 下载查询 SQL 文件
+# 修改查询任务的 SQL 文件
 cp -r queries queries_bak
-git clone https://github.com/oceanbase/obdeploy.git
-cp -r obdeploy/plugins/tpch/3.1.0/queries .
+cp -r /usr/obd/plugins/tpch/3.1.0/queries/ .
 sed -i "s/cpu_num/$(nproc)/g" queries/*.sql
 
 # 修改创建表的 SQL 文件
-cp -r obdeploy/plugins/tpch/3.1.0/create_tpch_mysql_table_part.ddl .
+mkdir -p load
+cd load
+cp -r /usr/obd/plugins/tpch/3.1.0/create_tpch_mysql_table_part.ddl .
 sed -i "s/cpu_num/$(nproc)/g" create_tpch_mysql_table_part.ddl
+## 将 create_table.py 和 load.py 下载到当前目录
+cp /root/ec2-test-suite/misc/oceanbase/tpch/create_table.py .
+cp /root/ec2-test-suite/misc/oceanbase/tpch/load.py .
+
+
+
+# 创建表并加载数据
+screen -R ttt -L
+python3 create_table.py
+python3 load.py
+
+# 通过 dool 查看
+
+# 执行合并操作
+obclient -h127.0.0.1 -P2883 -uroot@sys -p'GH7GM1wVfjUiMSmrpyFy' -Doceanbase -A 
+obclient(root@sys)[oceanbase]> ALTER SYSTEM major freeze;
+# Query OK, 0 rows affected (0.011 sec)
+
+## 查看状态
+obclient(root@sys)[oceanbase]> select STATUS from oceanbase.DBA_OB_MAJOR_COMPACTION;
+# +------------+
+# | STATUS     |
+# +------------+
+# | COMPACTING |
+# +------------+
+# 1 row in set (0.001 sec)
+
+## 直到完成
+obclient(root@sys)[oceanbase]> select STATUS from oceanbase.DBA_OB_MAJOR_COMPACTION;
+# +--------+
+# | STATUS |
+# +--------+
+# | IDLE   |
+# +--------+
+# 1 row in set (0.001 sec)
+
+## 收集统计信息
+obclient(root@sys)[oceanbase]> call dbms_stats.gather_schema_stats('oceanbase',degree=>96);
+# Query OK, 0 rows affected (3 min 46.688 sec)
+
+## 执行查询
+cd /root/TPC-H_Tools_v3.0.0/dbgen/queries
 
