@@ -42,9 +42,14 @@ EOF
 # 应用系统参数
 sysctl -p
 
+## 重新登录 session
+logout
+sudo su - root
+
+
 # root密码
-echo "export ROOT_PASSWORD=gv2mysql" >> ~/.bash_profile
-source ~/.bash_profile
+# echo "export ROOT_PASSWORD=gv2mysql" >> ~/.bash_profile
+# source ~/.bash_profile
 
 # 准备 all-in-one 版本
 bash -c "$(curl -s https://obbusiness-private.oss-cn-shanghai.aliyuncs.com/download-center/opensource/oceanbase-all-in-one/installer.sh)"
@@ -61,7 +66,10 @@ obd pref
 # +-----------+---------+------+-------+--------+
 # | 127.0.0.1 | 4.4.1.0 | 2881 | zone1 | ACTIVE |
 # +-----------+---------+------+-------+--------+
-# obclient -h127.0.0.1 -P2881 -uroot@sys -p'dBdlaKRchufYZBxBiS9x' -Doceanbase -A
+# x86 
+# obclient -h127.0.0.1 -P2883 -uroot@sys -p'GH7GM1wVfjUiMSmrpyFy' -Doceanbase -A 
+# arm
+# obclient -h127.0.0.1 -P2881 -uroot@sys -p'Khlwmj5BnkwsToKDNLTw' -Doceanbase -A
 
 # obd cluster stop   obtest        
 # obd cluster reload obtest   
@@ -78,6 +86,8 @@ SET GLOBAL ob_query_timeout = 36000000000;
 SET GLOBAL ob_trx_timeout = 36000000000;
 SET GLOBAL max_allowed_packet = 67108864;
 SET GLOBAL parallel_servers_target = 624;
+# obclient(root@sys)[oceanbase]> exit
+# Bye
 
 # 上传 并解压TPCH 安装包
 unzip -q 5D69EC5B-533B-4DF1-B544-E3BD4BBE265F-TPC-H-Tool.zip
@@ -92,8 +102,7 @@ sed -i "s/MACHINE = /MACHINE = LINUX/g" Makefile
 sed -i "s/WORKLOAD = /WORKLOAD = TPCH/g" Makefile
 
 # 修改 tpcd.h 头文件
-cat << EOF >> tpcd.h 
-# added for oceanbase tpch test
+cat << EOF >> tpcd.h
 #ifdef MYSQL
 #define GEN_QUERY_PLAN ""
 #define START_TRAN "START TRANSACTION"
@@ -104,6 +113,23 @@ cat << EOF >> tpcd.h
 #endif
 EOF
 
-yum group install -y "Development Tools"
-
+# 构建数据生成工具
+yum group install -yq "Development Tools"
 make
+
+# 生成数据,例如生成 50GB 的数据：
+SF=50
+./dbgen -s $SF
+mkdir tpch$SF
+mv *.tbl tpch$SF
+
+# 下载查询 SQL 文件
+cp -r queries queries_bak
+git clone https://github.com/oceanbase/obdeploy.git
+cp -r obdeploy/plugins/tpch/3.1.0/queries .
+sed -i "s/cpu_num/$(nproc)/g" queries/*.sql
+
+# 修改创建表的 SQL 文件
+cp -r obdeploy/plugins/tpch/3.1.0/create_tpch_mysql_table_part.ddl .
+sed -i "s/cpu_num/$(nproc)/g" create_tpch_mysql_table_part.ddl
+
