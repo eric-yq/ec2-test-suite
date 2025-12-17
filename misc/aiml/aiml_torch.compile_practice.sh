@@ -8,8 +8,8 @@ sudo su - root
 
 apt update
 apt install -y build-essential vim unzip git lsb-release grub2-common net-tools dmidecode hwloc \
-util-linux numactl screen wget zip p7zip php php-cli php-json php-xml php-curl python3-pip python3-dev \
-cargo libssl-dev libcurl4-openssl-dev libpcap-dev liblzma-dev scons 
+  util-linux numactl screen wget zip p7zip php php-cli php-json php-xml php-curl python3-pip python3-dev \
+  cargo libssl-dev libcurl4-openssl-dev libpcap-dev liblzma-dev scons 
 pip install --upgrade pip
 
 ## 更新 cmake
