@@ -26,10 +26,10 @@ IAMGE_NAME=763104351884.dkr.ecr.us-east-1.amazonaws.com/pytorch-inference$([ "$(
 docker pull ${IAMGE_NAME}
 
 # 启动容器
-docker run -d --name pytorch-container --restart unless-stopped ${IAMGE_NAME} tail -f /dev/null
+docker run -d --name pytorch-benchmark-test --restart unless-stopped ${IAMGE_NAME} tail -f /dev/null
 
 # 进入容器
-docker exec -it pytorch-container /bin/bash
+docker exec -it pytorch-benchmark-test /bin/bash
 # 可以使用exit 退出容器，
 # 下面是容器中里面的脚本：
 git clone https://github.com/pytorch/benchmark.git
@@ -45,17 +45,31 @@ ls -tr metric*.json
 #########################################################################################################
 
 # on the host machine
-
-# ARM
-python3 run_full_benchmark.py --arm64 --model nvidia_deeprecommender \
-    --batch-sizes "1,2,4,8,16,32,64,128,256,512,1024" \
-    --niter 30 --test eval --metrics="latencies,cpu_peak_mem"
-
-# Intel
-python3 run_full_benchmark.py --model nvidia_deeprecommender \
-    --batch-sizes "1,2,4,8,16,32,64,128,256,512,1024" \
-    --niter 30 --test eval --metrics="latencies,cpu_peak_mem"
+ARCH=$([ "$(uname -m)" = "aarch64" ] && echo "--arm64" || echo "")
+MODEL_NAME="nvidia_deeprecommender"
+BATCH_SIZE="1,2,4,8,16,32,64,128,256,512,1024"
+ITER_NUM="3O"
+python3 run_full_benchmark.py $ARCH \
+    --model $MODEL_NAME \
+    --batch-sizes $BATCH_SIZE \
+    --niter $ITER_NUM \
+    --test eval --metrics="latencies,cpu_peak_mem"
 
 # 其他可以使用的选项： --force-setup
 
 # 原始结果在 /benchmark/.userbenchmark/cpu 目录下
+
+## 简单测试
+# MODEL_NAME="nvidia_deeprecommender"
+ARCH=$([ "$(uname -m)" = "aarch64" ] && echo "--arm64" || echo "")
+BATCH_SIZE="1"
+ITER_NUM="1"
+models="dlrm"
+for MODEL_NAME in $models
+do
+  python3 run_full_benchmark.py $ARCH \
+      --test eval --metrics="latencies,cpu_peak_mem" --force-setup \
+      --model $MODEL_NAME \
+      --batch-sizes $BATCH_SIZE \
+      --niter $ITER_NUM
+done 
