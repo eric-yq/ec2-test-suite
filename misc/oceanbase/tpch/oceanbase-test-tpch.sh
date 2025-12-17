@@ -2,6 +2,7 @@
 # Amazon Linux 2023, r8i.4xlarge
 # EBS: 200G gp3, 性能 10000 IOPS, 500 MB/s
 sudo su - root
+git clone https://github.com/eric-yq/ec2-test-suite.git
 
 # 修改系统限制
 cat << EOF >> /etc/security/limits.conf
@@ -134,11 +135,9 @@ mkdir -p load
 cd load
 cp -r /usr/obd/plugins/tpch/3.1.0/create_tpch_mysql_table_part.ddl .
 sed -i "s/cpu_num/$(nproc)/g" create_tpch_mysql_table_part.ddl
-## 将 create_table.py 和 load.py 下载到当前目录
+## 将 create_table.py 和 load.py 下载到当前目录，并根据实际情况修改其中的参数
 cp /root/ec2-test-suite/misc/oceanbase/tpch/create_table.py .
 cp /root/ec2-test-suite/misc/oceanbase/tpch/load.py .
-
-
 
 # 创建表并加载数据
 screen -R ttt -L
@@ -176,4 +175,7 @@ obclient(root@sys)[oceanbase]> call dbms_stats.gather_schema_stats('oceanbase',d
 
 ## 执行查询
 cd /root/TPC-H_Tools_v3.0.0/dbgen/queries
+cp /root/ec2-test-suite/misc/oceanbase/tpch/tpch.sh .
+chmod +x tpch.sh
+./tpch.sh
 
