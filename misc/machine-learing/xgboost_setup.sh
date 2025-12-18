@@ -8,9 +8,9 @@ pip3 install dool
 
 # 安装conda
 cd /root
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
-  -O Miniconda3-latest-Linux-x86_64.sh
-bash Miniconda3-latest-Linux-x86_64.sh -b   
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-$(arch).sh \
+  -O Miniconda3-latest-Linux-$(arch).sh
+bash Miniconda3-latest-Linux-$(arch).sh -b   
 echo "PATH=/root/miniconda3/bin:$PATH" >> /root/.bashrc
 source ~/.bashrc
 
