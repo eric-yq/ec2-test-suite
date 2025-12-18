@@ -21,7 +21,7 @@ source ~/.bashrc
 conda activate skl
 
 # 安装 scikit-learn 及相关依赖
-pip install -U scikit-learn matplotlib
+pip install -U scikit-learn matplotlib xgboost
 
 # 下载sciki-learn repo
 cd /root
