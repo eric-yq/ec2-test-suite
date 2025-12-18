@@ -147,12 +147,13 @@ python3 load.py
 # 通过 dool 查看
 
 # 执行合并操作
-obclient -h127.0.0.1 -P2883 -uroot@sys -p'GH7GM1wVfjUiMSmrpyFy' -Doceanbase -A 
-obclient(root@sys)[oceanbase]> ALTER SYSTEM major freeze;
+obclient -h127.0.0.1 -P2881 -uroot@sys -p'Khlwmj5BnkwsToKDNLTw' -Doceanbase -A -e \
+  "ALTER SYSTEM major freeze;"
 # Query OK, 0 rows affected (0.011 sec)
 
 ## 查看状态
-obclient(root@sys)[oceanbase]> select STATUS from oceanbase.DBA_OB_MAJOR_COMPACTION;
+obclient -h127.0.0.1 -P2881 -uroot@sys -p'Khlwmj5BnkwsToKDNLTw' -Doceanbase -A -e \
+  "select STATUS from oceanbase.DBA_OB_MAJOR_COMPACTION;"
 # +------------+
 # | STATUS     |
 # +------------+
@@ -161,7 +162,8 @@ obclient(root@sys)[oceanbase]> select STATUS from oceanbase.DBA_OB_MAJOR_COMPACT
 # 1 row in set (0.001 sec)
 
 ## 直到完成
-obclient(root@sys)[oceanbase]> select STATUS from oceanbase.DBA_OB_MAJOR_COMPACTION;
+obclient -h127.0.0.1 -P2881 -uroot@sys -p'Khlwmj5BnkwsToKDNLTw' -Doceanbase -A -e \
+  "select STATUS from oceanbase.DBA_OB_MAJOR_COMPACTION;"
 # +--------+
 # | STATUS |
 # +--------+
@@ -170,12 +172,13 @@ obclient(root@sys)[oceanbase]> select STATUS from oceanbase.DBA_OB_MAJOR_COMPACT
 # 1 row in set (0.001 sec)
 
 ## 收集统计信息
-obclient(root@sys)[oceanbase]> call dbms_stats.gather_schema_stats('oceanbase',degree=>96);
+obclient -h127.0.0.1 -P2881 -uroot@sys -p'Khlwmj5BnkwsToKDNLTw' -Doceanbase -A -e \
+  "call dbms_stats.gather_schema_stats('oceanbase',degree=>96);"
 # Query OK, 0 rows affected (3 min 46.688 sec)
 
 ## 执行查询
 cd /root/TPC-H_Tools_v3.0.0/dbgen/queries
 cp /root/ec2-test-suite/misc/oceanbase/tpch/tpch.sh .
 chmod +x tpch.sh
-./tpch.sh
+bash tpch.sh
 
