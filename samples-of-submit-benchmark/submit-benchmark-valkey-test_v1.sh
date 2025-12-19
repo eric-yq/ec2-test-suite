@@ -20,8 +20,8 @@ do
 			continue
 		fi
 		
-		echo "$0: [$(date +%Y%m%d.%H%M%S)] Sleep 180 seconds ..."
-		sleep 180
+		echo "$0: [$(date +%Y%m%d.%H%M%S)] Sleep 600 seconds ..."
+		sleep 600
 
 		## 执行 Benchmark 测试，使用 redis-benchmark_v1.sh 脚本
 		echo "$0: Star to run benchmark"
