@@ -37,8 +37,7 @@ EOF
     exit 0
 fi
 
-############## 
-
+################################################################################################################       
 # Reference：https://aws.amazon.com/cn/blogs/china/aws-graviton3-accelerates-spark-job-execution-benchmark/
 # Amazon Linux 2023, 使用 ec2-user 账号登录.
 
