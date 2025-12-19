@@ -31,8 +31,8 @@ EOF
     
     echo "已创建并启用 systemd 服务 userdata.service"
 
-    ### 如果 3 分钟之后，实例没有重启，或者也有可能不需要重启，则开始启动服务执行后续安装过程。
-    sleep 180
+    ### 如果 5 分钟之后，实例没有重启，或者也有可能不需要重启，则开始启动服务执行后续安装过程。
+    sleep 300
     systemctl start userdata.service
     exit 0
 fi
