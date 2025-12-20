@@ -73,7 +73,8 @@ mongosh ${MONGO_URL} << EOF
 use ycsb
 db.dropDatabase()
 EOF
-rm -rf /data/mongodb/ycsb/ && ll /data/mongodb/
+ssh -o StrictHostKeyChecking=no -i ~/ericyq-global.pem ec2-user@${SUT_IP_ADDR} \
+    "rm -rf /data/mongodb/ycsb/"
 }
 
 ## 执行 benchmark 测试

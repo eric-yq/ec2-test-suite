@@ -20,7 +20,6 @@ LIBRARIES = \
 	libevent-devel \
 	openssl-devel \
 	libaio-devel \
-	mariadb105-devel \
 	python3.13-devel
 
 # Install the required packages, libraries, and tools
@@ -101,8 +100,8 @@ install:
 
 	@echo "Installing VDBBench for Milvus benchmark ..."
 	cd /root/ && \
-	pip3.11 install vectordb-bench ujson
-	@echo "YCSB installation complete!"
+	pip3.13 install vectordb-bench ujson
+	@echo "VDBBench installation complete!"
 
 # Clean yum cache
 .PHONY: clean
