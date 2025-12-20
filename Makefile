@@ -94,6 +94,7 @@ install:
 	cd /root/ && \
 	wget https://github.com/mongodb-js/mongosh/releases/download/v2.5.10/mongodb-mongosh-2.5.10.x86_64.rpm && \
 	rpm -Uvh mongodb-mongosh-2.5.10.x86_64.rpm && \
+	yum install python-is-python3 && \
 	wget https://github.com/brianfrankcooper/YCSB/releases/download/0.17.0/ycsb-0.17.0.tar.gz && \
 	tar zxf ycsb-0.17.0.tar.gz && rm -rf ycsb-0.17.0.tar.gz
 	@echo "YCSB installation complete!"
