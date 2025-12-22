@@ -229,7 +229,7 @@ export TEST_RESULTS_DESCRIPTION=${PN}
 export TEST_RESULTS_NAME=${PN}
 
 # 安装新测试项目需要的软件包
-yum install -yq lz4-devel lzo-devel
+yum install -yq lz4-devel lzo-devel libcurl-devel
 pip3 install sklearn scons
 DOWNLOAD_FILE="ffmpeg-master-latest-linux$([ "$(uname -m)" = "aarch64" ] && echo "arm" || echo "")64-gpl"
 DOWNLOAD_URL="https://github.com/BtbN/FFmpeg-Builds/releases/download/latest"

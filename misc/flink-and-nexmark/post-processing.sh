@@ -2,13 +2,15 @@
 
 # for Amazon Linux 2023，使用 ec2-user 用户登录执行
 
+su - ec2-user
+
 # 在使用 flink-nexmark AMI 启动 3 台实例后，
 # 分别通过 SSH 登录到 Master 和 2 个 Worker 节点，执行下面命令完成 Flink 和 Nexmark 的安装与基准测试。
 
 ## 将 下列 3 个 IPADDR_xxx 变量设置为 3 台 EC2 实例的 VPC IP 地址，并保存在 /etc/hosts 文件中
-IPADDR_MASTER="172.31.4.38"
-IPADDR_WORKER1="172.31.8.99"
-IPADDR_WORKER2="172.31.4.18"
+IPADDR_MASTER="172.31.95.221"
+IPADDR_WORKER1="172.31.82.94"
+IPADDR_WORKER2="172.31.83.132"
 cat << EOF | sudo tee -a /etc/hosts
 $IPADDR_MASTER  master
 $IPADDR_WORKER1 worker1
@@ -18,14 +20,20 @@ EOF
 ## 生成密钥, 将 master 和 worker1,2 节点的 
 ## id_rsa.pub 添加到所有节点的 authorized_keys 文件
 ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
-chmod 0600 ~/.ssh/authorized_keys
 cat ~/.ssh/id_rsa.pub 
+chmod 0600 ~/.ssh/authorized_keys
 vim ~/.ssh/authorized_keys
 ### 保存退出
 
 #####################################################################
 ## 在 Master 节点继续执行下面操作
 #####################################################################
+# Flink-nexmark AMI 是按照 48G 进行的配置；如果是内存不是 48G 的话，根据需要修改。
+# 48G 是 Flink 的 TaskManager 的 JVM 堆内存设置，如果内存不是 48G 的话，根据需要修改。
+cd /home/ec2-user/flink-benchmark
+sed -i "s/48G/24G/g" nexmark-flink/conf/config.yaml
+
+# 启动 Flink 集群和 Benchmark
 bash ~/flink-benchmark/flink/bin/start-cluster.sh
 bash ~/flink-benchmark/nexmark-flink/bin/setup_cluster.sh
 
@@ -34,7 +42,7 @@ bash ~/flink-benchmark/nexmark-flink/bin/setup_cluster.sh
 ## 在 Master 节点继续执行下面操作
 #####################################################################
 # 试跑一个查询:
-bash ~/flink-benchmark/nexmark-flink/bin/run_query.sh q10
+bash ~/flink-benchmark/nexmark-flink/bin/run_query.sh q7
 
 # screen -R ttt -L
 # 执行任务

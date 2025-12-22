@@ -74,9 +74,12 @@ cd ~/flink-benchmark && tar xzf nexmark-flink.tgz
 cp ~/flink-benchmark/nexmark-flink/lib/*.jar ~/flink-benchmark/flink/lib
 
 ## 编辑 Nexmark 配置文件 nexmark-flink/conf/config.yaml
+CPU_CORES=$(nproc)
+MEM_TOTAL_GB=$(free -g |grep Mem | awk -F " " '{print $2}')
+let XXX=${MEM_TOTAL_GB}*75/100
 sed -i "s/jobmanager.rpc.address: localhost/jobmanager.rpc.address: master/g" nexmark-flink/conf/config.yaml
-sed -i "s/taskmanager.numberOfTaskSlots: 1/taskmanager.numberOfTaskSlots: 8/g" nexmark-flink/conf/config.yaml
-sed -i "s/taskmanager.memory.process.size: 8G/taskmanager.memory.process.size: 48G/g" nexmark-flink/conf/config.yaml
+sed -i "s/taskmanager.numberOfTaskSlots: 1/taskmanager.numberOfTaskSlots: ${CPU_CORES}/g" nexmark-flink/conf/config.yaml
+sed -i "s/taskmanager.memory.process.size: 8G/taskmanager.memory.process.size: ${XXX}G/g" nexmark-flink/conf/config.yaml
 sed -i "s/parallelism.default: 8/parallelism.default: 24/g" nexmark-flink/conf/config.yaml
 sed -i "s/file:\/\/\/path\/to\/checkpoint/file:\/\/\/home\/ec2-user\/checkpoint/g" nexmark-flink/conf/config.yaml
 sed -i "s/-XX:ParallelGCThreads=4/-XX:ParallelGCThreads=4 -XX:+IgnoreUnrecognizedVMOptions/g" nexmark-flink/conf/config.yaml
