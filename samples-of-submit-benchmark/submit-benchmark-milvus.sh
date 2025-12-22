@@ -33,4 +33,4 @@ do
 	done
 done
 
-echo "$0: Redis benchmark completed."
+echo "$0: Milvus benchmark completed."
