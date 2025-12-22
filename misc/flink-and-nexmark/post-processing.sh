@@ -8,9 +8,10 @@ su - ec2-user
 # 分别通过 SSH 登录到 Master 和 2 个 Worker 节点，执行下面命令完成 Flink 和 Nexmark 的安装与基准测试。
 
 ## 将 下列 3 个 IPADDR_xxx 变量设置为 3 台 EC2 实例的 VPC IP 地址，并保存在 /etc/hosts 文件中
-IPADDR_MASTER="172.31.88.17"
-IPADDR_WORKER1="172.31.81.218"
-IPADDR_WORKER2="172.31.94.90"
+hostname -I
+IPADDR_MASTER="172.31.81.188"
+IPADDR_WORKER1="172.31.81.206"
+IPADDR_WORKER2="172.31.81.57"
 cat << EOF | sudo tee -a /etc/hosts
 $IPADDR_MASTER  master
 $IPADDR_WORKER1 worker1
