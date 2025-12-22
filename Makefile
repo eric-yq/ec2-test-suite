@@ -103,6 +103,10 @@ install:
 	pip3.13 install vectordb-bench ujson
 	@echo "VDBBench installation complete!"
 
+	@echo "Perform OS Optimization ..."
+	bash benchmark/os-optimization.sh
+	@echo "Perform OS Optimization complete!"
+
 # Clean yum cache
 .PHONY: clean
 clean:
