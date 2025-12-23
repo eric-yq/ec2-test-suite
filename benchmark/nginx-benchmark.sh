@@ -9,9 +9,6 @@ source /tmp/temp-setting
 RESULT_PATH="/root/ec2-test-suite/benchmark-result-files"
 mkdir -p ${RESULT_PATH}
 
-# 执行OS优化
-# bash /root/ec2-test-suite/benchmark/os-optimization.sh
-
 # 命令
 THREADS=${INSTANCE_VCPU_NUM}
 CONNECTIONS="10 20 30 40 60 80 100 150 200 300"
