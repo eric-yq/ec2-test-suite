@@ -7,6 +7,7 @@ os_types="al2023"
 # instance_types="m9g.2xlarge"
 instance_types="$1"
 
+# loadgen上执行一遍 OS/网络优化脚本
 bash benchmark/os-optimization.sh
 
 sleep 60
@@ -22,6 +23,7 @@ do
         launch_status=$?
         if [ $launch_status -ne 0 ]; then
             echo "\$0: [$(date +%Y%m%d.%H%M%S)] Instance launch failed for OS_TYPE=${os}, INSTANCE_TYPE=${ins}. Continuing with next configuration..."
+            rm -rf redis/tf_cfg_redis/
             continue
         fi
 
@@ -54,6 +56,7 @@ do
         launch_status=$?
         if [ $launch_status -ne 0 ]; then
             echo "\$0: [$(date +%Y%m%d.%H%M%S)] Instance launch failed for OS_TYPE=${os}, INSTANCE_TYPE=${ins}. Continuing with next configuration..."
+            rm -rf valkey/tf_cfg_valkey/
             continue
         fi
 
@@ -118,6 +121,7 @@ do
         # 检查启动状态
         if [ $launch_status -ne 0 ]; then
             echo "\$0: [$(date +%Y%m%d.%H%M%S)] Instance launch failed for OS_TYPE=${os}, INSTANCE_TYPE=${ins}. Continuing with next configuration..."
+            rm -rf mysql-ebs/tf_cfg_mysql-ebs/
             continue
         fi
 
@@ -128,7 +132,7 @@ do
         echo "$0: Star to run benchmark"
         source /tmp/temp-setting
 
-        ## 准备数据
+        ## 准备数据: r8i.2xlage 使用 64G; m8i.2xlarge 使用 24G 
         bash benchmark/mysql-benchmark_v2_prepare.sh ${INSTANCE_IP_MASTER} 64 ${ins} 
 
         ## 使用不同的vuser执行benchmark
@@ -159,6 +163,7 @@ do
         launch_status=$?
         if [ $launch_status -ne 0 ]; then
             echo "\$0: [$(date +%Y%m%d.%H%M%S)] Instance launch failed for OS_TYPE=${os}, INSTANCE_TYPE=${ins}. Continuing with next configuration..."
+            rm -rf mongo/tf_cfg_mongo/
             continue
         fi
 
@@ -189,7 +194,8 @@ do
 		launch_status=$?
 		if [ $launch_status -ne 0 ]; then
 			echo "\$0: [$(date +%Y%m%d.%H%M%S)] Instance launch failed for OS_TYPE=${os}, INSTANCE_TYPE=${ins}. Continuing with next configuration..."
-			continue
+			rm -rf milvus/tf_cfg_milvus/
+            continue
 		fi
 		
 		echo "$0: [$(date +%Y%m%d.%H%M%S)] Sleep 600 seconds..."
