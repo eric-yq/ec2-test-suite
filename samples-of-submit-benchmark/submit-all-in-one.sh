@@ -129,17 +129,17 @@ do
         source /tmp/temp-setting
 
         ## 准备数据
-        bash benchmark/mysql-benchmark_v2_prepare.sh ${INSTANCE_IP_MASTER} 24 ${ins} 
+        bash benchmark/mysql-benchmark_v2_prepare.sh ${INSTANCE_IP_MASTER} 64 ${ins} 
 
         ## 使用不同的vuser执行benchmark
-        bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 60  1 24 ${ins} 
-        bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 60  2 24 ${ins} 
-        bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 60  4 24 ${ins} 
-        bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 60  6 24 ${ins} 
-        bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 60  8 24 ${ins} 
-        bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 30 10 24 ${ins} 
-        bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 30 12 24 ${ins} 
-        bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 30 16 24 ${ins} 
+        bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 60  1 64 ${ins} 
+        bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 60  2 64 ${ins} 
+        bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 60  4 64 ${ins} 
+        bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 60  6 64 ${ins} 
+        bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 60  8 64 ${ins} 
+        bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 30 10 64 ${ins} 
+        bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 30 12 64 ${ins} 
+        bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 30 16 64 ${ins} 
 
         ## 停止实例
         aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region) &
