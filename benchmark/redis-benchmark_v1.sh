@@ -24,7 +24,6 @@ ssh -o StrictHostKeyChecking=no -i ~/ericyq-global.pem ec2-user@${SUT_IP_ADDR} \
   1> ${DOOL_FILE} 2>&1 &
 
 THREAD_LIST="1 2 4 6 8 12 16 32 48 64"
-# THREAD_LIST="1 4 8 12 16"
 
 for i in ${THREAD_LIST}
 do
