@@ -367,6 +367,7 @@ SF=600
 ./tpcds-setup.sh $SF
 
 echo "[Info] Complete to generate $SF GB data for TPC-DS benchmark."
+sleep 60
 
 ################################################################################################
 # 执行全部的 SQL 分析任务

@@ -9,9 +9,9 @@ su - ec2-user
 
 ## 将 下列 3 个 IPADDR_xxx 变量设置为 3 台 EC2 实例的 VPC IP 地址，并保存在 /etc/hosts 文件中
 hostname -I
-IPADDR_MASTER="172.31.81.188"
-IPADDR_WORKER1="172.31.81.206"
-IPADDR_WORKER2="172.31.81.57"
+IPADDR_MASTER="172.31.80.14"
+IPADDR_WORKER1="172.31.88.126"
+IPADDR_WORKER2="172.31.94.228"
 cat << EOF | sudo tee -a /etc/hosts
 $IPADDR_MASTER  master
 $IPADDR_WORKER1 worker1
