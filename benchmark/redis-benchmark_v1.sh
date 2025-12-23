@@ -28,7 +28,7 @@ THREAD_LIST="1 2 4 6 8 12 16 32 48 64"
 
 for i in ${THREAD_LIST}
 do
-	redis-cli -h ${SUT_IP_ADDR} flushall
+	# redis-cli -h ${SUT_IP_ADDR} flushall
 	RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${SUT_IP_ADDR}_${SUT_PORT}_${i}.txt"
 	
 	OPTS="--threads ${i} --clients 4"
