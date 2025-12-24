@@ -246,7 +246,6 @@ tests="gmpbench primesieve stream cachebench ramspeed compress-zstd compress-lz4
   cassandra scylladb rocksdb influxdb clickhouse duckdb leveldb \
   stockfish mt-dgemm perf-bench mlpack mnn whisper-cpp whisperfile opencv \
   "
-tests="stream sysbench"
 for testname in ${tests} 
 do
     # 启动一个监控
@@ -256,7 +255,8 @@ do
     # 执行基准测试
     FORCE_TIMES_TO_RUN=3 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
     # 保存结果 URL
-    echo "${testname}.txt:" >> ${DATA_DIR}/test-report-url-summary.txt
+    echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
+    phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
     grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
     # 停止监控
     kill -9 ${DOOL_PID}
@@ -270,16 +270,17 @@ for testname in ${tests1}
 do
     # 启动一个监控
     DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
-    dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
+    dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 10 > ${DOOL_FILE} 2>&1 &
     DOOL_PID=$!
     # 执行基准测试
     FORCE_TIMES_TO_RUN=1 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
     # 保存结果 URL
-    echo "${testname}.txt:" >> ${DATA_DIR}/test-report-url-summary.txt
+    echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
+    phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
     grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
     # 停止监控
     kill -9 ${DOOL_PID}
-    
+
     sleep 5
 done
 
@@ -287,18 +288,19 @@ done
 tests2="scikit-learn"
 for testname in ${tests2} 
 do
-# 启动一个监控
+    # 启动一个监控
     DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
-    dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
+    dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 10 > ${DOOL_FILE} 2>&1 &
     DOOL_PID=$!
     # 执行基准测试
     FORCE_TIMES_TO_RUN=2 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
     # 保存结果 URL
-    echo "${testname}.txt:" >> ${DATA_DIR}/test-report-url-summary.txt
+    echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
+    phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
     grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
     # 停止监控
     kill -9 ${DOOL_PID}
-    
+
     sleep 5
 done
 
