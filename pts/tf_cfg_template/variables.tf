@@ -39,10 +39,10 @@ variable "root_block_volume_size" {
 	default = "300"
 }
 variable "root_block_iops" {
-	default = "6000"
+	default = "3000"
 }
 variable "root_block_throughput" {
-	default = "300"
+	default = "200"
 }
 
 ## 
