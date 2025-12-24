@@ -39,26 +39,25 @@ fi
 
 install_al2023_dependencies () {
   echo "------ INSTALLING UTILITIES ------"
-  yum clean metadata
-  yum -y update
-  yum install -y -q dmidecode vim unzip git screen wget p7zip
-  yum -y -q groupinstall "Development Tools"
-  yum install -y -q glibc blas blas-devel openssl-devel libXext-devel libX11-devel libXaw libXaw-devel mesa-libGL-devel 
-  yum install -y -q python3 python3-pip python3-devel cargo java-17-amazon-corretto java-17-amazon-corretto-devel
-  yum install -y -q php php-cli php-json php-xml perl-IPC-Cmd
+  yum -yq update
+  yum install -yq dmidecode vim unzip git screen wget p7zip
+  yum -yq groupinstall "Development Tools"
+  yum install -yq glibc blas blas-devel openssl-devel libXext-devel libX11-devel libXaw libXaw-devel mesa-libGL-devel 
+  yum install -yq python3 python3-pip python3-devel cargo java-17-amazon-corretto java-17-amazon-corretto-devel
+  yum install -yq php php-cli php-json php-xml perl-IPC-Cmd
   pip3 install dool
 
   echo "------ INSTALLING HIGH LEVEL PERFORMANCE TOOLS ------"
-  yum install -y -q sysstat  hwloc hwloc-gui util-linux numactl tcpdump htop iotop iftop 
+  yum install -yq sysstat hwloc hwloc-gui util-linux numactl tcpdump htop iotop iftop 
 
   echo "------ INSTALLING LOW LEVEL PERFORAMANCE TOOLS ------"
-  yum install -y -q perf kernel-devel-$(uname -r) bcc
+  yum install -yq perf kernel-devel-$(uname -r) bcc
 
   echo "------ INSTALL ANALYSIS TOOLS AND DEPENDENCIES ------"
-  curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-  python3 get-pip.py
+#   curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+#   python3 get-pip.py
   python3 -m pip install pandas numpy scipy matplotlib sh seaborn plotext
-  git clone https://github.com/brendangregg/FlameGraph.git FlameGraph
+#   git clone https://github.com/brendangregg/FlameGraph.git FlameGraph
   
   echo "------ DONE ------"
 }
@@ -68,7 +67,7 @@ cd /root/
 yum remove -y awscli
 ARCH=$(arch)
 curl "https://awscli.amazonaws.com/awscli-exe-linux-${ARCH}.zip" -o "awscliv2.zip"
-unzip awscliv2.zip
+unzip -q awscliv2.zip
 ./aws/install
 cp -rf /usr/local/bin/aws /usr/bin/aws
 aws --version
@@ -130,7 +129,7 @@ uname -a > ${CFG_DIR}/cfg_uname-a.txt
 
 ## core-to-core-latency 测试 ===========================================================
 cargo install core-to-core-latency
-pip3 install cython numpy pandas matplotlib
+python3 -m pip install cython numpy pandas matplotlib
 ## 生成heatmap.py, 该py脚本用于生成 core-to-core-latency 的热力图 --BEGIN
 cat > ~/heatmap.py << EOF
 import pandas as pd
@@ -230,16 +229,12 @@ export TEST_RESULTS_NAME=${PN}
 
 # 安装新测试项目需要的软件包
 yum install -yq lz4-devel lzo-devel libcurl-devel
-pip3 install sklearn scons
+python3 -m pip install sklearn scons
 DOWNLOAD_FILE="ffmpeg-master-latest-linux$([ "$(uname -m)" = "aarch64" ] && echo "arm" || echo "")64-gpl"
 DOWNLOAD_URL="https://github.com/BtbN/FFmpeg-Builds/releases/download/latest"
 wget ${DOWNLOAD_URL}/${DOWNLOAD_FILE}.tar.xz
 tar xf ${DOWNLOAD_FILE}.tar.xz
 cp ${DOWNLOAD_FILE}/bin/ffmpeg /usr/local/bin/ && rm -rf ${DOWNLOAD_FILE}*
-
-# 启动一个监控
-# DOOL_FILE="${DATA_DIR}/dool.txt"
-# dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 1> ${DOOL_FILE} 2>&1 &
 
 ## 执行基准测试(标准)
 echo "[INFO] Step1: Start to perform PTS tests ..."
@@ -251,6 +246,7 @@ tests="gmpbench primesieve stream cachebench ramspeed compress-zstd compress-lz4
   cassandra scylladb rocksdb influxdb clickhouse duckdb leveldb \
   stockfish mt-dgemm perf-bench mlpack mnn whisper-cpp whisperfile opencv \
   "
+tests="stream sysbench"
 for testname in ${tests} 
 do
     # 启动一个监控
@@ -260,8 +256,8 @@ do
     # 执行基准测试
     FORCE_TIMES_TO_RUN=3 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
     # 保存结果 URL
-    echo "${testname}.txt:" >> ${DATA_DIR}/pts-result-url-summary.txt
-    grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/pts-result-url-summary.txt
+    echo "${testname}.txt:" >> ${DATA_DIR}/test-report-url-summary.txt
+    grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
     # 停止监控
     kill -9 ${DOOL_PID}
 
@@ -274,13 +270,13 @@ for testname in ${tests1}
 do
     # 启动一个监控
     DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
-    dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 10 > ${DOOL_FILE} 2>&1 &
+    dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
     DOOL_PID=$!
     # 执行基准测试
     FORCE_TIMES_TO_RUN=1 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
     # 保存结果 URL
-    echo "${testname}.txt:" >> ${DATA_DIR}/pts-result-url-summary.txt
-    grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/pts-result-url-summary.txt
+    echo "${testname}.txt:" >> ${DATA_DIR}/test-report-url-summary.txt
+    grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
     # 停止监控
     kill -9 ${DOOL_PID}
     
@@ -293,13 +289,13 @@ for testname in ${tests2}
 do
 # 启动一个监控
     DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
-    dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 10 > ${DOOL_FILE} 2>&1 &
+    dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
     DOOL_PID=$!
     # 执行基准测试
     FORCE_TIMES_TO_RUN=2 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
     # 保存结果 URL
-    echo "${testname}.txt:" >> ${DATA_DIR}/pts-result-url-summary.txt
-    grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/pts-result-url-summary.txt
+    echo "${testname}.txt:" >> ${DATA_DIR}/test-report-url-summary.txt
+    grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
     # 停止监控
     kill -9 ${DOOL_PID}
     
