@@ -228,7 +228,7 @@ export TEST_RESULTS_DESCRIPTION=${PN}
 export TEST_RESULTS_NAME=${PN}
 
 # 安装新测试项目需要的软件包
-yum install -yq lz4-devel lzo-devel libcurl-devel
+yum install -yq lz4-devel lzo-devel libcurl-devel bzip2-devel
 python3 -m pip install sklearn scons
 DOWNLOAD_FILE="ffmpeg-master-latest-linux$([ "$(uname -m)" = "aarch64" ] && echo "arm" || echo "")64-gpl"
 DOWNLOAD_URL="https://github.com/BtbN/FFmpeg-Builds/releases/download/latest"
@@ -250,7 +250,7 @@ for testname in ${tests}
 do
     # 启动一个监控
     DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
-    dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 10 > ${DOOL_FILE} 2>&1 &
+    dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 30 > ${DOOL_FILE} 2>&1 &
     DOOL_PID=$!
     # 执行基准测试
     FORCE_TIMES_TO_RUN=3 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
@@ -270,7 +270,7 @@ for testname in ${tests1}
 do
     # 启动一个监控
     DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
-    dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 10 > ${DOOL_FILE} 2>&1 &
+    dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
     DOOL_PID=$!
     # 执行基准测试
     FORCE_TIMES_TO_RUN=1 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
@@ -290,7 +290,7 @@ for testname in ${tests2}
 do
     # 启动一个监控
     DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
-    dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 10 > ${DOOL_FILE} 2>&1 &
+    dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
     DOOL_PID=$!
     # 执行基准测试
     FORCE_TIMES_TO_RUN=2 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
