@@ -103,6 +103,16 @@ install:
 	pip3.13 install vectordb-bench ujson
 	@echo "VDBBench installation complete!"
 
+	@echo "Installing Crank for .NET benchmark ..."
+	cd /root/ && \
+	yum install -y git aspnetcore-runtime-8.0 dotnet-runtime-8.0 dotnet-sdk-8.0 && \
+	dotnet tool install -g Microsoft.Crank.Controller --version "0.2.0-*" && \
+	dotnet tool install -g Microsoft.Crank.Agent --version "0.2.0-*" && \
+	cat << EOF >> ~/.bash_profile
+	export PATH="$PATH:/root/.dotnet/tools"
+	EOF && 
+	@echo "Crank installation complete!"
+
 	@echo "Perform OS Optimization ..."
 	bash benchmark/os-optimization.sh
 	@echo "Perform OS Optimization complete!"
