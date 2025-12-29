@@ -4,12 +4,24 @@ set -e
 
 ## 待测 EC2 规格和 OS
 os_types="al2023"
-# instance_types="m9g.2xlarge"
 instance_types="$1"
 
 # loadgen上执行一遍 OS/网络优化脚本
 bash benchmark/os-optimization.sh
 
+### 一批单机的测试，不需要网络通信。
+for os in ${os_types} 
+do
+	for ins in ${instance_types} 
+	do
+		## 创建实例、安装软件
+		echo "$0: OS_TYPE=${os}, INSTANCE_TYPE=${ins}"
+		bash launch-instances-single.sh -s specjbb15 -t ${ins} -o ${os}
+		bash launch-instances-single.sh -s ffmpeg    -t ${ins} -o ${os}
+		bash launch-instances-single.sh -s spark     -t ${ins} -o ${os}
+		bash launch-instances-single.sh -s pts       -t ${ins} -o ${os}
+	done
+done
 
 sleep 60
 ## Redis
