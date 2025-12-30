@@ -59,10 +59,10 @@ crank --config ./benchmarks.crudapi.yml \
       --profile my-profile \
       --application.source.localFolder $PWD/../../.. \
       --application.endpoints http://$SUT_IPADDR:5010 \
-      --load.endpoints http://localhost:5010 \
+      --load.endpoints http://$SUT_IPADDR:5010 \
       --variable serverAddress=$SUT_IPADDR \
       --variable duration=60 \
-      --variable connections=16 \
+      --variable connections=4 \
       --json results-crudapi-$SUT_INSTANCE-$SUT_IPADDR.json
 
 ## 查看结果: c7g.xlarge
