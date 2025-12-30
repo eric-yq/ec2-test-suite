@@ -76,7 +76,7 @@ crank --config ./benchmarks.crudapi.yml \
       --variable serverAddress=$SUT_IPADDR \
       --variable duration=60 \
       --variable connections=4 \
-      --json results-distribuited-crudapi-$SUT_INSTANCE-$SUT_IPADDR.json
+      --json results-remote-crudapi-$SUT_INSTANCE-$SUT_IPADDR.json
 
 ## 比较多个结果
 crank compare results-crudapi-*.json
