@@ -1,15 +1,9 @@
-# 总结
-## app 和 load 在不同实例：吞吐，平均时延，P99 时延
-c7g: 68,402, 0.23, 0.41  +0%
-c8g: 88,177, 0.18, 0.33  +29%
-c8i: 60,941, 0.26, 0.45  -12%
-## app 和 load 在同一实例：吞吐，平均时延，P99 时延
-c7g: 38,239, 0.10, 0.30  +0%
-c8g: 59,135, 0.07, 0.19  +55%
-c8i: 67,466, 0.06, 0.14  +76%
-
 
 # 1. Remote 模式：app 和 load 在不同实例，结果可能受网络延时不同而受一定影响
+ping 值参考：
+- c7g: rtt min/avg/max/mdev = 0.170/0.368/0.625/0.115 ms
+- c8g: rtt min/avg/max/mdev = 0.127/0.334/0.535/0.094 ms
+- c8i: 
 [root@ip-172-31-8-85 Mvc]# crank compare results-remote-*.json
 
 | load                      | results-remote-crudapi-c7g.xlarge-172.31.10.199 | results-remote-crudapi-c8g.xlarge-172.31.15.192 |         | results-remote-crudapi-c8i.xlarge-172.31.4.109 |         |
