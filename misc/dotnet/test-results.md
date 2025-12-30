@@ -9,275 +9,61 @@ c8g: 59,135, 0.07, 0.19  +55%
 c8i: 67,466, 0.06, 0.14  +76%
 
 
-# 1. app 和 load 在不同实例，结果可能受网络延时不同而受一定影响
-## c7g.xlarge
-| application               |                     |
-| ------------------------- | ------------------- |
-| Max Process CPU Usage (%) | 100                 |
-| Max Cores usage (%)       | 399                 |
-| Max Working Set (MB)      | 182                 |
-| Max Private Memory (MB)   | 288                 |
-| Build Time (ms)           | 6,142               |
-| Start Time (ms)           | 229                 |
-| Published Size (KB)       | 108,094             |
-| Symbols Size (KB)         | 24                  |
-| .NET Core SDK Version     | 8.0.416             |
-| ASP.NET Core Version      | 8.0.22+ee4174799332 |
-| .NET Runtime Version      | 8.0.22+a2266c728f63 |
-| Max Global CPU Usage (%)  | 100                 |
+# 1. Remote 模式：app 和 load 在不同实例，结果可能受网络延时不同而受一定影响
+[root@ip-172-31-8-85 Mvc]# crank compare results-remote-*.json
 
+| load                      | results-remote-crudapi-c7g.xlarge-172.31.10.199 | results-remote-crudapi-c8g.xlarge-172.31.15.192 |         | results-remote-crudapi-c8i.xlarge-172.31.4.109 |         |
+| ------------------------- | ----------------------------------------------- | ----------------------------------------------- | ------- | ---------------------------------------------- | ------- |
+| Max Process CPU Usage (%) |                                               7 |                                               9 | +28.57% |                                              6 | -14.29% |
+| Max Cores usage (%)       |                                              53 |                                              70 | +32.08% |                                             44 | -16.98% |
+| Max Working Set (MB)      |                                              47 |                                              47 |   0.00% |                                             47 |   0.00% |
+| Max Private Memory (MB)   |                                             135 |                                             135 |   0.00% |                                            135 |   0.00% |
+| Build Time (ms)           |                                           4,022 |                                           3,494 | -13.13% |                                          3,563 | -11.41% |
+| Start Time (ms)           |                                              87 |                                             103 | +18.39% |                                            120 | +37.93% |
+| Published Size (KB)       |                                          72,281 |                                          72,281 |   0.00% |                                         72,281 |   0.00% |
+| Symbols Size (KB)         |                                               0 |                                               0 |         |                                              0 |         |
+| .NET Core SDK Version     |                                         8.0.416 |                                         8.0.416 |         |                                        8.0.416 |         |
+| Max Global CPU Usage (%)  |                                               8 |                                              10 | +25.00% |                                              7 | -12.50% |
+| First Request (ms)        |                                             139 |                                             112 | -19.42% |                                            105 | -24.46% |
+| Requests                  |                                       1,330,584 |                                       1,708,580 | +28.41% |                                      1,006,212 | -24.38% |
+| Bad responses             |                                               0 |                                               0 |         |                                              0 |         |
+| Latency 50th (ms)         |                                            0.17 |                                            0.13 | -23.98% |                                           0.22 | +29.24% |
+| Latency 75th (ms)         |                                            0.20 |                                            0.15 | -24.37% |                                           0.25 | +27.41% |
+| Latency 90th (ms)         |                                            0.22 |                                            0.18 | -15.98% |                                           0.32 | +46.12% |
+| Latency 95th (ms)         |                                            0.24 |                                            0.22 | -11.43% |                                           0.36 | +45.71% |
+| Latency 99th (ms)         |                                            0.34 |                                            0.28 | -17.65% |                                           0.44 | +28.24% |
+| Mean latency (ms)         |                                            0.18 |                                            0.14 | -22.32% |                                           0.24 | +32.50% |
+| Max latency (ms)          |                                           10.43 |                                            7.36 | -29.39% |                                           6.22 | -40.37% |
+| Requests/sec              |                                          22,176 |                                          28,476 | +28.41% |                                         16,770 | -24.38% |
+| Requests/sec (max)        |                                          26,183 |                                          35,231 | +34.56% |                                         19,669 | -24.88% |
+| Read throughput (MB/s)    |                                           79.77 |                                          102.44 | +28.41% |                                          60.33 | -24.38% |
 
-| load                      |                     |
-| ------------------------- | ------------------- |
-| Max Process CPU Usage (%) | 19                  |
-| Max Cores usage (%)       | 151                 |
-| Max Working Set (MB)      | 47                  |
-| Max Private Memory (MB)   | 136                 |
-| Build Time (ms)           | 3,569               |
-| Start Time (ms)           | 96                  |
-| Published Size (KB)       | 72,281              |
-| Symbols Size (KB)         | 0                   |
-| .NET Core SDK Version     | 8.0.416             |
-| ASP.NET Core Version      | 8.0.22+ee4174799332 |
-| .NET Runtime Version      | 8.0.22+a2266c728f63 |
-| Max Global CPU Usage (%)  | 23                  |
-| First Request (ms)        | 137                 |
-| Requests                  | 4,104,067           |
-| Bad responses             | 0                   |
-| Latency 50th (ms)         | 0.22                |
-| Latency 75th (ms)         | 0.26                |
-| Latency 90th (ms)         | 0.30                |
-| Latency 95th (ms)         | 0.33                |
-| Latency 99th (ms)         | 0.41                |
-| Mean latency (ms)         | 0.23                |
-| Max latency (ms)          | 11.77               |
-| Requests/sec              | 68,402              |
-| Requests/sec (max)        | 76,536              |
-| Read throughput (MB/s)    | 246.06              |
-
-## c8g.xlarge
-| application               |                     |
-| ------------------------- | ------------------- |
-| Max Process CPU Usage (%) | 100                 |
-| Max Cores usage (%)       | 399                 |
-| Max Working Set (MB)      | 187                 |
-| Max Private Memory (MB)   | 301                 |
-| Build Time (ms)           | 4,814               |
-| Start Time (ms)           | 189                 |
-| Published Size (KB)       | 108,240             |
-| Symbols Size (KB)         | 24                  |
-| .NET Core SDK Version     | 8.0.416             |
-| ASP.NET Core Version      | 8.0.22+ee4174799332 |
-| .NET Runtime Version      | 8.0.22+a2266c728f63 |
-| Max Global CPU Usage (%)  | 100                 |
-
-
-| load                      |                     |
-| ------------------------- | ------------------- |
-| Max Process CPU Usage (%) | 24                  |
-| Max Cores usage (%)       | 194                 |
-| Max Working Set (MB)      | 47                  |
-| Max Private Memory (MB)   | 135                 |
-| Build Time (ms)           | 3,530               |
-| Start Time (ms)           | 67                  |
-| Published Size (KB)       | 72,281              |
-| Symbols Size (KB)         | 0                   |
-| .NET Core SDK Version     | 8.0.416             |
-| ASP.NET Core Version      | 8.0.22+ee4174799332 |
-| .NET Runtime Version      | 8.0.22+a2266c728f63 |
-| Max Global CPU Usage (%)  | 26                  |
-| First Request (ms)        | 111                 |
-| Requests                  | 5,290,620           |
-| Bad responses             | 0                   |
-| Latency 50th (ms)         | 0.17                |
-| Latency 75th (ms)         | 0.21                |
-| Latency 90th (ms)         | 0.24                |
-| Latency 95th (ms)         | 0.26                |
-| Latency 99th (ms)         | 0.33                |
-| Mean latency (ms)         | 0.18                |
-| Max latency (ms)          | 14.81               |
-| Requests/sec              | 88,177              |
-| Requests/sec (max)        | 100,357             |
-| Read throughput (MB/s)    | 317.19              |
-
-
-## c8i.xlarge
-| application               |                     |
-| ------------------------- | ------------------- |
-| Max Process CPU Usage (%) | 98                  |
-| Max Cores usage (%)       | 391                 |
-| Max Working Set (MB)      | 1,286               |
-| Max Private Memory (MB)   | 1,413               |
-| Build Time (ms)           | 4,098               |
-| Start Time (ms)           | 231                 |
-| Published Size (KB)       | 99,385              |
-| Symbols Size (KB)         | 24                  |
-| .NET Core SDK Version     | 8.0.416             |
-| ASP.NET Core Version      | 8.0.22+ee4174799332 |
-| .NET Runtime Version      | 8.0.22+a2266c728f63 |
-| Max Global CPU Usage (%)  | 98                  |
-
-
-| load                      |                     |
-| ------------------------- | ------------------- |
-| Max Process CPU Usage (%) | 18                  |
-| Max Cores usage (%)       | 146                 |
-| Max Working Set (MB)      | 47                  |
-| Max Private Memory (MB)   | 135                 |
-| Build Time (ms)           | 3,520               |
-| Start Time (ms)           | 77                  |
-| Published Size (KB)       | 72,281              |
-| Symbols Size (KB)         | 0                   |
-| .NET Core SDK Version     | 8.0.416             |
-| ASP.NET Core Version      | 8.0.22+ee4174799332 |
-| .NET Runtime Version      | 8.0.22+a2266c728f63 |
-| Max Global CPU Usage (%)  | 20                  |
-| First Request (ms)        | 106                 |
-| Requests                  | 3,656,422           |
-| Bad responses             | 0                   |
-| Latency 50th (ms)         | 0.25                |
-| Latency 75th (ms)         | 0.29                |
-| Latency 90th (ms)         | 0.34                |
-| Latency 95th (ms)         | 0.37                |
-| Latency 99th (ms)         | 0.45                |
-| Mean latency (ms)         | 0.26                |
-| Max latency (ms)          | 5.49                |
-| Requests/sec              | 60,941              |
-| Requests/sec (max)        | 69,579              |
-| Read throughput (MB/s)    | 219.22              |
 
 # 2. app 和 load 在同一个实例，结果不受网络延迟影响
-## c7g
-| application               |                     |
-| ------------------------- | ------------------- |
-| Max Process CPU Usage (%) | 86                  |
-| Max Cores usage (%)       | 344                 |
-| Max Working Set (MB)      | 173                 |
-| Max Private Memory (MB)   | 286                 |
-| Build Time (ms)           | 4,560               |
-| Start Time (ms)           | 226                 |
-| Published Size (KB)       | 107,947             |
-| Symbols Size (KB)         | 23                  |
-| .NET Core SDK Version     | 8.0.416             |
-| ASP.NET Core Version      | 8.0.22+ee4174799332 |
-| .NET Runtime Version      | 8.0.22+a2266c728f63 |
-| Max Global CPU Usage (%)  | 100                 |
+[root@ip-172-31-8-85 Mvc]# crank compare results-local-crudapi-c*.json
 
-
-| load                      |                     |
-| ------------------------- | ------------------- |
-| Max Process CPU Usage (%) | 24                  |
-| Max Cores usage (%)       | 95                  |
-| Max Working Set (MB)      | 46                  |
-| Max Private Memory (MB)   | 135                 |
-| Build Time (ms)           | 5,568               |
-| Start Time (ms)           | 91                  |
-| Published Size (KB)       | 78,542              |
-| Symbols Size (KB)         | 0                   |
-| .NET Core SDK Version     | 8.0.416             |
-| ASP.NET Core Version      | 8.0.22+ee4174799332 |
-| .NET Runtime Version      | 8.0.22+a2266c728f63 |
-| Max Global CPU Usage (%)  | 100                 |
-| First Request (ms)        | 151                 |
-| Requests                  | 2,294,294           |
-| Bad responses             | 0                   |
-| Latency 50th (ms)         | 0.09                |
-| Latency 75th (ms)         | 0.12                |
-| Latency 90th (ms)         | 0.15                |
-| Latency 95th (ms)         | 0.19                |
-| Latency 99th (ms)         | 0.30                |
-| Mean latency (ms)         | 0.10                |
-| Max latency (ms)          | 16.84               |
-| Requests/sec              | 38,239              |
-| Requests/sec (max)        | 64,794              |
-| Read throughput (MB/s)    | 137.55              |
-
-## c8g
-| application               |                     |
-| ------------------------- | ------------------- |
-| Max Process CPU Usage (%) | 84                  |
-| Max Cores usage (%)       | 335                 |
-| Max Working Set (MB)      | 184                 |
-| Max Private Memory (MB)   | 290                 |
-| Build Time (ms)           | 3,461               |
-| Start Time (ms)           | 193                 |
-| Published Size (KB)       | 108,132             |
-| Symbols Size (KB)         | 24                  |
-| .NET Core SDK Version     | 8.0.416             |
-| ASP.NET Core Version      | 8.0.22+ee4174799332 |
-| .NET Runtime Version      | 8.0.22+a2266c728f63 |
-| Max Global CPU Usage (%)  | 99                  |
-
-
-| load                      |                     |
-| ------------------------- | ------------------- |
-| Max Process CPU Usage (%) | 24                  |
-| Max Cores usage (%)       | 94                  |
-| Max Working Set (MB)      | 46                  |
-| Max Private Memory (MB)   | 127                 |
-| Build Time (ms)           | 4,151               |
-| Start Time (ms)           | 68                  |
-| Published Size (KB)       | 78,542              |
-| Symbols Size (KB)         | 0                   |
-| .NET Core SDK Version     | 8.0.416             |
-| ASP.NET Core Version      | 8.0.22+ee4174799332 |
-| .NET Runtime Version      | 8.0.22+a2266c728f63 |
-| Max Global CPU Usage (%)  | 99                  |
-| First Request (ms)        | 111                 |
-| Requests                  | 3,548,148           |
-| Bad responses             | 0                   |
-| Latency 50th (ms)         | 0.06                |
-| Latency 75th (ms)         | 0.07                |
-| Latency 90th (ms)         | 0.09                |
-| Latency 95th (ms)         | 0.11                |
-| Latency 99th (ms)         | 0.19                |
-| Mean latency (ms)         | 0.07                |
-| Max latency (ms)          | 18.86               |
-| Requests/sec              | 59,135              |
-| Requests/sec (max)        | 84,409              |
-| Read throughput (MB/s)    | 212.73              |
-
-## c8i
-| application               |                     |
-| ------------------------- | ------------------- |
-| Max Process CPU Usage (%) | 88                  |
-| Max Cores usage (%)       | 352                 |
-| Max Working Set (MB)      | 1,296               |
-| Max Private Memory (MB)   | 1,414               |
-| Build Time (ms)           | 2,874               |
-| Start Time (ms)           | 213                 |
-| Published Size (KB)       | 99,294              |
-| Symbols Size (KB)         | 24                  |
-| .NET Core SDK Version     | 8.0.416             |
-| ASP.NET Core Version      | 8.0.22+ee4174799332 |
-| .NET Runtime Version      | 8.0.22+a2266c728f63 |
-| Max Global CPU Usage (%)  | 98                  |
-
-
-| load                      |                     |
-| ------------------------- | ------------------- |
-| Max Process CPU Usage (%) | 23                  |
-| Max Cores usage (%)       | 91                  |
-| Max Working Set (MB)      | 47                  |
-| Max Private Memory (MB)   | 127                 |
-| Build Time (ms)           | 3,715               |
-| Start Time (ms)           | 70                  |
-| Published Size (KB)       | 72,281              |
-| Symbols Size (KB)         | 0                   |
-| .NET Core SDK Version     | 8.0.416             |
-| ASP.NET Core Version      | 8.0.22+ee4174799332 |
-| .NET Runtime Version      | 8.0.22+a2266c728f63 |
-| Max Global CPU Usage (%)  | 98                  |
-| First Request (ms)        | 105                 |
-| Requests                  | 4,047,978           |
-| Bad responses             | 0                   |
-| Latency 50th (ms)         | 0.05                |
-| Latency 75th (ms)         | 0.06                |
-| Latency 90th (ms)         | 0.08                |
-| Latency 95th (ms)         | 0.09                |
-| Latency 99th (ms)         | 0.14                |
-| Mean latency (ms)         | 0.06                |
-| Max latency (ms)          | 16.22               |
-| Requests/sec              | 67,466              |
-| Requests/sec (max)        | 86,263              |
-| Read throughput (MB/s)    | 242.69              |
+| load                      | results-local-crudapi-c7g.xlarge-172.31.10.199 | results-local-crudapi-c8g.xlarge-172.31.15.192 |         | results-local-crudapi-c8i.xlarge-172.31.4.109 |         |
+| ------------------------- | ---------------------------------------------- | ---------------------------------------------- | ------- | --------------------------------------------- | ------- |
+| Max Process CPU Usage (%) |                                             23 |                                             24 |  +4.35% |                                            23 |   0.00% |
+| Max Cores usage (%)       |                                             93 |                                             94 |  +1.08% |                                            90 |  -3.23% |
+| Max Working Set (MB)      |                                             46 |                                             46 |   0.00% |                                            47 |  +2.17% |
+| Max Private Memory (MB)   |                                            127 |                                            135 |  +6.30% |                                           127 |   0.00% |
+| Build Time (ms)           |                                          5,575 |                                          4,245 | -23.86% |                                         3,791 | -32.00% |
+| Start Time (ms)           |                                             74 |                                             76 |  +2.70% |                                           106 | +43.24% |
+| Published Size (KB)       |                                         78,542 |                                         78,542 |   0.00% |                                        72,281 |  -7.97% |
+| Symbols Size (KB)         |                                              0 |                                              0 |         |                                             0 |         |
+| .NET Core SDK Version     |                                        8.0.416 |                                        8.0.416 |         |                                       8.0.416 |         |
+| Max Global CPU Usage (%)  |                                             99 |                                            100 |  +1.01% |                                            99 |   0.00% |
+| First Request (ms)        |                                            155 |                                            111 | -28.39% |                                           106 | -31.61% |
+| Requests                  |                                      2,199,036 |                                      3,576,880 | +62.66% |                                     4,043,036 | +83.85% |
+| Bad responses             |                                              0 |                                              0 |         |                                             0 |         |
+| Latency 50th (ms)         |                                           0.10 |                                           0.06 | -40.21% |                                          0.05 | -45.36% |
+| Latency 75th (ms)         |                                           0.12 |                                           0.07 | -41.13% |                                          0.07 | -47.58% |
+| Latency 90th (ms)         |                                           0.16 |                                           0.09 | -40.38% |                                          0.08 | -49.36% |
+| Latency 95th (ms)         |                                           0.20 |                                           0.11 | -42.86% |                                          0.09 | -53.06% |
+| Latency 99th (ms)         |                                           0.31 |                                           0.18 | -40.26% |                                          0.14 | -55.19% |
+| Mean latency (ms)         |                                           0.11 |                                           0.07 | -38.86% |                                          0.06 | -45.76% |
+| Max latency (ms)          |                                          13.22 |                                          15.58 | +17.87% |                                          8.29 | -37.29% |
+| Requests/sec              |                                         36,651 |                                         59,615 | +62.66% |                                        67,384 | +83.86% |
+| Requests/sec (max)        |                                         64,273 |                                         82,667 | +28.62% |                                        84,049 | +30.77% |
+| Read throughput (MB/s)    |                                         131.84 |                                         214.45 | +62.66% |                                        242.40 | +83.85% |
