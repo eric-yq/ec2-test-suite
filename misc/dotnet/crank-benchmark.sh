@@ -6,10 +6,8 @@ sudo su - root
 
 yum install -y git aspnetcore-runtime-8.0 dotnet-runtime-8.0 dotnet-sdk-8.0 
 
-## 在 Load Generator 上安装 Crank Controller
+## 在 Load Generator 和 SUT 上都安装 Crank Controller 和 Agent
 dotnet tool install -g Microsoft.Crank.Controller --version "0.2.0-*" 
-
-## 在 SUT 上安装 Crank agent
 dotnet tool install -g Microsoft.Crank.Agent --version "0.2.0-*"
 
 cat << EOF >> ~/.bash_profile
