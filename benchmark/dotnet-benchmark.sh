@@ -28,8 +28,6 @@ rm -rf /root/Benchmarks
 cd /root/
 git clone https://github.com/aspnet/Benchmarks.git
 
-echo "Test Detail on $(date)====================================================================================" >> ${RESULT_FILE}
-
 ## BenchmarkApp : Mvc
 APPNAME="Mvc"
 CONFIG="benchmarks.crudapi.yml"
@@ -54,7 +52,7 @@ profiles:
 EOF
 # 执行其中包含的各个场景
 yq '.scenarios | keys[]' $CONFIG | while read SCENARIO; do
-    echo "Processing scenario: $SCENARIO"
+    echo "Processing scenario: $SCENARIO" >> ${RESULT_FILE}
     # 获取该 scenario 的详细信息
     crank --config ./$CONFIG \
       --scenario $SCENARIO \
@@ -67,5 +65,3 @@ yq '.scenarios | keys[]' $CONFIG | while read SCENARIO; do
       --variable connections=$CONN 1>>${RESULT_FILE} 2>&1
 
 done
-
-echo "Test End on $(date)====================================================================================" >> ${RESULT_FILE}
