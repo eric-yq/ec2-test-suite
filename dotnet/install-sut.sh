@@ -19,7 +19,7 @@ fi
 	
 install_public_tools(){
     yum update -y 
-	yum install -yq python3-pip git
+	yum install -yq python3-pip git yq
 	pip3 install dool
 }
 
@@ -37,6 +37,7 @@ EOF
 
 ## 启动
 start_sut(){
+    cd /root/
     nohup crank-agent &
 }
 
