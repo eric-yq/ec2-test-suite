@@ -105,12 +105,14 @@ install:
 
 	@echo "Installing Crank for .NET benchmark ..."
 	cd /root/ && \
-	yum install -y git aspnetcore-runtime-8.0 dotnet-runtime-8.0 dotnet-sdk-8.0 && \
+	yum install -y git yq aspnetcore-runtime-8.0 dotnet-runtime-8.0 dotnet-sdk-8.0 && \
 	dotnet tool install -g Microsoft.Crank.Controller --version "0.2.0-*" && \
 	dotnet tool install -g Microsoft.Crank.Agent --version "0.2.0-*" && \
 	cat << EOF >> ~/.bash_profile
 	export PATH="$PATH:/root/.dotnet/tools"
-	EOF && 
+	EOF && \
+	source ~/.bash_profile && \
+	nohup crank-agent & && \
 	@echo "Crank installation complete!"
 
 	@echo "Perform OS Optimization ..."
