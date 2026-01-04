@@ -26,7 +26,7 @@ do
 		## 执行 Benchmark 测试
 		echo "$0: Star to run benchmark"
 		source /tmp/temp-setting
-		bash benchmark/milvus-benchmark.sh ${INSTANCE_IP_MASTER}
+		bash benchmark/dotnet-benchmark.sh ${INSTANCE_IP_MASTER}
 		
 		## 停止实例
 		aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region) &
