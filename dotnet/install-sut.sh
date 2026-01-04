@@ -2,7 +2,6 @@
 
 set -e
 
-
 SUT_NAME=${1}
 echo "$0: Install SUT_NAME: ${SUT_NAME}"
 
@@ -43,6 +42,5 @@ start_sut(){
 
 ## 主要流程
 install_public_tools
-os_configure
 install_sut
 start_sut
