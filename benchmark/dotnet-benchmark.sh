@@ -24,8 +24,8 @@ ssh -o StrictHostKeyChecking=no -i ~/ericyq-global.pem ec2-user@${SUT_IP_ADDR} \
   1> ${DOOL_FILE} 2>&1 &
 
 ## 下载 Benchmark 应用
-rm -rf /root/Benchmarks
 cd /root/
+rm -rf /root/Benchmarks
 git clone https://github.com/aspnet/Benchmarks.git
 
 ## BenchmarkApp : Mvc
@@ -48,8 +48,12 @@ profiles:
       application:
         endpoints: "http://default-app:5010"
       load:
-        endpoints: "http://default-load:5010"
+        endpoints: "http://default-load:5011"
 EOF
+
+APP_IPADDR=$SUT_IP_ADDR
+LOAD_IPADDR=$APP_IPADDR
+
 # 执行其中包含的各个场景
 yq '.scenarios | keys[]' $CONFIG | while read SCENARIO; do
     echo "Processing scenario: $SCENARIO" >> ${RESULT_FILE}
@@ -58,10 +62,9 @@ yq '.scenarios | keys[]' $CONFIG | while read SCENARIO; do
       --scenario $SCENARIO \
       --profile my-profile \
       --application.source.localFolder $PWD/../../.. \
-      --application.endpoints http://$SUT_IP_ADDR:5010 \
-      --load.endpoints http://$SUT_IP_ADDR:5010 \
-      --variable serverAddress=$SUT_IP_ADDR \
+      --application.endpoints http://$APP_IPADDR:5010 \
+      --load.endpoints http://$LOAD_IPADDR:5011 \
+      --variable serverAddress=$APP_IPADDR \
       --variable duration=$DURATION \
       --variable connections=$CONN 1>>${RESULT_FILE} 2>&1
-
 done
