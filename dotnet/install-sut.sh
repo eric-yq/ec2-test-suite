@@ -37,7 +37,9 @@ EOF
 ## 启动
 start_sut(){
     cd /root/
-    nohup crank-agent &
+    # 启动 crank-agent：Applicaiton 和 Load 都需要运行 crank-agent
+    nohup crank-agent --url 'http://*:5010' > crank-agent-app.log 2>&1 &
+    nohup crank-agent --url 'http://*:5011' > crank-agent-load.log 2>&1 &
 }
 
 ## 主要流程
