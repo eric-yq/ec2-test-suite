@@ -110,7 +110,18 @@ crank --config ./benchmarks.jwtapi.yml \
       --application.endpoints http://$APP_IPADDR:5010 \
       --load.endpoints http://$LOAD_IPADDR:5011 \
       --variable serverAddress=$APP_IPADDR \
-      --variable serverPort=5010 \
+      --variable serverPort=5020 \
+      --variable duration=60 \
+      --variable connections=$XXX 
+
+crank --config ./benchmarks.jwtapi.yml \
+      --scenario ApiCrudListProducts \
+      --profile my-profile \
+      --application.source.localFolder $PWD/../../.. \
+      --application.endpoints http://$APP_IPADDR:5010 \
+      --load.endpoints http://$LOAD_IPADDR:5011 \
+      --variable serverAddress=$APP_IPADDR \
+      --variable serverPort=5020 \
       --variable duration=60 \
       --variable connections=$XXX 
 
