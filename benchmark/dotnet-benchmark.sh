@@ -28,15 +28,15 @@ cd /root/
 rm -rf /root/Benchmarks
 git clone https://github.com/aspnet/Benchmarks.git
 
-## scenario : Mvc CRUD API
+###########################################################################################################
+## 测试1: Mvc, crudapi
 APPNAME="Mvc"
 CONFIG="benchmarks.crudapi.yml"
 SCENARIOS="ApiCrudListProducts ApiCrudGetProductDetails ApiCrudAddProduct ApiCrudUpdateProduct ApiCrudDeleteProduct"
 DURATION=60
 CONN=4
-RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}_${APPNAME}.txt"
+RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}_${APPNAME}_${CONFIG}.txt"
 
-echo "Start to perform test: SUT_IP_ADDR=$SUT_IP_ADDR, Applicaiton=$APPNAME, " >> ${RESULT_FILE}
 cd /root/Benchmarks/src/BenchmarksApps/$APPNAME/
 cp $CONFIG $CONFIG.bak
 cat << EOF >> $CONFIG
@@ -55,10 +55,10 @@ EOF
 APP_IPADDR=$SUT_IP_ADDR
 LOAD_IPADDR=$APP_IPADDR
 
-# 执行其中包含的各个场景
+# 执行各个场景
 for SCENARIO in $SCENARIOS
 do
-    echo "Processing scenario: $SCENARIO" >> ${RESULT_FILE}
+    echo "Processing Application: $APNAME, Config: $CONFIG, Scenario: $SCENARIO ..." >> ${RESULT_FILE}
     # 获取该 scenario 的详细信息
     crank --config ./$CONFIG \
       --scenario $SCENARIO \
@@ -69,4 +69,95 @@ do
       --variable serverAddress=$APP_IPADDR \
       --variable duration=$DURATION \
       --variable connections=$CONN 1>>${RESULT_FILE} 2>&1
+done
+
+
+###########################################################################################################
+## 测试2: Mvc, jwtapi
+APPNAME="Mvc"
+CONFIG="benchmarks.jwtapi.yml"
+SCENARIOS="Auth NoMvcNoAuth ApiCrudListProducts ApiCrudGetProductDetails ApiCrudUpdateProduct ApiCrudDeleteProduct"
+DURATION=60
+CONN=2
+RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}_${APPNAME}_${CONFIG}.txt"
+
+cd /root/Benchmarks/src/BenchmarksApps/$APPNAME/
+cp $CONFIG $CONFIG.bak
+cat << EOF >> $CONFIG
+
+profiles:
+  my-profile:
+    variables:
+      serverAddress: default-app
+    jobs:
+      application:
+        endpoints: "http://default-app:5010"
+      load:
+        endpoints: "http://default-load:5011"
+EOF
+
+APP_IPADDR=$SUT_IP_ADDR
+LOAD_IPADDR=$APP_IPADDR
+
+# 执行各个场景
+for SCENARIO in $SCENARIOS
+do
+    echo "Processing Application: $APNAME, Config: $CONFIG, Scenario: $SCENARIO ..." >> ${RESULT_FILE}
+    # 获取该 scenario 的详细信息
+    crank --config ./$CONFIG \
+      --scenario $SCENARIO \
+      --profile my-profile \
+      --application.source.localFolder $PWD/../../.. \
+      --application.endpoints http://$APP_IPADDR:5010 \
+      --load.endpoints http://$LOAD_IPADDR:5011 \
+      --variable serverAddress=$APP_IPADDR \
+      --variable serverPort=5020 \
+      --variable duration=$DURATION \
+      --variable connections=$CONN 1>>${RESULT_FILE} 2>&1
+done
+
+###########################################################################################################
+## 测试3: Mvc, mvcjson
+APPNAME="Mvc"
+CONFIG="benchmarks.mvcjson.yml"
+SCENARIOS="MvcJson2k MvcJsonOutput60k MvcJsonOutput2M MvcJsonInput2k MvcJsonInput60k MvcJsonInput2M"
+DURATION=60
+CONN=2
+RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}_${APPNAME}_${CONFIG}.txt"
+
+cd /root/Benchmarks/src/BenchmarksApps/$APPNAME/
+cp $CONFIG $CONFIG.bak
+cat << EOF >> $CONFIG
+
+profiles:
+  my-profile:
+    variables:
+      serverAddress: default-app
+    jobs:
+      application:
+        endpoints: "http://default-app:5010"
+      load:
+        endpoints: "http://default-load:5011"
+EOF
+
+APP_IPADDR=$SUT_IP_ADDR
+LOAD_IPADDR=$APP_IPADDR
+
+# 执行各个场景
+for SCENARIO in $SCENARIOS
+do
+    echo "Processing Application: $APNAME, Config: $CONFIG, Scenario: $SCENARIO ..." >> ${RESULT_FILE}
+    # 获取该 scenario 的详细信息
+    crank --config ./$CONFIG \
+      --scenario $SCENARIO \
+      --profile my-profile \
+      --application.source.localFolder $PWD/../../.. \
+      --application.endpoints http://$APP_IPADDR:5010 \
+      --load.endpoints http://$LOAD_IPADDR:5011 \
+      --variable serverAddress=$APP_IPADDR \
+      --variable serverPort=5020 \
+      --variable duration=$DURATION \
+      --variable connections=$CONN \
+      --variable threads=$CONN \
+      1>>${RESULT_FILE} 2>&1
 done

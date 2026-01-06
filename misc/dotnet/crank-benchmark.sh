@@ -101,8 +101,7 @@ LOAD_IPADDR=$SUT_IPADDR
 # APP_IPADDR=$SUT_IPADDR
 # LOAD_IPADDR=localhost
 
-## 成功的场景： NoMvcAuth, NoMvcNoAuth, ApiCrudListProducts, 
-##            ApiCrudGetProductDetails, ApiCrudUpdateProduct, ApiCrudDeleteProduct
+## 成功的场景： NoMvcAuth, NoMvcNoAuth, ApiCrudListProducts, ApiCrudGetProductDetails, ApiCrudUpdateProduct, ApiCrudDeleteProduct
 ## 报错的场景： NoMvcAsymmetricAuth, ApiCrudAddProduct
 
 crank --config ./benchmarks.jwtapi.yml \
@@ -160,8 +159,6 @@ crank --config ./benchmarks.mvcjson.yml \
       --variable duration=60 \
       --variable connections=2 \
       --variable threads=2
-
-
 
 
 
