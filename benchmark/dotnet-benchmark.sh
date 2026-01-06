@@ -28,9 +28,10 @@ cd /root/
 rm -rf /root/Benchmarks
 git clone https://github.com/aspnet/Benchmarks.git
 
-## BenchmarkApp : Mvc
+## scenario : Mvc CRUD API
 APPNAME="Mvc"
 CONFIG="benchmarks.crudapi.yml"
+SCENARIOS=("ApiCrudListProducts" "ApiCrudGetProductDetails" "ApiCrudAddProduct" "ApiCrudUpdateProduct" "ApiCrudDeleteProduct")
 DURATION=60
 CONN=4
 RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}_${APPNAME}.txt"
@@ -55,7 +56,7 @@ APP_IPADDR=$SUT_IP_ADDR
 LOAD_IPADDR=$APP_IPADDR
 
 # 执行其中包含的各个场景
-yq '.scenarios | keys[]' $CONFIG | while read SCENARIO; do
+$SCENARIOS | while read SCENARIO; do
     echo "Processing scenario: $SCENARIO" >> ${RESULT_FILE}
     # 获取该 scenario 的详细信息
     crank --config ./$CONFIG \
