@@ -23,6 +23,7 @@ source ~/.bash_profile
 # 启动 crank-agent：Applicaiton 和 Load 都需要运行 crank-agent
 nohup crank-agent --url 'http://*:5010' > crank-agent-app.log 2>&1 &
 nohup crank-agent --url 'http://*:5011' > crank-agent-load.log 2>&1 &
+nohup crank-agent --url 'http://*:5012' > crank-agent-db.log 2>&1 &
 
 ## 下载 Benchmark 应用
 cd /root/
@@ -44,6 +45,8 @@ profiles:
       application:
         endpoints: "http://default-app:5010"
       load:
+        endpoints: "http://default-load:5011"
+      db:
         endpoints: "http://default-load:5011"
 EOF
 
@@ -160,6 +163,54 @@ crank --config ./benchmarks.mvcjson.yml \
       --variable connections=2 \
       --variable threads=2
 
+
+#########################################################################################################
+## scenario : TechEmpower BlazorSSR 
+cd /root/Benchmarks/src/BenchmarksApps/TechEmpower/BlazorSSR
+cp benchmarks.mvcjson.yml benchmarks.mvcjson.yml.bak
+
+cat << EOF >> my-profile.yml
+
+profiles:
+  my-profile:
+    variables:
+      serverAddress: default-app
+    jobs:
+      application:
+        endpoints: "http://default-app:5010"
+      load:
+        endpoints: "http://default-load:5011"
+      db:
+        endpoints: "http://default-load:5012"
+EOF
+
+## 测试方式 1(Local)：Application 和 Load 在同一台机器上运行，
+SUT_IPADDR="172.31.89.43"
+APP_IPADDR=$SUT_IPADDR
+LOAD_IPADDR=$SUT_IPADDR
+
+## 测试方式 2(Remote)：Application 和 Load 在两台不同的机器上运行
+## 使用crank controller 所在实例发起流量
+# SUT_IPADDR="172.31.83.43"
+# APP_IPADDR=$SUT_IPADDR
+# LOAD_IPADDR=localhost
+
+## 成功的场景： MvcJson2k, MvcJsonOutput60k, MvcJsonOutput2M, MvcJsonInput2k, MvcJsonInput60k, MvcJsonInput2M,
+## 报错的场景： MapActionEchoTodo MapActionEchoTodoForm
+
+crank --config ./blazorssr.benchmarks.yml \
+      --config ./my-profile.yml \
+      --profile my-profile \
+      --scenario fortunes \
+      --application.endpoints http://$APP_IPADDR:5010 \
+      --load.endpoints http://$LOAD_IPADDR:5011 \
+      --db.endpoints http://$APP_IPADDR:5012 \
+      --variable serverAddress=$APP_IPADDR \
+      --variable databaseServer=$APP_IPADDR \
+      --variable serverPort=5020 \
+      --variable duration=60 \
+      --variable connections=2 \
+      --variable threads=2
 
 
 #########################################################################################################
