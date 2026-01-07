@@ -18,8 +18,10 @@ fi
 	
 install_public_tools(){
     yum update -y 
-	yum install -yq python3-pip git yq
+	yum install -yq python3-pip git yq docker
 	pip3 install dool
+    systemctl start docker
+    systemctl enable docker
 }
 
 ## 安装
@@ -40,6 +42,7 @@ start_sut(){
     # 启动 crank-agent：Applicaiton 和 Load 都需要运行 crank-agent
     nohup crank-agent --url 'http://*:5010' > crank-agent-app.log 2>&1 &
     nohup crank-agent --url 'http://*:5011' > crank-agent-load.log 2>&1 &
+    nohup crank-agent --url 'http://*:5012' > crank-agent-db.log 2>&1 &
 }
 
 ## 主要流程
