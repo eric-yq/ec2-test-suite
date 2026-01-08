@@ -50,8 +50,13 @@ cp -r ec2-test-suite/misc/demo-code-for-graviton-migration /root/
 
 ## 初始化需要porting的代码库
 cd /root/demo-code-for-graviton-migration
-git init
+git init 
 git add .
 git commit -m "Initial commit before Graviton migration"
 
 ## 开始
+atx
+
+## 
+> list_available_transformations_from_registry
+
