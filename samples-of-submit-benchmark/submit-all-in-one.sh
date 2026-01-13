@@ -6,6 +6,12 @@ set -e
 os_types="al2023"
 instance_types="$1"
 
+if [ "$USE_CPG" = "1" ] ; then
+  OPT="USE_CPG=1"
+else
+  OPT=""
+fi
+
 # loadgen上执行一遍 OS/网络优化脚本
 bash benchmark/os-optimization.sh
 
@@ -16,10 +22,10 @@ do
 	do
 		## 创建实例、安装软件
 		echo "$0: OS_TYPE=${os}, INSTANCE_TYPE=${ins}"
-		bash launch-instances-single.sh -s specjbb15 -t ${ins} -o ${os}
-		bash launch-instances-single.sh -s ffmpeg    -t ${ins} -o ${os}
-		bash launch-instances-single.sh -s spark     -t ${ins} -o ${os}
-		bash launch-instances-single.sh -s pts       -t ${ins} -o ${os}
+		$OPT bash launch-instances-single.sh -s specjbb15 -t ${ins} -o ${os}
+		$OPT bash launch-instances-single.sh -s ffmpeg    -t ${ins} -o ${os}
+		$OPT bash launch-instances-single.sh -s spark     -t ${ins} -o ${os}
+		$OPT bash launch-instances-single.sh -s pts       -t ${ins} -o ${os}
 	done
 done
 
@@ -31,7 +37,7 @@ do
     do
         ## 创建实例、安装软件
         echo "$0: OS_TYPE=${os}, INSTANCE_TYPE=${ins}"
-        bash launch-instances-single.sh -s redis -t ${ins} -o ${os}
+        $OPT bash launch-instances-single.sh -s redis -t ${ins} -o ${os}
         # 检查实例启动状态：如果失败则跳过后续测试。
         launch_status=$?
         if [ $launch_status -ne 0 ]; then
@@ -64,7 +70,7 @@ do
     do
         ## 创建实例、安装软件
         echo "$0: OS_TYPE=${os}, INSTANCE_TYPE=${ins}"
-        bash launch-instances-single.sh -s valkey -t ${ins} -o ${os}
+        $OPT bash launch-instances-single.sh -s valkey -t ${ins} -o ${os}
         # 检查实例启动状态：如果失败则跳过后续测试。
         launch_status=$?
         if [ $launch_status -ne 0 ]; then
@@ -97,7 +103,7 @@ do
         do
         ## 创建实例、安装软件
         echo "$0: OS_TYPE=${os}, INSTANCE_TYPE=${ins}"
-        bash launch-instances-nginx.sh -s nginx -t ${ins} -o ${os}
+        $OPT bash launch-instances-nginx.sh -s nginx -t ${ins} -o ${os}
         # 检查实例启动状态：如果失败则跳过后续测试。
         launch_status=$?
         if [ $launch_status -ne 0 ]; then
@@ -129,7 +135,7 @@ do
     do
         ## 创建实例、安装软件
         echo "$0: OS_TYPE=${os}, INSTANCE_TYPE=${ins}"
-        bash launch-instances-single.sh -s mysql-ebs -t ${ins} -o ${os}
+        $OPT bash launch-instances-single.sh -s mysql-ebs -t ${ins} -o ${os}
         launch_status=$?
 
         # 检查启动状态
@@ -172,7 +178,7 @@ do
     do
         ## 创建实例、安装软件
         echo "$0: OS_TYPE=${os}, INSTANCE_TYPE=${ins}"
-        bash launch-instances-single.sh -s mongo -t ${ins} -o ${os}
+        $OPT bash launch-instances-single.sh -s mongo -t ${ins} -o ${os}
         # 检查实例启动状态：如果失败则跳过后续测试。
         launch_status=$?
         if [ $launch_status -ne 0 ]; then
@@ -202,7 +208,7 @@ do
 	do
 		## 创建实例、安装软件
 		echo "$0: OS_TYPE=${os}, INSTANCE_TYPE=${ins}"
-		bash launch-instances-single.sh -s milvus -t ${ins} -o ${os}
+		$OPT bash launch-instances-single.sh -s milvus -t ${ins} -o ${os}
 		# 检查实例启动状态：如果失败则跳过后续测试。
 		launch_status=$?
 		if [ $launch_status -ne 0 ]; then
