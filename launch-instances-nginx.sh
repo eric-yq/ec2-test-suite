@@ -69,14 +69,25 @@ PG_NAME_XXX=$(aws ec2 describe-instances \
 sed -i "s/REGION_NAME_XXX/${REGION_NAME}/g" variables.tf
 sed -i "s/SUBNET_ID_XXX/${SUBNET_ID_XXX}/g" variables.tf
 sed -i "s/SG_ID_XXX/${SG_ID_XXX}/g" variables.tf
-sed -i "s/PG_NAME_XXX/${PG_NAME_XXX}/g" variables.tf
 sed -i "s/INSTANCE_NAME_XXX/SUT_${SUT_NAME}/g" variables.tf
 sed -i "s/INSTANCE_TYPE_XXX/${INSTANCE_TYPE}/g" variables.tf
 sed -i "s/AMI_ID_XXX/${AMI_ID}/g" variables.tf
 sed -i "s/USERDATA_FILE_XXX/userdata.sh/g" variables.tf
 
-## 修改 userdata-xx.sh 的 SUT_NAME 
+## 修改 userdata.sh: 设置 AWC CLI 的 AK/SK
 sed -i "s/SUT_XXX/${SUT_NAME}/g" userdata.sh
+if grep -q "akxxx" userdata.sh && grep -q "skxxx" userdata.sh; then
+    sed -i "s/akxxx/$(aws configure get aws_access_key_id)/g" userdata.sh
+    sed -i "s/skxxx/$(aws configure get aws_secret_access_key)/g" userdata.sh
+fi
+
+## 修改 userdata.sh: 设置是否使用Cluster Placement Group
+## USE_CPG 通过 调用脚本 launch-instances-single.sh 时传递过来 USE_cpg=1 表示使用 CPG， 否则不使用。
+if [ "$USE_CPG" = "1" ] && [ -n "$PG_NAME_XXX" ]; then
+  sed -i "s/PG_NAME_XXX/\"${PG_NAME_XXX}\"/g" variables.tf
+else
+  sed -i "s/PG_NAME_XXX/null/g" variables.tf
+fi
 
 ## 使用 terraform 启动实例
 terraform init
@@ -120,7 +131,6 @@ cd tf_cfg_${SUT_NAME}
 sed -i "s/REGION_NAME_XXX/${REGION_NAME}/g" variables.tf
 sed -i "s/SUBNET_ID_XXX/${SUBNET_ID_XXX}/g" variables.tf
 sed -i "s/SG_ID_XXX/${SG_ID_XXX}/g" variables.tf
-sed -i "s/PG_NAME_XXX/${PG_NAME_XXX}/g" variables.tf
 sed -i "s/INSTANCE_NAME_XXX/SUT_${SUT_NAME}/g" variables.tf
 sed -i "s/INSTANCE_TYPE_XXX/${INSTANCE_TYPE}/g" variables.tf
 sed -i "s/AMI_ID_XXX/${AMI_ID}/g" variables.tf
@@ -130,6 +140,19 @@ sed -i "s/USERDATA_FILE_XXX/userdata.sh/g" variables.tf
 sed -i "s/SUT_XXX/${SUT_NAME}/g" userdata.sh
 sed -i "s/INSTANCE_IP_WEB1_XXX/${INSTANCE_IP_WEB1}/g" userdata.sh
 sed -i "s/INSTANCE_IP_WEB2_XXX/${INSTANCE_IP_WEB2}/g" userdata.sh
+
+if grep -q "akxxx" userdata.sh && grep -q "skxxx" userdata.sh; then
+    sed -i "s/akxxx/$(aws configure get aws_access_key_id)/g" userdata.sh
+    sed -i "s/skxxx/$(aws configure get aws_secret_access_key)/g" userdata.sh
+fi
+
+## 修改 userdata.sh: 设置是否使用Cluster Placement Group
+## USE_CPG 通过 调用脚本 launch-instances-single.sh 时传递过来 USE_cpg=1 表示使用 CPG， 否则不使用。
+if [ "$USE_CPG" = "1" ] && [ -n "$PG_NAME_XXX" ]; then
+  sed -i "s/PG_NAME_XXX/\"${PG_NAME_XXX}\"/g" variables.tf
+else
+  sed -i "s/PG_NAME_XXX/null/g" variables.tf
+fi
 
 ## 使用 terraform 启动实例
 terraform init

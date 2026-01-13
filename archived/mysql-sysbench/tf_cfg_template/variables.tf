@@ -7,7 +7,7 @@ variable "vpc_security_group_ids" {
 }
 
 variable "placement_group_name" {
-	default = "PG_NAME_XXX"
+	default = PG_NAME_XXX
 }
 
 
