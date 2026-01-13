@@ -210,8 +210,8 @@ http {
         ## 负载均衡配置
         location / {
             proxy_pass http://nginx-webserver-group;
-            # proxy_http_version 1.1;
-            # proxy_set_header Connection "";
+            proxy_http_version 1.1;
+            proxy_set_header Connection "";
         }
     }
 }
