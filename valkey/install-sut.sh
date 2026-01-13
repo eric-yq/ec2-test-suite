@@ -134,8 +134,6 @@ install_valkey(){
 start_valkey(){
     sysctl vm.overcommit_memory=1
     
-	
-
     ## 1. 配置一个单线程 valkey, 不使用 io-threads
     ## 计算内存容量
 	MEM_TOTAL_GB=$(free -g |grep Mem | awk -F " " '{print $2}')

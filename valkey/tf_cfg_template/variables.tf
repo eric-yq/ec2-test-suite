@@ -13,7 +13,7 @@ variable "ami_key_pair_name" {
 
 
 variable "placement_group_name" {
-	default = "PG_NAME_XXX"
+	default = PG_NAME_XXX
 }
 
 

@@ -34,7 +34,7 @@ variable "ami_id" {
 }
 
 variable "placement_group_name" {
-	default = "PG_NAME_XXX"
+	default = PG_NAME_XXX
 }
 
 variable "userdata_file" {
