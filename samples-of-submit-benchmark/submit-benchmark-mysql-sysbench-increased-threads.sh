@@ -42,15 +42,15 @@ do
 		# oltp   294912656  64290.00     4466.85
 
 		## 使用不同的 “线程数+时间“ 的组合，执行 benchmark
+		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 60  15 20000000 2
 		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 60  15 20000000 4
 		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 60  15 20000000 6
 		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 60  15 20000000 8
 		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 60  15 20000000 10
-		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 60  15 20000000 12
+		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 30  15 20000000 12
 		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 30  15 20000000 16
 		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 30  15 20000000 20
-		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 30  15 20000000 24
-		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 15  15 20000000 28
+		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 15  15 20000000 24
 		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 15  15 20000000 32
 
 		## 停止实例	
