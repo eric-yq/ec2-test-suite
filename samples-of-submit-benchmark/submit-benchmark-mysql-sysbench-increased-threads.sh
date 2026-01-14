@@ -35,19 +35,25 @@ do
 		source /tmp/temp-setting
 
 		## 准备数据
-		bash benchmark/mysql-benchmark_sysbench_prepare.sh ${INSTANCE_IP_MASTER} 60  9 20000000
+		bash benchmark/mysql-benchmark_sysbench_prepare.sh ${INSTANCE_IP_MASTER} 60  15 20000000
+		## 数据量估算：15 个表，每个表 20000000 条记录，数据库中大小约 68,756 MB 数据
+		# [Build Schema Summary]: 
+		# 数据库  记录数      数据容量(MB)  索引容量(MB)
+		# oltp   294912656  64290.00     4466.85
 
 		## 使用不同的线程数执行benchmark
-		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 60  9 20000000 1
-		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 60  9 20000000 2
-		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 60  9 20000000 4
-		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 60  9 20000000 6
-		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 60  9 20000000 8
-		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 30  9 20000000 10
-		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 30  9 20000000 12
-		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 30  9 20000000 16
+		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 60  15 20000000 1
+		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 60  15 20000000 2
+		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 60  15 20000000 4
+		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 60  15 20000000 6
+		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 60  15 20000000 8
+		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 30  15 20000000 10
+		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 30  15 20000000 12
+		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 30  15 20000000 16
+		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 15  15 20000000 24
+		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 15  15 20000000 32
 
-		## 停止实例
+		## 停止实例	
 		aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region) &
 	done
 done
