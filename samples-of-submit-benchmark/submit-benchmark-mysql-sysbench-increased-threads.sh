@@ -37,6 +37,7 @@ do
 		## 准备数据
 		bash benchmark/mysql-benchmark_sysbench_prepare.sh ${INSTANCE_IP_MASTER} 60  9 20000000
 		
+		## 使用不同的线程数执行benchmark
 		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 60  9 20000000 1
 		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 60  9 20000000 2
 		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 60  9 20000000 4
