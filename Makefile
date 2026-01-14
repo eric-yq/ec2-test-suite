@@ -75,7 +75,7 @@ install:
 	tar zxf 1.0.20.tar.gz && rm -rf 1.0.20.tar.gz && \
 	cd sysbench-1.0.20 && \
 	./autogen.sh && \
-	./configure && \
+	./configure --with-mysql && \
 	make -j && \
 	make install && \
 	sysbench --version
