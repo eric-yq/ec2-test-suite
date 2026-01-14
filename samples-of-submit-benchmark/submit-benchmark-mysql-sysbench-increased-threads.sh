@@ -41,7 +41,7 @@ do
 		# 数据库  记录数      数据容量(MB)  索引容量(MB)
 		# oltp   294912656  64290.00     4466.85
 
-		## 使用不同的线程数执行benchmark
+		## 使用不同的 “线程数+时间“ 的组合，执行 benchmark
 		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 60  15 20000000 1
 		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 60  15 20000000 2
 		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 60  15 20000000 4
