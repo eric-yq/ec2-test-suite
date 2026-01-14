@@ -1,6 +1,6 @@
 #!/bin/bash
 
-## 使用方法： bash mysql-benchmark_sysbench.sh <IP地址> <执行时间(分钟)> <表数量> <每个表记录条数> <线程数>
+## 使用方法： bash mysql-benchmark_sysbench_prepare.sh <IP地址> <执行时间(分钟)> <表数量> <每个表记录条数>
 
 # set -e
 
@@ -8,7 +8,7 @@ SUT_IP_ADDR=${1}
 OLTP_DURATION=${2}
 TABLES=${3}
 TABLE_SIZE=${4}
-RUN_THREADS=${5}
+RUN_THREADS=16
 
 cd ~/sysbench-1.0.20/
 
@@ -17,8 +17,15 @@ RESULT_PATH="/root/ec2-test-suite/benchmark-result-files"
 mkdir -p ${RESULT_PATH}
 RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}.txt"
 
+## 启动一个后台进程，执行dool命令，获取系统性能信息
+## Note: prepare: 按 38 分钟计算;  run: 按 64*8=512 分钟计算 ，总计打印 550 分钟的监控信息。
+DOOL_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}_dool.txt"
+ssh -o StrictHostKeyChecking=no -i ~/ericyq-global.pem ec2-user@${SUT_IP_ADDR} \
+  "dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 550" \
+  1> ${DOOL_FILE} 2>&1 &
+
 echo "Test Detail on $(date)====================================================================================" >> ${RESULT_FILE}
-echo "Command Line Parameters: SUT_IP_ADDR=${1}, OLTP_DURATION=${2}, TABLES=${3}, TABLE_SIZE=${4}, RUN_THREADS=${5}" >> ${RESULT_FILE}
+echo "Command Line Parameters: SUT_IP_ADDR=${1}, OLTP_DURATION=${2}, TABLES=${3}, TABLE_SIZE=${4}" >> ${RESULT_FILE}
 
 ## 准备数据
 mysql -h ${SUT_IP_ADDR} -p'gv2mysql' << EOF
@@ -37,7 +44,7 @@ echo "[Prepare Tables]: " >> ${RESULT_FILE}
   --tables=$TABLES \
   --table-size=$TABLE_SIZE \
   --report-interval=300 \
-  --threads=16 \
+  --threads=$RUN_THREADS \
   prepare >> ${RESULT_FILE}
   
 ## 更新 schema_information
@@ -54,35 +61,4 @@ echo "[Build Schema Summary]: " >> ${RESULT_FILE}
 echo "$database_statics" >> ${RESULT_FILE}
 echo "$table_statics" >> ${RESULT_FILE}
 
-## 执行 benchmark
-RAMPUP_DURATION=0
-let RUNTIMER_DURATION=$((${RAMPUP_DURATION}+${OLTP_DURATION}+1))*60
-echo "[Run Benchmark]: " >> ${RESULT_FILE}
-./src/sysbench ./src/lua/oltp_read_write.lua \
-  --mysql-host=$SUT_IP_ADDR \
-  --mysql-port=3306 \
-  --mysql-user=root \
-  --mysql-password='gv2mysql' \
-  --mysql-db=oltp \
-  --db-driver=mysql \
-  --tables=$TABLES \
-  --table-size=$TABLE_SIZE \
-  --report-interval=300 \
-  --threads=$RUN_THREADS \
-  --time=$RUNTIMER_DURATION \
-  run  >> ${RESULT_FILE}
-  
-## 清理数据
-echo "[Cleanup Data] " >> ${RESULT_FILE}
-./src/sysbench ./src/lua/oltp_read_write.lua \
-  --mysql-host=$SUT_IP_ADDR \
-  --mysql-port=3306 \
-  --mysql-user=root \
-  --mysql-password='gv2mysql' \
-  --mysql-db=oltp \
-  --db-driver=mysql \
-  --tables=$TABLES \
-  --table-size=$TABLE_SIZE \
-  --report-interval=60 \
-  --threads=16 \
-  cleanup
+echo "Prepare Completed on $(date)==================================================================================" >> ${RESULT_FILE}

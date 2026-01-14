@@ -1,8 +1,5 @@
 #!/bin/bash
 
-## 保存结果的目录
-mkdir -p $0--result-summary
-
 ## 待测 EC2 规格和 OS
 os_types="al2023"
 instance_types="$1"
@@ -15,42 +12,42 @@ else
   OPT=""
 fi
 
-instance_types="m6i.2xlarge m6g.2xlarge m5.2xlarge m7i.2xlarge m7a.2xlarge m6a.2xlarge "
-
 for os in ${os_types} 
 do
 	for ins in ${instance_types} 
 	do
 		## 创建实例、安装软件
 		echo "$0: OS_TYPE=${os}, INSTANCE_TYPE=${ins}"
-		$OPT bash launch-instances-single.sh -s mysql-sysbench -t ${ins} -o ${os}
-		
-		echo "$0: [$(date +%Y%m%d.%H%M%S)]  Sleep 180 seconds..."
-		sleep 180
-		
+		$OPT bash launch-instances-single.sh -s mysql-ebs -t ${ins} -o ${os}
+		launch_status=$?
+
+		# 检查启动状态
+		if [ $launch_status -ne 0 ]; then
+			echo "\$0: [$(date +%Y%m%d.%H%M%S)] Instance launch failed for OS_TYPE=${os}, INSTANCE_TYPE=${ins}. Continuing with next configuration..."
+			continue
+		fi
+
+		echo "$0: [$(date +%Y%m%d.%H%M%S)] Sleep 600 seconds ..."
+		sleep 600
+
 		## 执行 Benchmark 测试
 		echo "$0: Star to run benchmark"
 		source /tmp/temp-setting
-		
-		bash benchmark/mysql-benchmark_sysbench.sh ${INSTANCE_IP_MASTER} 60  9 20000000 1
-		bash benchmark/mysql-benchmark_sysbench.sh ${INSTANCE_IP_MASTER} 60  9 20000000 2
-		bash benchmark/mysql-benchmark_sysbench.sh ${INSTANCE_IP_MASTER} 60  9 20000000 4
-		bash benchmark/mysql-benchmark_sysbench.sh ${INSTANCE_IP_MASTER} 60  9 20000000 6
-		bash benchmark/mysql-benchmark_sysbench.sh ${INSTANCE_IP_MASTER} 60  9 20000000 8
-		bash benchmark/mysql-benchmark_sysbench.sh ${INSTANCE_IP_MASTER} 60  9 20000000 10
-		bash benchmark/mysql-benchmark_sysbench.sh ${INSTANCE_IP_MASTER} 60  9 20000000 12
-		bash benchmark/mysql-benchmark_sysbench.sh ${INSTANCE_IP_MASTER} 60  9 20000000 14
-		bash benchmark/mysql-benchmark_sysbench.sh ${INSTANCE_IP_MASTER} 60  9 20000000 16
-		bash benchmark/mysql-benchmark_sysbench.sh ${INSTANCE_IP_MASTER} 60  9 20000000 24
-		bash benchmark/mysql-benchmark_sysbench.sh ${INSTANCE_IP_MASTER} 60  9 20000000 32
-		bash benchmark/mysql-benchmark_sysbench.sh ${INSTANCE_IP_MASTER} 60  9 20000000 48
-		bash benchmark/mysql-benchmark_sysbench.sh ${INSTANCE_IP_MASTER} 60  9 20000000 64
 
-# only for test
-#  		bash benchmark/mysql-benchmark_sysbench.sh ${INSTANCE_IP_MASTER} 3  10 1000000 32
+		## 准备数据
+		bash benchmark/mysql-benchmark_sysbench_prepare.sh ${INSTANCE_IP_MASTER} 60  9 20000000
+		
+		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 60  9 20000000 1
+		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 60  9 20000000 2
+		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 60  9 20000000 4
+		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 60  9 20000000 6
+		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 60  9 20000000 8
+		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 30  9 20000000 10
+		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 30  9 20000000 12
+		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 30  9 20000000 16
 
 		## 停止实例
-		aws ec2 stop-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region)
+		# aws ec2 stop-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region)
 	done
 done
 
