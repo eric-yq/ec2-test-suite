@@ -36,7 +36,7 @@ do
 
 		## 准备数据
 		bash benchmark/mysql-benchmark_sysbench_prepare.sh ${INSTANCE_IP_MASTER} 60  9 20000000
-		
+
 		## 使用不同的线程数执行benchmark
 		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 60  9 20000000 1
 		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 60  9 20000000 2
@@ -48,7 +48,7 @@ do
 		bash benchmark/mysql-benchmark_sysbench_run.sh ${INSTANCE_IP_MASTER} 30  9 20000000 16
 
 		## 停止实例
-		# aws ec2 stop-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region)
+		# aws ec2 terminates-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region)
 	done
 done
 
