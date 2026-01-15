@@ -18,7 +18,7 @@ do
 		do
 		## 创建实例、安装软件
 		echo "$0: OS_TYPE=${os}, INSTANCE_TYPE=${ins}"
-		bash launch-instances-nginx.sh -s nginx -t ${ins} -o ${os}
+		eval $OPT bash launch-instances-nginx.sh -s nginx -t ${ins} -o ${os}
 		# 检查实例启动状态：如果失败则跳过后续测试。
 		launch_status=$?
 		if [ $launch_status -ne 0 ]; then

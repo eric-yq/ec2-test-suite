@@ -22,10 +22,10 @@ do
 	do
 		## 创建实例、安装软件
 		echo "$0: OS_TYPE=${os}, INSTANCE_TYPE=${ins}"
-		$OPT bash launch-instances-single.sh -s specjbb15 -t ${ins} -o ${os}
-		$OPT bash launch-instances-single.sh -s ffmpeg    -t ${ins} -o ${os}
-		$OPT bash launch-instances-single.sh -s spark     -t ${ins} -o ${os}
-		$OPT bash launch-instances-single.sh -s pts       -t ${ins} -o ${os}
+		eval $OPT bash launch-instances-single.sh -s specjbb15 -t ${ins} -o ${os}
+		eval $OPT bash launch-instances-single.sh -s ffmpeg    -t ${ins} -o ${os}
+		eval $OPT bash launch-instances-single.sh -s spark     -t ${ins} -o ${os}
+		eval $OPT bash launch-instances-single.sh -s pts       -t ${ins} -o ${os}
 	done
 done
 

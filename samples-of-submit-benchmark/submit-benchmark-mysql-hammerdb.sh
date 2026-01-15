@@ -20,7 +20,7 @@ do
 	do
 		## 创建实例、安装软件
 		echo "$0: OS_TYPE=${os}, INSTANCE_TYPE=${ins}"
-		$OPT bash launch-instances-single.sh -s mysql-ebs -t ${ins} -o ${os}
+		eval $OPT bash launch-instances-single.sh -s mysql-ebs -t ${ins} -o ${os}
 		launch_status=$?
 
 		# 检查启动状态
