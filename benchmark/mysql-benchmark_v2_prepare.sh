@@ -86,3 +86,7 @@ echo "$database_statics" >> ${RESULT_FILE}
 echo "$table_statics" >> ${RESULT_FILE}
 
 echo "Complete to prepare data. " >> ${RESULT_FILE}
+
+# 测试延迟
+sleep 30
+bash ~/ec2-test-suite/tools/mysql_latency_test.sh ${SUT_IP_ADDR} >> ${RESULT_FILE}
