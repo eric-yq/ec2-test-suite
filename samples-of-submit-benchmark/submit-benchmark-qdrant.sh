@@ -18,7 +18,7 @@ do
 	do
 		## 创建实例、安装软件
 		echo "$0: OS_TYPE=${os}, INSTANCE_TYPE=${ins}"
-		$OPT bash launch-instances-single.sh -s qdrant -t ${ins} -o ${os}
+		eval $OPT bash launch-instances-single.sh -s qdrant -t ${ins} -o ${os}
 		
 		echo "$0: [$(date +%Y%m%d.%H%M%S)] Sleep 300 seconds..."
 		sleep 120
