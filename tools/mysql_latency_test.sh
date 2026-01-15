@@ -5,6 +5,10 @@ USER="root"
 PASSWORD="gv2mysql"
 COUNT=1000
 
+echo "测试 MySQL Client-Server 延迟 (ping 60 次)"
+echo "=========================================="
+ping -q -c 60 $HOST 
+
 echo "测试 MySQL Client-Server 延迟 (执行 $COUNT 次)"
 echo "=========================================="
 
