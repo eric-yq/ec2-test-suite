@@ -48,14 +48,6 @@ cp -rf tf_cfg_template tf_cfg_${SUT_NAME}
 cd tf_cfg_${SUT_NAME}
 
 # 获取 Subnet ID，Security Group ID和 placement group name
-# MAC=$(cloud-init query ds.meta_data.mac)
-# SUBNET_ID_XXX=$(cloud-init query ds.meta_data.network.interfaces.macs.$MAC.subnet_id)
-# SG_ID_XXX=$(cloud-init query ds.meta_data.network.interfaces.macs.$MAC.security_group_ids)
-# ins_id=$(cloud-init query ds.meta_data.instance_id)
-# PG_NAME_XXX=$(aws ec2 describe-instances \
-#   --instance-ids $ins_id --region $REGION_NAME \
-#   --query "Reservations[0].Instances[0].Placement.GroupName" \
-#   --output text)
 read SUBNET_ID_XXX SG_ID_XXX PG_NAME_XXX < <(aws ec2 describe-instances \
   --instance-ids $(ec2-metadata --quiet -i) \
   --query 'Reservations[0].Instances[0].[SubnetId,SecurityGroups[0].GroupId,Placement.GroupName]' \
