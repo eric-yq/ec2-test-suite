@@ -46,10 +46,6 @@ do
 
 		## 准备数据
 	    bash benchmark/mysql-benchmark_sysbench_prepare.sh ${SUT_IP_ADDR} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE}
-		## 数据量估算：15 个表，每个表 20000000 条记录，数据库中大小约 68,756 MB 数据
-		# [Build Schema Summary]: 
-		# 数据库  记录数      数据容量(MB)  索引容量(MB)
-		# oltp   294912656  64290.00     4466.85
 
 		## 使用不同的 “线程数+时间“ 的组合，执行 benchmark
 		# 精简并发: 低/中/高/极端
@@ -104,10 +100,6 @@ do
 
 		## 准备数据
 	    bash benchmark/mysql-benchmark_sysbench_prepare.sh ${SUT_IP_ADDR} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE}
-		## 数据量估算：15 个表，每个表 20000000 条记录，数据库中大小约 68,756 MB 数据
-		# [Build Schema Summary]: 
-		# 数据库  记录数      数据容量(MB)  索引容量(MB)
-		# oltp   294912656  64290.00     4466.85
 
 		## 使用不同的 “线程数+时间“ 的组合，执行 benchmark
 		# 精简并发: 低/中/高/极端
