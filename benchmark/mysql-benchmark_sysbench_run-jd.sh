@@ -55,8 +55,6 @@ else
   exit 1
 fi
 
-
-
 ## 执行 benchmark
 RAMPUP_DURATION=0
 let RUNTIMER_DURATION=$((${RAMPUP_DURATION}+${OLTP_DURATION}+1))*60
@@ -75,3 +73,4 @@ echo "[Run Benchmark]: " >> ${RESULT_FILE}
   --time=$RUNTIMER_DURATION \
   run  >> ${RESULT_FILE}
   
+  sleep 30
