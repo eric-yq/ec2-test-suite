@@ -67,9 +67,11 @@ do
 		done
 
 		## 停止实例	
-		aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region) &
+		# aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region) &
 	done
 done
+
+sleep 60
 
 ## 测试 2： 补充测试，100*3M
 # 测试参数
@@ -123,7 +125,7 @@ do
 		done
 
 		## 停止实例	
-		aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region) &
+		# aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region) &
 	done
 done
 
