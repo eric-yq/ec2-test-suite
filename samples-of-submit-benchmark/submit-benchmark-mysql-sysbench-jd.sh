@@ -17,7 +17,6 @@ fi
 
 ## 测试 1： JD 提供的数据量；
 # 测试参数
-SUT_IP_ADDR=${INSTANCE_IP_MASTER}
 OLTP_DURATION=10
 TABLES=100
 TABLE_SIZE=1000000
@@ -45,21 +44,21 @@ do
 		source /tmp/temp-setting
 
 		## 准备数据
-	    bash benchmark/mysql-benchmark_sysbench_prepare.sh ${SUT_IP_ADDR} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE}
+	    bash benchmark/mysql-benchmark_sysbench_prepare.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE}
 
 		## 使用不同的 “线程数+时间“ 的组合，执行 benchmark
 		# 精简并发: 低/中/高/极端
 		THREADS="4 32 128 512"
 		for t in ${THREADS}
 		do
-		    bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${SUT_IP_ADDR} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} read_only
-			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${SUT_IP_ADDR} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} write_only
-			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${SUT_IP_ADDR} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} rw_default
-			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${SUT_IP_ADDR} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} rw_70_30
-			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${SUT_IP_ADDR} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} rw_90_10
-			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${SUT_IP_ADDR} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} point_select
-			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${SUT_IP_ADDR} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} update_index
-			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${SUT_IP_ADDR} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} update_non_index
+		    bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} read_only
+			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} write_only
+			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} rw_default
+			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} rw_70_30
+			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} rw_90_10
+			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} point_select
+			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} update_index
+			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} update_non_index
 		done
 
 		## 停止实例	
@@ -71,7 +70,6 @@ sleep 60
 
 ## 测试 2： 补充测试，100*3M
 # 测试参数
-SUT_IP_ADDR=${INSTANCE_IP_MASTER}
 OLTP_DURATION=10
 TABLES=100
 TABLE_SIZE=3000000
@@ -99,21 +97,21 @@ do
 		source /tmp/temp-setting
 
 		## 准备数据
-	    bash benchmark/mysql-benchmark_sysbench_prepare.sh ${SUT_IP_ADDR} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE}
+	    bash benchmark/mysql-benchmark_sysbench_prepare.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE}
 
 		## 使用不同的 “线程数+时间“ 的组合，执行 benchmark
 		# 精简并发: 低/中/高/极端
 		THREADS="4 32 128 512"
 		for t in ${THREADS}
 		do
-		    bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${SUT_IP_ADDR} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} read_only
-			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${SUT_IP_ADDR} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} write_only
-			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${SUT_IP_ADDR} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} rw_default
-			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${SUT_IP_ADDR} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} rw_70_30
-			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${SUT_IP_ADDR} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} rw_90_10
-			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${SUT_IP_ADDR} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} point_select
-			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${SUT_IP_ADDR} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} update_index
-			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${SUT_IP_ADDR} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} update_non_index
+		    bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} read_only
+			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} write_only
+			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} rw_default
+			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} rw_70_30
+			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} rw_90_10
+			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} point_select
+			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} update_index
+			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} update_non_index
 		done
 
 		## 停止实例	
