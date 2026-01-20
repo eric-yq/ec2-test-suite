@@ -1,8 +1,8 @@
 #!/bin/bash
 
 ## JD 在 20260120 提供的测试报告中：
-## 数据量采用 100*1M(约 23GB）， 实例size 为 m7i.4xlarge(16 vCPU, 64 GiB)
-## 补充测试时，数据量采用 100*3M
+## 数据量采用 100*1M(约 23GB）， 实例 size 为 m7i.4xlarge(16 vCPU, 64 GiB)
+## 补充测试时，数据量采用 100*3M(约 67GB）
 
 # 待测 EC2 规格和 OS
 os_types="al2023"
