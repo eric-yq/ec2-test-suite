@@ -43,22 +43,25 @@ do
 		echo "$0: Star to run benchmark"
 		source /tmp/temp-setting
 
+		# 组合参数
+		opt="${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE}"
+
 		## 准备数据
-	    bash benchmark/mysql-benchmark_sysbench_prepare.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE}
+	    bash benchmark/mysql-benchmark_sysbench_prepare.sh ${opt}
 
 		## 使用不同的 “线程数+时间“ 的组合，执行 benchmark
 		# 精简并发: 低/中/高/极端
 		THREADS="4 32 128 512"
 		for t in ${THREADS}
 		do
-		    bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} read_only
-			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} write_only
-			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} rw_default
-			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} rw_70_30
-			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} rw_90_10
-			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} point_select
-			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} update_index
-			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} update_non_index
+		    bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${opt} ${t} read_only
+			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${opt} ${t} write_only
+			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${opt} ${t} rw_default
+			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${opt} ${t} rw_70_30
+			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${opt} ${t} rw_90_10
+			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${opt} ${t} point_select
+			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${opt} ${t} update_index
+			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${opt} ${t} update_non_index
 		done
 
 		## 停止实例	
@@ -96,22 +99,25 @@ do
 		echo "$0: Star to run benchmark"
 		source /tmp/temp-setting
 
+		# 组合参数
+		opt="${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE}"
+
 		## 准备数据
-	    bash benchmark/mysql-benchmark_sysbench_prepare.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE}
+	    bash benchmark/mysql-benchmark_sysbench_prepare.sh ${opt}
 
 		## 使用不同的 “线程数+时间“ 的组合，执行 benchmark
 		# 精简并发: 低/中/高/极端
 		THREADS="4 32 128 512"
 		for t in ${THREADS}
 		do
-		    bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} read_only
-			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} write_only
-			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} rw_default
-			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} rw_70_30
-			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} rw_90_10
-			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} point_select
-			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} update_index
-			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE} ${t} update_non_index
+		    bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${opt} ${t} read_only
+			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${opt} ${t} write_only
+			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${opt} ${t} rw_default
+			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${opt} ${t} rw_70_30
+			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${opt} ${t} rw_90_10
+			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${opt} ${t} point_select
+			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${opt} ${t} update_index
+			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${opt} ${t} update_non_index
 		done
 
 		## 停止实例	
