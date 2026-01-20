@@ -31,3 +31,4 @@ done
 avg_latency=$(($total_time / $COUNT))
 echo ""
 echo "平均延迟: ${avg_latency} ms"
+echo "=========================================="
