@@ -72,3 +72,6 @@ echo "Start to perform test: SUT_IP_ADDR=${1}, TPCC_DURATION=${2}, VUSER_NUM=${3
 ## 获取 metric
 grep "TEST RESULT" ./temp-output.log >> ${RESULT_FILE}
 tail -n 17 /tmp/hdbxtprofile.log     >> ${RESULT_FILE}
+
+# 停止 dool 监控
+sleep 10 && killall ssh dool

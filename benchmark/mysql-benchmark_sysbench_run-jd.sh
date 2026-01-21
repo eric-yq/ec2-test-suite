@@ -81,4 +81,5 @@ echo "[Run Benchmark]: " >> ${RESULT_FILE}
 echo "$(date +%Y%m%d.%H%M%S) Complete to run benchmark. " >> ${RESULT_FILE}
 echo "====================================================================================" >> ${RESULT_FILE}
 
-sleep 30
+# 停止 dool 监控
+sleep 10 && killall ssh dool
