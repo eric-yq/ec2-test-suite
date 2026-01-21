@@ -124,4 +124,3 @@ do
 		# aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region) &
 	done
 done
-
