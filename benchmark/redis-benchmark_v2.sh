@@ -17,10 +17,13 @@ RESULT_PATH="/root/ec2-test-suite/benchmark-result-files"
 mkdir -p ${RESULT_PATH}
 
 ## 启动一个后台进程，执行dool命令，获取系统性能信息
-DOOL_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${SUT_IP_ADDR}_dool.txt"
+DOOL_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}_dool-sut.txt"
 ssh -o StrictHostKeyChecking=no -i ~/ericyq-global.pem ec2-user@${SUT_IP_ADDR} \
-  "sudo dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 200" \
+  "dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60" \
   1> ${DOOL_FILE} 2>&1 &
+DOOL_FILE_LOADGEN="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}_dool-loadgen.txt"
+nohup dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 \
+  1> ${DOOL_FILE_LOADGEN} 2>&1 &
 
 # 预热数据 - 只执行一次
 echo "预热Redis数据..."
