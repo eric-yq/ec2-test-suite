@@ -55,10 +55,6 @@ else
   exit 1
 fi
 
-# 测试延迟
-bash ~/ec2-test-suite/tools/mysql_latency_test.sh ${SUT_IP_ADDR} >> ${RESULT_FILE}
-sleep 10
-
 ## 执行 benchmark
 RAMPUP_DURATION=0
 let RUNTIMER_DURATION=$((${RAMPUP_DURATION}+${OLTP_DURATION}+1))*60
