@@ -14,6 +14,10 @@
 
 # set -e
 
+## 暂时关闭补丁更新流程
+sudo systemctl stop amazon-ssm-agent
+# sudo systemctl disable amazon-ssm-agent
+
 # 实例启动成功之后的首次启动 OS， /root/userdata.sh 不存在，创建该 userdata.sh 文件并设置开启自动执行该脚本。
 if [ ! -f "/root/userdata.sh" ]; then
     echo "首次启动 OS, 未找到 /root/userdata.sh，准备创建..."
