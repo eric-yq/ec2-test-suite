@@ -26,6 +26,10 @@ DOOL_FILE_LOADGEN="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INST
 nohup dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 \
   1> ${DOOL_FILE_LOADGEN} 2>&1 &
 
+## 远程输出 /etc/my.cnf 内容
+echo "Export MySQL configuration /etc/my.cnf first... " >> ${RESULT_FILE}
+ssh -o StrictHostKeyChecking=no -i ~/ericyq-global.pem ec2-user@${SUT_IP_ADDR} "sudo cat /etc/my.cnf" >> ${RESULT_FILE}
+
 # 测试延迟
 bash ~/ec2-test-suite/tools/mysql_latency_test.sh ${SUT_IP_ADDR} >> ${RESULT_FILE}
 

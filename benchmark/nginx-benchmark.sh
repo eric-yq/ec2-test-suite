@@ -18,11 +18,13 @@ DURATION='3m'
 RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_LOADBALANCE}.txt"
 
 ## 启动一个后台进程，执行dool命令，获取系统性能信息
-## Note: prepare: 按 38 分钟计算;  run: 按 64*8=512 分钟计算 ，总计打印 550 分钟的监控信息。
-DOOL_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${SUT_IP_ADDR}_dool.txt"
+DOOL_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}_dool-sut.txt"
 ssh -o StrictHostKeyChecking=no -i ~/ericyq-global.pem ec2-user@${SUT_IP_ADDR} \
-  "sudo dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 100" \
+  "dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60" \
   1> ${DOOL_FILE} 2>&1 &
+DOOL_FILE_LOADGEN="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}_dool-loadgen.txt"
+nohup dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 \
+  1> ${DOOL_FILE_LOADGEN} 2>&1 &
 
 for i in $CONNECTIONS
 do
