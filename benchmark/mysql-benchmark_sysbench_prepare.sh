@@ -17,6 +17,10 @@ RESULT_PATH="/root/ec2-test-suite/benchmark-result-files"
 mkdir -p ${RESULT_PATH}
 RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}.txt"
 
+echo "====================================================================================" >> ${RESULT_FILE}
+echo "$(date) Start to prepare data. " >> ${RESULT_FILE}
+echo "SUT_IP_ADDR=${1}, OLTP_DURATION=${2}, TABLES=${3}, TABLE_SIZE=${4}" >> ${RESULT_FILE}
+
 ## 启动一个后台进程，执行dool命令，获取系统性能信息
 ## Note: prepare: 按 38 分钟计算;  run: 按 64*8=512 分钟计算 ，总计打印 550 分钟的监控信息。
 DOOL_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}_dool.txt"
@@ -26,9 +30,6 @@ ssh -o StrictHostKeyChecking=no -i ~/ericyq-global.pem ec2-user@${SUT_IP_ADDR} \
 
 # 测试延迟
 bash ~/ec2-test-suite/tools/mysql_latency_test.sh ${SUT_IP_ADDR} >> ${RESULT_FILE}
-
-echo "Test Detail on $(date)====================================================================================" >> ${RESULT_FILE}
-echo "Command Line Parameters: SUT_IP_ADDR=${1}, OLTP_DURATION=${2}, TABLES=${3}, TABLE_SIZE=${4}" >> ${RESULT_FILE}
 
 ## 准备数据
 mysql -h ${SUT_IP_ADDR} -p'gv2mysql' << EOF
@@ -64,4 +65,5 @@ echo "[Build Schema Summary]: " >> ${RESULT_FILE}
 echo "$database_statics" >> ${RESULT_FILE}
 echo "$table_statics" >> ${RESULT_FILE}
 
-echo "Prepare Completed on $(date)==================================================================================" >> ${RESULT_FILE}
+echo "$(date) Complete to prepare data. " >> ${RESULT_FILE}
+echo "====================================================================================" >> ${RESULT_FILE}
