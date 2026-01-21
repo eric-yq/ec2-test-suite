@@ -18,6 +18,9 @@ RESULT_PATH="/root/ec2-test-suite/benchmark-result-files"
 mkdir -p ${RESULT_PATH}
 RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}.txt"
 
+# 测试延迟
+bash ~/ec2-test-suite/tools/mysql_latency_test.sh ${SUT_IP_ADDR} >> ${RESULT_FILE}
+
 echo "Test Detail on $(date)====================================================================================" >> ${RESULT_FILE}
 echo "Command Line Parameters: SUT_IP_ADDR=${1}, OLTP_DURATION=${2}, TABLES=${3}, TABLE_SIZE=${4}, RUN_THREADS=${5}, PROFILE_MODE=${6}" >> ${RESULT_FILE}
 
