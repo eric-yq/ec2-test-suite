@@ -87,6 +87,9 @@ mkdir -p ${RESULT_PATH}
 
 submit_task ${1}
 
+# 停止 dool 监控
+sleep 10 && killall ssh dool
+
 # ### 查看结果
 # Load 结果数据：吞吐
 # grep Throughput *load* | awk -F '[_ ]' '{print $2,$NF}'

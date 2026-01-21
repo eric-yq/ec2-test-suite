@@ -50,4 +50,5 @@ EOF
 	sleep 10
 done
     
-
+# 停止 dool 监控
+sleep 10 && killall ssh dool

@@ -38,3 +38,5 @@ echo "[Run Benchmark]: " >> ${RESULT_FILE}
   --time=$RUNTIMER_DURATION \
   run  >> ${RESULT_FILE}
   
+# 停止 dool 监控
+sleep 10 && killall ssh dool
