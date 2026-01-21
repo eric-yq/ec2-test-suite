@@ -34,6 +34,9 @@ do
 		echo "$0: Star to run benchmark"
 		source /tmp/temp-setting
 		bash benchmark/dotnet-benchmark.sh ${INSTANCE_IP_MASTER}
+
+		# 停止 dool 监控
+		sleep 10 && killall ssh dool
 		
 		## 停止实例
 		aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region) &

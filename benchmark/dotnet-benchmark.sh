@@ -257,6 +257,3 @@ do
       --variable threads=$CONN \
       1>>${RESULT_FILE} 2>&1
 done
-
-# 停止 dool 监控
-sleep 10 && killall ssh dool

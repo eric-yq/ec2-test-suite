@@ -65,9 +65,8 @@ do
 			bash benchmark/mysql-benchmark_sysbench_run-jd.sh ${opt} ${t} update_non_index
 		done
 
-		## 停止dool 监控
-		killall dool
-		killall ssh
+		# 停止 dool 监控
+		sleep 10 && killall ssh dool
 
 		## 停止实例	
 		# aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region) &

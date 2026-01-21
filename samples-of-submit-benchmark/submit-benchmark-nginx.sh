@@ -35,7 +35,10 @@ do
 		echo "$0: Star to run benchmark"
 		source /tmp/temp-setting
 		bash benchmark/nginx-benchmark.sh ${INSTANCE_IP_LOADBALANCE}
-		
+
+		# 停止 dool 监控
+		sleep 10 && killall ssh dool
+
 		## 停止实例
 		aws ec2 terminate-instances --region $(cloud-init query region) \
 		--instance-ids ${INSTANCE_ID_LOADBALANCE} ${INSTANCE_ID_WEB1} ${INSTANCE_ID_WEB2} &
