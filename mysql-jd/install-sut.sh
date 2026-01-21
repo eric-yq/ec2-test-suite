@@ -46,23 +46,24 @@ pid-file=/var/run/mysqld/mysqld.pid
 ## if on instance store: suggest enable them all;
 performance_schema=off
 skip_log_bin=1
-innodb_flush_log_at_trx_commit=0
+innodb_flush_log_at_trx_commit=1
 binlog_expire_logs_seconds=3600
 ######################################################
 # general
 max_connections=4000
+max_connect_errors=100000
 table_open_cache=8000
 table_open_cache_instances=16
 back_log=1500
 default_password_lifetime=0
 ssl=0
-max_prepared_stmt_count=128000
+max_prepared_stmt_count=1000000
 character_set_server=latin1
 collation_server=latin1_swedish_ci
 transaction_isolation=REPEATABLE-READ
 # files
 innodb_file_per_table
-innodb_log_file_size=1024M
+innodb_log_file_size=2048M
 innodb_log_files_in_group=16
 innodb_open_files=4000
 # buffers
@@ -75,16 +76,16 @@ innodb_doublewrite=0
 innodb_thread_concurrency=0
 innodb_max_dirty_pages_pct=90
 innodb_max_dirty_pages_pct_lwm=10
-join_buffer_size=32K
-sort_buffer_size=32K
+join_buffer_size=4MB
+sort_buffer_size=4MB
 innodb_use_native_aio=1
 innodb_stats_persistent=1
 innodb_spin_wait_delay=6
 innodb_max_purge_lag_delay=300000
 innodb_max_purge_lag=0
-innodb_flush_method=O_DIRECT_NO_FSYNC
+innodb_flush_method=O_DIRECT
 innodb_checksum_algorithm=none
-innodb_io_capacity=4000
+innodb_io_capacity=10000
 innodb_io_capacity_max=20000
 innodb_lru_scan_depth=9000
 innodb_change_buffering=none
@@ -100,6 +101,13 @@ innodb_purge_threads=4
 innodb_adaptive_hash_index=0
 # 20240815-new-added
 innodb_use_fdatasync=ON
+# From JD config
+tmp_table_size=256MB
+max_heap_table_size=256MB
+read_buffer_size=2MB
+read_rnd_buffer_size=8MB
+table_definition_cache=2000
+skip-name-resolve=1
 EOF
 
     systemctl restart ${MYSQL_SERVICE}
