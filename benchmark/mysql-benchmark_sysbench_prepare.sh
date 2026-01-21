@@ -24,9 +24,6 @@ ssh -o StrictHostKeyChecking=no -i ~/ericyq-global.pem ec2-user@${SUT_IP_ADDR} \
   "dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 550" \
   1> ${DOOL_FILE} 2>&1 &
 
-# 测试延迟
-bash ~/ec2-test-suite/tools/mysql_latency_test.sh ${SUT_IP_ADDR} >> ${RESULT_FILE}
-
 echo "Test Detail on $(date)====================================================================================" >> ${RESULT_FILE}
 echo "Command Line Parameters: SUT_IP_ADDR=${1}, OLTP_DURATION=${2}, TABLES=${3}, TABLE_SIZE=${4}" >> ${RESULT_FILE}
 
