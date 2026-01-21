@@ -45,6 +45,7 @@ do
 
 		# 组合参数
 		opt="${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE}"
+		echo "Parameters: ${opt}"
 
 		## 准备数据
 	    bash benchmark/mysql-benchmark_sysbench_prepare.sh ${opt}
@@ -101,6 +102,7 @@ do
 
 		# 组合参数
 		opt="${INSTANCE_IP_MASTER} ${OLTP_DURATION} ${TABLES} ${TABLE_SIZE}"
+		echo "Parameters: ${opt}"
 
 		## 准备数据
 	    bash benchmark/mysql-benchmark_sysbench_prepare.sh ${opt}
