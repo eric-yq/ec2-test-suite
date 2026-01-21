@@ -49,6 +49,9 @@ do
 		bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 30 12 64 ${ins} 
 		bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 30 16 64 ${ins} 
 
+		# 停止 dool 监控
+		sleep 10 && killall ssh dool
+		
 		## 停止实例
 		aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region) &
 	done

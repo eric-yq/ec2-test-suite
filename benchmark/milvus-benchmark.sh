@@ -44,6 +44,3 @@ cat /usr/local/lib/python3.13/site-packages/vectordb_bench/results/Milvus/result
   >> ${RESULT_FILE}
   
 echo "Test End on $(date)====================================================================================" >> ${RESULT_FILE}
-
-# 停止 dool 监控
-sleep 10 && killall ssh dool
