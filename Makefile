@@ -115,6 +115,16 @@ install:
 	nohup crank-agent & && \
 	@echo "Crank installation complete!"
 
+	@echo "Installing Jmeter ..."
+	cd /opt && \
+	sudo wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.6.3.tgz && \
+	sudo tar -xzf apache-jmeter-5.6.3.tgz && \
+	sudo ln -s /opt/apache-jmeter-5.6.3 /opt/jmeter && \
+	echo 'export PATH=$PATH:/opt/jmeter/bin' | sudo tee -a /etc/profile.d/jmeter.sh && \
+	source /etc/profile.d/jmeter.sh && \
+	jmeter -v
+	@echo "Jmeter installation complete!"
+
 	@echo "Perform OS Optimization ..."
 	bash benchmark/os-optimization.sh
 	@echo "Perform OS Optimization complete!"
