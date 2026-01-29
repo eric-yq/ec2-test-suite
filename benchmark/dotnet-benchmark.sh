@@ -21,10 +21,10 @@ mkdir -p ${RESULT_PATH}
 DOOL_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}_dool-sut.txt"
 ssh -o StrictHostKeyChecking=no -i ~/ericyq-global.pem ec2-user@${SUT_IP_ADDR} \
   "dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 5" \
-  1> ${DOOL_FILE} 2>&1 &
+  1>> ${DOOL_FILE} 2>&1 &
 DOOL_FILE_LOADGEN="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}_dool-loadgen.txt"
 nohup dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 5 \
-  1> ${DOOL_FILE_LOADGEN} 2>&1 &
+  1>> ${DOOL_FILE_LOADGEN} 2>&1 &
 
 ## 下载 Benchmark 应用
 cd /root/
