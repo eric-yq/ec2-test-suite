@@ -19,14 +19,14 @@ mkdir -p ${RESULT_PATH}
 ## 启动一个后台进程，执行dool命令，获取系统性能信息
 DOOL_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}_dool-sut.txt"
 # 先测试一下 ping 延迟
-echo "测试 MySQL Client-Server 延迟 (ping 60 次)"
-echo "=========================================="
-ping -q -c 60 ${INSTANCE_IP_MASTER} >> ${DOOL_FILE} 2>&1
-echo "=========================================="
+echo "测试 MySQL Client-Server 延迟 (ping 60 次)" >> ${DOOL_FILE}
+echo "==========================================" >> ${DOOL_FILE}
+ping -q -c 60 ${INSTANCE_IP_MASTER} >> ${DOOL_FILE}
+echo "==========================================" >> ${DOOL_FILE}
 # 启动监控: sut
 ssh -o StrictHostKeyChecking=no -i ~/ericyq-global.pem ec2-user@${SUT_IP_ADDR} \
   "dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60" \
-  1> ${DOOL_FILE} 2>&1 &
+  1>> ${DOOL_FILE} 2>&1 &
 # 启动监控:loadgen
 DOOL_FILE_LOADGEN="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}_dool-loadgen.txt"
 nohup dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 \
