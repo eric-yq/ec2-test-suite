@@ -21,7 +21,7 @@ DOOL_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_
 # 先测试一下 ping 延迟
 echo "测试 MySQL Client-Server 延迟 (ping 60 次)"
 echo "=========================================="
-ping -q -c 60 $HOST >> ${DOOL_FILE} 2>&1
+ping -q -c 60 ${INSTANCE_IP_MASTER} >> ${DOOL_FILE} 2>&1
 echo "=========================================="
 # 启动监控: sut
 ssh -o StrictHostKeyChecking=no -i ~/ericyq-global.pem ec2-user@${SUT_IP_ADDR} \
@@ -55,7 +55,8 @@ for COMMAND in "${!COMMANDS[@]}"; do
         RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${SUT_IP_ADDR}_${SUT_PORT}_${COMMAND}_${THREADS}.txt"
         
         echo "  Threads: ${THREADS}"
-        resp-benchmark -h ${SUT_IP_ADDR} -p ${SUT_PORT} -s ${TEST_TIME} "${OPT}" -c ${THREADS} > "${RESULT_FILE}" 2>&1
+        resp-benchmark -h ${SUT_IP_ADDR} -p ${SUT_PORT} -s ${TEST_TIME} \
+          -P 5 "${OPT}" -c ${THREADS} > ${RESULT_FILE} 2>&1
         sleep 30
     done
 done
