@@ -149,19 +149,14 @@ protected-mode no
 maxmemory ${XXX}gb
 maxmemory-policy allkeys-lru
 EOF
-
+    # 启动 redis 
     docker run -d --name redis-6379 --restart=always \
 	  -p 6379:6379 \
 	  -v /root/redis-6379.conf:/etc/redis/redis.conf \
 	  redis:7.0.15 \
 	  redis-server /etc/redis/redis.conf
 
-	## 2. 配置 3 种 io-threads 模式：vCPU数量的40%、65%、90%
-    # CPU_CORES=$(nproc)
-    # let YYY1=${CPU_CORES}*40/100
-    # let YYY2=${CPU_CORES}*65/100
-    # let YYY3=${CPU_CORES}*90/100
-
+    ## 2. 配置多线程 redis 实例
 	# 生成 3个 配置文件，端口号为 8000 + io-threads数
     for i in $(seq 1 8)
     do
