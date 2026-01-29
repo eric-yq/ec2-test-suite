@@ -157,13 +157,13 @@ EOF
 	  redis-server /etc/redis/redis.conf
 
 	## 2. 配置 3 种 io-threads 模式：vCPU数量的40%、65%、90%
-    CPU_CORES=$(nproc)
-    let YYY1=${CPU_CORES}*40/100
-    let YYY2=${CPU_CORES}*65/100
-    let YYY3=${CPU_CORES}*90/100
+    # CPU_CORES=$(nproc)
+    # let YYY1=${CPU_CORES}*40/100
+    # let YYY2=${CPU_CORES}*65/100
+    # let YYY3=${CPU_CORES}*90/100
 
 	# 生成 3个 配置文件，端口号为 8000 + io-threads数
-    for i in $YYY1 $YYY2 $YYY3
+    for i in $(seq 1 8)
     do
         let PORT=8000+$i
         cat > /root/redis-$PORT.conf << EOF
