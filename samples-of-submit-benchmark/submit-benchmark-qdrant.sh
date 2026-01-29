@@ -20,8 +20,8 @@ do
 		echo "$0: OS_TYPE=${os}, INSTANCE_TYPE=${ins}"
 		eval $OPT bash launch-instances-single.sh -s qdrant -t ${ins} -o ${os}
 		
-		echo "$0: [$(date +%Y%m%d.%H%M%S)] Sleep 300 seconds..."
-		sleep 120
+		echo "$0: [$(date +%Y%m%d.%H%M%S)] Sleep 180 seconds..."
+		sleep 180
 		
 		## 执行 Benchmark 测试
 		echo "$0: Star to run benchmark"

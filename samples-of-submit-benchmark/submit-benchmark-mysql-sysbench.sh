@@ -27,8 +27,8 @@ do
 			continue
 		fi
 
-		echo "$0: [$(date +%Y%m%d.%H%M%S)] Sleep 600 seconds ..."
-		sleep 600
+		echo "$0: [$(date +%Y%m%d.%H%M%S)] Sleep 180 seconds ..."
+		sleep 180
 
 		## 执行 Benchmark 测试
 		echo "$0: Star to run benchmark"

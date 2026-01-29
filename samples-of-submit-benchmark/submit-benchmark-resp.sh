@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# qdrant Benchmark
+# Redis Benchmark
+# 待测 EC2 规格和 OS
 os_types="al2023"
 instance_types="$1"
 # instance_types="r8a.2xlarge r8g.2xlarge r8i.2xlarge r7a.2xlarge r7g.2xlarge r7i.2xlarge r6a.2xlarge r6g.2xlarge r6i.2xlarge"
@@ -17,7 +18,8 @@ do
 	for ins in ${instance_types} 
 	do
 		## 创建实例、安装软件
-		eval $OPT bash launch-instances-single.sh -s mongo -t ${ins} -o ${os}
+		echo "$0: OS_TYPE=${os}, INSTANCE_TYPE=${ins}"
+		eval $OPT bash launch-instances-single.sh -s redis -t ${ins} -o ${os}
 		# 检查实例启动状态：如果失败则跳过后续测试。
 		launch_status=$?
 		if [ $launch_status -ne 0 ]; then
@@ -31,16 +33,16 @@ do
 		## 执行 Benchmark 测试
 		echo "$0: Star to run benchmark"
 		source /tmp/temp-setting
-		bash benchmark/mongo-benchmark_v2.sh ${INSTANCE_IP_MASTER}
+		# bash benchmark/resp-benchmark.sh ${INSTANCE_IP_MASTER} 6379 180
+		bash benchmark/resp-benchmark.sh ${INSTANCE_IP_MASTER} 8004 180
+		bash benchmark/resp-benchmark.sh ${INSTANCE_IP_MASTER} 8008 180
 		
 		# 停止 dool 监控
 		sleep 10 && killall ssh dool
-		
+
 		## 停止实例
-		aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region) &
+		# aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region) &
 	done
 done
 
-
-
-echo "$0: Qdrant benchmark completed."
+echo "$0: Redis benchmark (resp tool) completed."
