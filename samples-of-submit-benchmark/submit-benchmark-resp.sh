@@ -36,9 +36,6 @@ do
 		# bash benchmark/resp-benchmark.sh ${INSTANCE_IP_MASTER} 6379 180
 		bash benchmark/resp-benchmark.sh ${INSTANCE_IP_MASTER} 8004 180
 		bash benchmark/resp-benchmark.sh ${INSTANCE_IP_MASTER} 8008 180
-		
-		# 停止 dool 监控
-		sleep 10 && killall ssh dool
 
 		## 停止实例
 		# aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region) &

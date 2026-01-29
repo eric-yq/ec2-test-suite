@@ -34,10 +34,10 @@ submit_task(){
     DOOL_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}_dool-sut.txt"
     ssh -o StrictHostKeyChecking=no -i ~/ericyq-global.pem ec2-user@${SUT_IP_ADDR} \
       "dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60" \
-      1> ${DOOL_FILE} 2>&1 &
+      1>> ${DOOL_FILE} 2>&1 &
     DOOL_FILE_LOADGEN="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}_dool-loadgen.txt"
     nohup dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 \
-      1> ${DOOL_FILE_LOADGEN} 2>&1 &
+      1>> ${DOOL_FILE_LOADGEN} 2>&1 &
 
 	### 加载数据, load
 	echo "[Info] Load data ..." >> ${RESULT_FILE}
