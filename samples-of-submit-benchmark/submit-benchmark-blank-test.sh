@@ -21,7 +21,7 @@ do
 		eval $OPT bash launch-instances-single.sh -s blank -t ${ins} -o ${os}
 		launch_status=$?
 
-		检查启动状态
+		# 检查启动状态
 		if [ $launch_status -ne 0 ]; then
 			echo "\$0: [$(date +%Y%m%d.%H%M%S)] Instance launch failed for OS_TYPE=${os}, INSTANCE_TYPE=${ins}. Continuing with next configuration..."
 			continue
