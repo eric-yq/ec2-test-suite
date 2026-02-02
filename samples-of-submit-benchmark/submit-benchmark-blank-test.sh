@@ -29,7 +29,7 @@ do
 
 		# 实例类型和 IP 地址记录到文件
 		source /tmp/temp-setting
-		echo "${ins} ${INSTANCE_IP_MASTER}" >> /tmp/servers.txt
+		echo "${ins} ${INSTANCE_IP_MASTER} ${INSTANCE_ID}" >> /tmp/servers.txt
 		
 		## 停止实例
 		# aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region) &
@@ -43,9 +43,11 @@ sleep 30
 # 执行 ping 测试
 echo "[$(date +%Y%m%d.%H%M%S)] Ping latency test, result shows the avg. latency only. Extra option : ${OPT}" \
   >> /tmp/ping_latency_log.txt
-while read -r instance_type ip_address; do
+while read -r instance_type ip_address instance_id; do
   echo "[$(date +%Y%m%d.%H%M%S)]   Pinging Instance Type: ${instance_type}, IP: ${ip_address} ..."
   ping_result=$(ping -q -c 30 ${ip_address} | tail -n 1 | awk -F '/' '{print $5 " ms"}')
   echo "[$(date +%Y%m%d.%H%M%S)]   ${instance_type}, ${ip_address} : ${ping_result}" >> /tmp/ping_latency_log.txt
+  aws ec2 terminate-instances --instance-ids ${instance_id} --region $(cloud-init query region) &
 done < /tmp/servers.txt
 rm -f /tmp/servers.txt
+
