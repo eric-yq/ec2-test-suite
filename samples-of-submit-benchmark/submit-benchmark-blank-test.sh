@@ -42,6 +42,7 @@ sleep 30
 # 执行 ping 测试
 echo "[$(date +%Y%m%d.%H%M%S)] Ping latency test ..." >> /tmp/ping_latency_log.txt
 while read -r instance_type ip_address; do
+  echo "[$(date +%Y%m%d.%H%M%S)]   Pinging Instance Type: ${instance_type}, IP: $ip_address ..."
   ping_result=$(ping -q -c 30 $ip_address | tail -n 1)
   echo "[$(date +%Y%m%d.%H%M%S)]   Instance Type: ${instance_type}, IP: $ip_address: ${ping_result}" >> /tmp/ping_latency_log.txt
 done < /tmp/servers.txt
