@@ -9,7 +9,7 @@ instance_types="$1"
 if [ "$USE_CPG" = "1" ] ; then
   OPT="USE_CPG=1"
 else
-  OPT=""
+  OPT="USE_CPG=0"
 fi
 
 for os in ${os_types} 
@@ -42,6 +42,7 @@ sleep 30
 
 # 执行 ping 测试
 echo "[$(date +%Y%m%d.%H%M%S)] Ping latency test, result shows the avg. latency only ..." >> /tmp/ping_latency_log.txt
+echo "[$(date +%Y%m%d.%H%M%S)] Extra option : ${OPT}" >> /tmp/ping_latency_log.txt
 while read -r instance_type ip_address; do
   echo "[$(date +%Y%m%d.%H%M%S)]   Pinging Instance Type: ${instance_type}, IP: ${ip_address} ..."
   ping_result=$(ping -q -c 30 ${ip_address} | tail -n 1 | awk -F '/' '{print $5 " ms"}')
