@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# 设置默认region
+aws configure set default.region $(ec2-metadata --quiet --region)
+
 ## 运行脚本的实例所在的 CPG 名称
 CPG_NAME=$(aws ec2 describe-instances \
   --instance-ids $(ec2-metadata --quiet -i) \
