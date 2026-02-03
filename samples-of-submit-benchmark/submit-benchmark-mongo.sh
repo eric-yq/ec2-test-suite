@@ -25,12 +25,20 @@ do
 			continue
 		fi
 		
-		echo "$0: [$(date +%Y%m%d.%H%M%S)] Sleep 180 seconds..."
-		sleep 180
+		####################################
+		# 实例类型、IP 地址和实例 ID 记录到文件
+		source /tmp/temp-setting
+		echo "${ins} ${INSTANCE_IP_MASTER} ${INSTANCE_ID}" >> /tmp/servers.txt
+		echo "[$(date +%Y%m%d.%H%M%S)] Sleep 30 seconds ..." && sleep 30
+		# 执行 ping 测试
+		echo "[$(date +%Y%m%d.%H%M%S)] Ping latency test, result shows the avg. latency only. Extra option : ${OPT}"
+		ping_result=$(ping -q -c 60 ${INSTANCE_IP_MASTER} | tail -n 1 | awk -F '/' '{print $5 " ms"}') 
+		echo "[$(date +%Y%m%d.%H%M%S)]   ${ins}, ${INSTANCE_IP_MASTER} : ${ping_result}"
+		sleep 120
+	    ####################################
 		
 		## 执行 Benchmark 测试
 		echo "$0: Star to run benchmark"
-		source /tmp/temp-setting
 		bash benchmark/mongo-benchmark_v2.sh ${INSTANCE_IP_MASTER}
 		
 		# 停止 dool 监控
