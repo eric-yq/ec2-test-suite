@@ -6,6 +6,7 @@
 os_types="al2023"
 instance_types="$1"
 
+## CPG 选项
 if [ "$USE_CPG" = "1" ] ; then
   OPT="USE_CPG=1"
 else
@@ -27,7 +28,7 @@ do
 			continue
 		fi
 
-		# 实例类型和 IP 地址记录到文件
+		# 实例类型、IP 地址和实例 ID 记录到文件
 		source /tmp/temp-setting
 		echo "${ins} ${INSTANCE_IP_MASTER} ${INSTANCE_ID}" >> /tmp/servers.txt
 		
@@ -47,7 +48,7 @@ while read -r instance_type ip_address instance_id; do
   echo "[$(date +%Y%m%d.%H%M%S)]   Pinging Instance Type: ${instance_type}, IP: ${ip_address} ..."
   ping_result=$(ping -q -c 30 ${ip_address} | tail -n 1 | awk -F '/' '{print $5 " ms"}')
   echo "[$(date +%Y%m%d.%H%M%S)]   ${instance_type}, ${ip_address} : ${ping_result}" >> /tmp/ping_latency_log.txt
-  aws ec2 terminate-instances --instance-ids ${instance_id} --region $(cloud-init query region) &
+  aws ec2 terminate-instances --instance-ids ${instance_id} --region $(cloud-init query region) > /dev/null 2>&1 &
 done < /tmp/servers.txt
 rm -f /tmp/servers.txt
 
