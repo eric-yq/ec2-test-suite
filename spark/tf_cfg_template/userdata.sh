@@ -21,8 +21,8 @@ After=network.target
 
 [Service]
 Type=oneshot
-User=root
-ExecStart=/root/userdata.sh
+User=ec2-user
+ExecStart=/home/ec2-user/userdata.sh
 RemainAfterExit=yes
 
 [Install]
