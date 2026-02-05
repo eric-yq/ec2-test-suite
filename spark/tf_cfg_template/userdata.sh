@@ -82,8 +82,8 @@ echo "All steps completed successfully"
 
 
 # 安装 OpenJDK
-# sudo yum install -yq java-1.8.0-openjdk java-1.8.0-openjdk-devel git gcc gcc-c++ patch htop python3 python3-pip
-sudo yum install -yq java-17-amazon-corretto-devel git gcc gcc-c++ patch htop python3 python3-pip
+sudo yum install -yq java-1.8.0-openjdk java-1.8.0-openjdk-devel git gcc gcc-c++ patch htop python3 python3-pip
+# sudo yum install -yq java-17-amazon-corretto-devel git gcc gcc-c++ patch htop python3 python3-pip
 sudo pip3 install dool
 JAVA_HOME="/usr/lib/jvm/jre"
 echo "export JAVA_HOME=${JAVA_HOME}" >> ~/.bashrc
@@ -266,7 +266,6 @@ $HADOOP_HOME/sbin/start-yarn.sh
 jps
 
 # 安装和配置 Hive 软件
-# 下载和安装 Hive 软件：
 cd ~
 # wget https://archive.apache.org/dist/hive/hive-$HIVE_VERSION/apache-hive-$HIVE_VERSION-bin.tar.gz
 aws s3 cp ${aws_s3_bucket_name}/software/spark-local/apache-hive-$HIVE_VERSION-bin.tar.gz .
