@@ -80,7 +80,8 @@ echo "All steps completed successfully"
 
 
 # 安装 OpenJDK
-sudo yum install -yq java-1.8.0-openjdk java-1.8.0-openjdk-devel git gcc gcc-c++ patch htop python3 python3-pip
+# sudo yum install -yq java-1.8.0-openjdk java-1.8.0-openjdk-devel git gcc gcc-c++ patch htop python3 python3-pip
+sudo yum install -yq java-17-amazon-corretto-devel git gcc gcc-c++ patch htop python3 python3-pip
 sudo pip3 install dool
 JAVA_HOME="/usr/lib/jvm/jre"
 echo "export JAVA_HOME=${JAVA_HOME}" >> ~/.bashrc
