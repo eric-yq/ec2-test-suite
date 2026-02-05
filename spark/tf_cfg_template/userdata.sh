@@ -7,12 +7,13 @@
 sudo systemctl stop amazon-ssm-agent
 sudo systemctl disable amazon-ssm-agent
 
-# 实例启动成功之后的首次启动 OS， /root/userdata.sh 不存在，创建该 userdata.sh 文件并设置开启自动执行该脚本。
-if [ ! -f "/root/userdata.sh" ]; then
-    echo "首次启动 OS, 未找到 /root/userdata.sh，准备创建..."
+# 实例启动成功之后的首次启动 OS， /home/ec2-user/userdata.sh 不存在，创建该 userdata.sh 文件并设置开启自动执行该脚本。
+# !!! Spark 比较特殊，需要使用 ec2-user 执行。
+if [ ! -f "/home/ec2-user/userdata.sh" ]; then
+    echo "首次启动 OS, 未找到 /root/userdata.sh, 准备创建..."
     # 复制文件
-    cp /var/lib/cloud/instance/scripts/part-001 /root/userdata.sh
-    chmod +x /root/userdata.sh
+    cp /var/lib/cloud/instance/scripts/part-001 /home/ec2-user/userdata.sh
+    chmod 755 /home/ec2-user/userdata.sh
     # 创建 systemd 服务单元
     cat > /etc/systemd/system/userdata.service << EOF
 [Unit]
@@ -28,6 +29,7 @@ RemainAfterExit=yes
 [Install]
 WantedBy=multi-user.target
 EOF
+
     # 启用服务
     systemctl daemon-reload
     systemctl enable userdata.service
