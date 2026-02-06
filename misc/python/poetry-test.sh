@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# amazon linux 2023
+# amazon linux 2023，c8g.xlarge 实例，安装 poetry 和依赖包的脚本
 
 # 安装开发工具包
 sudo yum groupinstall "Development Tools" -yq
@@ -43,7 +43,7 @@ cat > pyproject.toml << EOF
 [tool.poetry]
 name = "notification-api"
 version = "0.1.0"
-description = ""
+description = "test"
 authors = []
 
 [tool.poetry.dependencies]
@@ -100,4 +100,5 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 EOF
 
+# 安装
 poetry install --no-root
