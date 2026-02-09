@@ -152,14 +152,8 @@ RUN echo "=== Verifying installations ===" && \
     java -version && \
     echo "=== All tools installed successfully ==="
 
-RUN git clone https://github.com/eric-yq/ec2-test-suite.git
-COPY ~/.aws /root/.aws
-COPY /run/cloud-init/instance-data-sensitive.json /root/cloud-init/instance-data-sensitive.json
-COPY /run/cloud-init/instance-data.json /root/cloud-init/instance-data.json
-RUN echo "=== Verifying EC2 Tools ===" && \
-    cloud-init query region && \
-    ec2-metadata -i && \
-    echo "=== EC2 Tools verified successfully ==="
+RUN git clone https://github.com/eric-yq/ec2-test-suite.git && \
+    mkdir -p /root/.aws /run/cloud-init
 
 # Set default command
 CMD ["/bin/bash"]
