@@ -152,8 +152,7 @@ RUN echo "=== Verifying installations ===" && \
     java -version && \
     echo "=== All tools installed successfully ==="
 
-RUN git clone https://github.com/eric-yq/ec2-test-suite.git && \
-    mkdir -p /root/.aws /run/cloud-init
+RUN mkdir -p /root/.aws /run/cloud-init /root/ec2-test-suite
 
 # Set default command
 CMD ["/bin/bash"]
