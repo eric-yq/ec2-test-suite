@@ -34,7 +34,10 @@ RUN yum -yq groupinstall "Development Tools" && \
         wget \
         tar \
         which \
-        unzip && \
+        unzip \
+        awscli \
+        cloud-init \
+        ec2-utils && \
     pip3.13 install dool && \
     yum clean all
 
@@ -150,6 +153,13 @@ RUN echo "=== Verifying installations ===" && \
     echo "=== All tools installed successfully ==="
 
 RUN git clone https://github.com/eric-yq/ec2-test-suite.git
+COPY ~/.aws /root/.aws
+COPY /run/cloud-init/instance-data-sensitive.json /root/cloud-init/instance-data-sensitive.json
+COPY /run/cloud-init/instance-data.json /root/cloud-init/instance-data.json
+RUN echo "=== Verifying EC2 Tools ===" && \
+    cloud-init query region && \
+    ec2-metadata -i && \
+    echo "=== EC2 Tools verified successfully ==="
 
 # Set default command
 CMD ["/bin/bash"]
