@@ -156,8 +156,8 @@ cp -r ssd-deployment ssd-deployment-$INSTYPE
 cd ssd-deployment-$INSTYPE
 
 # 获取一些环境信息
-REGION=$(cloud-init query ds.meta_data.placement.region)
-AZ=$(cloud-init query ds.meta_data.placement.availability-zone)
+REGION=$(ec2-metadata --quiet --region)
+AZ=$(ec2-metadata --quiet --availability-zone)
 
 # 查询 AL2023 最新AMI ID
 ARCH_KAFKA=$(aws ec2 describe-instance-types --instance-types $INSTYPE --query 'InstanceTypes[*].ProcessorInfo.SupportedArchitectures' --output text)

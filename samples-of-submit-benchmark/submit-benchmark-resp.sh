@@ -46,7 +46,7 @@ do
 		bash benchmark/resp-benchmark.sh ${INSTANCE_IP_MASTER} 8008 180
 
 		## 停止实例
-		# aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region) &
+		# aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(ec2-metadata --quiet --region) &
 	done
 done
 

@@ -6,7 +6,7 @@ aws --version
 ## AWSCLI 配置：Global
 aws_sk_value="xxx"
 aws_sk_value="xxx"
-aws_region_name=$(cloud-init query ds.meta_data.placement.region)
+aws_region_name=$(ec2-metadata --quiet --region)
 aws configure set aws_access_key_id ${aws_ak_value}
 aws configure set aws_secret_access_key ${aws_sk_value}
 aws configure set default.region ${aws_region_name}
@@ -66,10 +66,21 @@ EOF
 
 
 # AeroSpike 集群公共配置
-REGION=$(cloud-init query ds.meta_data.placement.region)
-MAC=$(cloud-init query ds.meta_data.mac)
-SGID=$(cloud-init query ds.meta_data.network.interfaces.macs.$MAC.security-group-ids)
-SUBID=$(cloud-init query ds.meta_data.network.interfaces.macs.$MAC.subnet-id)
+# 获取子网 ID和安全组 ID
+INSTANCE_ID=$(ec2-metadata --quiet --instance-id)
+REGION=$(ec2-metadata --quiet --region)
+SGID=$(aws ec2 describe-instances \
+  --instance-ids $INSTANCE_ID \
+  --region $REGION \
+  --query 'Reservations[0].Instances[0].SubnetId' \
+  --output text)
+SUBID=$(aws ec2 describe-instances \
+  --instance-ids $INSTANCE_ID \
+  --region $REGION \
+  --query 'Reservations[0].Instances[0].SecurityGroups[*].GroupId' \
+  --output text)
+
+
 ## AWS EC2 实例配置
 INSTYPE="r6id.8xlarge"
 COUNT=3
@@ -307,10 +318,19 @@ IPADDR=$(aerolab attach shell --name $NAME -- hostname -I) && echo $IPADDR
 aerolab cluster add exporter -n $NAME
 
 # 创建 Monitor stack
-REGION=$(cloud-init query ds.meta_data.placement.region)
-MAC=$(cloud-init query ds.meta_data.mac)
-SGID=$(cloud-init query ds.meta_data.network.interfaces.macs.$MAC.security-group-ids)
-SUBID=$(cloud-init query ds.meta_data.network.interfaces.macs.$MAC.subnet-id)
+# 获取子网 ID和安全组 ID
+INSTANCE_ID=$(ec2-metadata --quiet --instance-id)
+REGION=$(ec2-metadata --quiet --region)
+SGID=$(aws ec2 describe-instances \
+  --instance-ids $INSTANCE_ID \
+  --region $REGION \
+  --query 'Reservations[0].Instances[0].SubnetId' \
+  --output text)
+SUBID=$(aws ec2 describe-instances \
+  --instance-ids $INSTANCE_ID \
+  --region $REGION \
+  --query 'Reservations[0].Instances[0].SecurityGroups[*].GroupId' \
+  --output text)
 # echo $REGION $MAC $SGID $SUBID
 INSTYPE="c6g.xlarge"
 NAME="ams"

@@ -47,7 +47,7 @@ docker-compose ps -a
 # docker_worker_1          /bin/bash /entrypoint.sh         Up             5001/tcp                                                                  
 # root@ip-172-31-34-251:~/dify/docker# 
 
-echo "Web UI: http://$(cloud-init query ds.meta_data.public_ipv4):5555"
+echo "Web UI: http://$(ec2-metadata --quiet --public-ipv4):5555"
 
 ######################################################################################################
 # 3. 在另一个 c8g.4xlarge 实例上安装 deepseek-r1-distiteld 

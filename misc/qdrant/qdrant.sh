@@ -124,13 +124,13 @@ bash test-filter.sh
 
 ##########################################################################################
 ## 结果文件处理
-INS_TYPE=$(cloud-init query ds.meta_data.instance_type)
+INS_TYPE=$(ec2-metadata --quiet --instance-type)
 RESULT_FILE_PATH="/root/vector-db-benchmark/results_$INS_TYPE"
 mkdir -p $RESULT_FILE_PATH
 mv /root/vector-db-benchmark/*.json $RESULT_FILE_PATH/
 # 合并数据
 cd $RESULT_FILE_PATH/
-INS_TYPE=$(cloud-init query ds.meta_data.instance_type)
+INS_TYPE=$(ec2-metadata --quiet --instance-type)
 jq -s '.' *upload*.json > qdrant_benchmark_upload_$INS_TYPE.json
 jq -s '.' *search*.json > qdrant_benchmark_search_$INS_TYPE.json
 # qdrant_benchmark_search_m6i.2xlarge.json 
@@ -139,7 +139,7 @@ jq -s '.' *search*.json > qdrant_benchmark_search_$INS_TYPE.json
 echo "experiment,engine,dataset,parallel,batch_size,hnsw_config.m,hnsw_config.ef_construct,upload_time,total_time" > qdrant_benchmark_upload_$INS_TYPE.csv
 jq -r '.[] | "\(.params.experiment),\(.params.engine),\(.params.dataset),\(.params.parallel),\(.params.batch_size),\(.params.hnsw_config.m),\(.params.hnsw_config.ef_construct),\(.results.upload_time),\(.results.total_time)"' qdrant_benchmark_upload_$INS_TYPE.json >> qdrant_benchmark_upload_$INS_TYPE.csv
 ## 结果文件生成 csv 文件：search 文件
-INS_TYPE=$(cloud-init query ds.meta_data.instance_type)
+INS_TYPE=$(ec2-metadata --quiet --instance-type)
 echo "experiment,engine,dataset,parallel,hnsw_ef,oversampling,mean_precisions,rps,total_time,mean_time,p95_time,p99_time" > qdrant_benchmark_search_$INS_TYPE.csv
 jq -r '.[] | "\(.params.experiment),\(.params.engine),\(.params.dataset),\(.params.parallel),\(.params.config.hnsw_ef),\(.params.config.quantization.oversampling),\(.results.mean_precisions),\(.results.rps),\(.results.total_time),\(.results.mean_time),\(.results.p95_time),\(.results.p99_time)"' qdrant_benchmark_search_$INS_TYPE.json >> qdrant_benchmark_search_$INS_TYPE.csv
 cd ../

@@ -109,7 +109,7 @@ do
 done
 
 ## 汇总结果并打包
-instance_type=$(cloud-init query ds.meta_data.instance.instance-type)
+instance_type=$(ec2-metadata --quiet --instance-type)
 timestamp=$(date +%Y%m%d-%H%M%S)
 archive="ffmpeg_result_${instance_type}_${timestamp}"
 

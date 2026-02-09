@@ -104,8 +104,8 @@ docker inspect redroid:latest | jq '.[0].Config.Entrypoint, .[0].Architecture'
 "arm64"
 
 #7) Tag and push image to Docker Hub (optional)
-AWS_REGION=$(cloud-init query ds.meta_data.placement.region)
-ACCOUNT_ID=$(cloud-init query ds.meta_data.identity-credentials.ec2.info.AccountId)
+AWS_REGION=$(ec2-metadata --quiet --region)
+ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 ECR_URL=$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 # TAG the image.
 docker images
@@ -152,8 +152,8 @@ lsmod | grep -e ashmem_linux -e binder_linux
 apt install -y awscli
 aws configure
 # ......
-AWS_REGION=$(cloud-init query ds.meta_data.placement.region)
-ACCOUNT_ID=$(cloud-init query ds.meta_data.identity-credentials.ec2.info.AccountId)
+AWS_REGION=$(ec2-metadata --quiet --region)
+ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 ECR_URL=$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_URL
 docker pull $ECR_URL/redroid:13.0.0_arm64-latest

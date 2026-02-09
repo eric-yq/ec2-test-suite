@@ -77,7 +77,7 @@ do
 		sleep 10 && killall ssh dool
 
 		## 停止实例	
-		# aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region) &
+		# aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(ec2-metadata --quiet --region) &
 	done
 done
 
@@ -138,6 +138,6 @@ do
 		killall ssh
 
 		## 停止实例	
-		# aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region) &
+		# aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(ec2-metadata --quiet --region) &
 	done
 done

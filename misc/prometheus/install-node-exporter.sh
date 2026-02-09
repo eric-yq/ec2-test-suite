@@ -85,7 +85,7 @@ cat >> /usr/local/prometheus/prometheus.yml << EOF
 # 自定义配置
   - job_name: 'ec2_nodes_redis'
     ec2_sd_configs:
-        - region: '$(cloud-init query region)'
+        - region: '$(ec2-metadata --quiet --region)'
     relabel_configs:
         - source_labels: [__meta_ec2_instance_state]
           regex: running

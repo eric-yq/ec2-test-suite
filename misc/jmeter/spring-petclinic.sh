@@ -3,7 +3,7 @@
 # This script runs JMeter tests against the Spring Petclinic application.
 
 # 实例类型
-PN=$(cloud-init query ds.meta_data.instance_type)
+PN=$(ec2-metadata --quiet --instance-type)
 # PN=$(ec2-metadata --quiet --instance-type)
 
 # Install Java 25 Corretto, Git, and Python3-pip

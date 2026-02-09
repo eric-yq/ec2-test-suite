@@ -78,7 +78,7 @@ aws --version
 
 aws_ak_value="akxxx"
 aws_sk_value="skxxx"
-aws_region_name=$(cloud-init query region)
+aws_region_name=$(ec2-metadata --quiet --region)
 aws_s3_bucket_name="s3://ec2-core-benchmark-ericyq"
 aws configure set aws_access_key_id ${aws_ak_value}
 aws configure set aws_secret_access_key ${aws_sk_value}
@@ -101,7 +101,7 @@ cmake -version
 
 ## 获取机型规格、kernel 版本，创建保存输出文件的目录。
 cd /root/
-PN=$(cloud-init query ds.meta_data.instance_type)
+PN=$(ec2-metadata --quiet --instance-type)
 KERNEL_RELEASE=$(uname -r)
 DATA_DIR=~/${PN}_hwinfo_${KERNEL_RELEASE}
 CFG_DIR=${DATA_DIR}/system-infomation

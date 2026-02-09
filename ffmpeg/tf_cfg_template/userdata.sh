@@ -103,7 +103,7 @@ ffmpeg -hide_banner -codecs |grep 264
 # 配置 AWS CLI
 aws_ak_value="akxxx"
 aws_sk_value="skxxx"
-aws_region_name=$(cloud-init query region)
+aws_region_name=$(ec2-metadata --quiet --region)
 aws configure set aws_access_key_id ${aws_ak_value}
 aws configure set aws_secret_access_key ${aws_sk_value}
 aws configure set default.region ${aws_region_name}
@@ -153,7 +153,7 @@ do
 done
 
 ## 汇总结果并打包
-instance_type=$(cloud-init query ds.meta_data.instance_type)
+instance_type=$(ec2-metadata --quiet --instance-type)
 timestamp=$(date +%Y%m%d-%H%M%S)
 archive="ffmpeg_result_${instance_type}_${timestamp}"
 

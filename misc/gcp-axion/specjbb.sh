@@ -38,7 +38,7 @@ java -version
 
 ## 系统配置
 PN="gcp-c4a-highmem-16"
-# PN=$(cloud-init query ds.meta_data.instance_type)
+# PN=$(ec2-metadata --quiet --instance-type)
 cat << EOF >> /etc/sysctl.conf
 dev.raid.speed_limit_min = 4000
 kernel.sched_rt_runtime_us = 990000
