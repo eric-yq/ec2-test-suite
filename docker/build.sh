@@ -57,11 +57,11 @@ echo "  ${IMAGE_NAME}:${VERSION}${TAG_SUFFIX}"
 echo "  ${IMAGE_NAME}:latest${TAG_SUFFIX}"
 echo ""
 echo "To run the container:"
-echo "  docker run -it -rm --name loadgen \
-          -v ~/.aws:/root/.aws:ro \
-          -v /run/cloud-init:/run/cloud-init:ro \
-          -v /root/ec2-test-suite:/root/ec2-test-suite \
-          ${IMAGE_NAME}:latest${TAG_SUFFIX}"
+echo "  docker run -it --rm --name loadgen"
+echo "    -v ~/.aws:/root/.aws:ro"
+echo "    -v /run/cloud-init:/run/cloud-init:ro"
+echo "    -v /root/ec2-test-suite:/root/ec2-test-suite"
+echo "    ${IMAGE_NAME}:latest${TAG_SUFFIX}"
 echo ""
 
 # Push to ECR if requested
