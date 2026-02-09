@@ -31,7 +31,7 @@ docker-compose ps
 
 #（可选）安装 Web 管理工具
 docker run -d -p 8000:3000 -e MILVUS_URL=$(hostname -i):19530 zilliz/attu:v2.4
-echo "[Info] Use http://$(cloud-init query ds.meta_data.public-ipv4):8000 to login the Web UI."
+echo "[Info] Use http://$(ec2-metadata --quiet --public-ipv4):8000 to login the Web UI."
 
 ## 3. 准备数据
 cd /root/

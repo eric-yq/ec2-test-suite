@@ -16,7 +16,7 @@ RESULT_PATH="/root/yuanquan/redis-valkey-benchmark-for-bytedance"
 mkdir -p ${RESULT_PATH}
 
 # 获取valkey 所在服务器的信息
-INSTANCE_TYPE=$(ssh -o StrictHostKeyChecking=no -i ~/ericyq-global.pem ec2-user@${SUT_IP_ADDR} "sudo cloud-init query ds.meta_data.instance_type")
+INSTANCE_TYPE=$(ssh -o StrictHostKeyChecking=no -i ~/ericyq-global.pem ec2-user@${SUT_IP_ADDR} "sudo ec2-metadata --quiet --instance-type")
 
 # 设置 memtier 选项
 OPTS="-s ${SUT_IP_ADDR} -p $PORT -t $THREADS -c $CONNECTIONS --test-time=180 --distinct-client-seed --key-minimum=1 --key-maximum=1 --print-percentiles 50,99,100 "

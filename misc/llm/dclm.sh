@@ -95,7 +95,7 @@ echo 0 | sudo tee /proc/sys/kernel/perf_event_paranoid
 # APerf has to open more than the default limit of files.
 ulimit -n 65536
 
-INS_TYPE=$(cloud-init query ds.meta_data.instance_type)
+INS_TYPE=$(ec2-metadata --quiet --instance-type)
 # sually aperf would be run in another terminal. 
 # For illustration purposes it is send to the background here
 aperf record --run-name dclm_$INS_TYPE --period 30 &

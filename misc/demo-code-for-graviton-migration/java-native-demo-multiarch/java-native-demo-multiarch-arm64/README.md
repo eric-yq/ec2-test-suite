@@ -188,7 +188,7 @@ docker buildx build --platform linux/arm64 -t java-native-demo:arm64 --load .
 
 # 登录到 AWS ECR
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-AWS_REGION=$(cloud-init query region)
+AWS_REGION=$(ec2-metadata --quiet --region)
 aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
 # 创建repo
@@ -223,7 +223,7 @@ aws ecr describe-images --repository-name graviton-demos/java-native-demo
 ```bash
 # 登录到 AWS ECR
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-AWS_REGION=$(cloud-init query region)
+AWS_REGION=$(ec2-metadata --quiet --region)
 aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
 # 通过 Manifest 运行容器

@@ -51,7 +51,7 @@ SUT_NAME="SUT_XXX"
 ## 配置 AWSCLI
 aws_ak_value="akxxx"
 aws_sk_value="skxxx"
-aws_region_name=$(cloud-init query region)
+aws_region_name=$(ec2-metadata --quiet --region)
 aws configure set aws_access_key_id ${aws_ak_value}
 aws configure set aws_secret_access_key ${aws_sk_value}
 aws configure set default.region ${aws_region_name}

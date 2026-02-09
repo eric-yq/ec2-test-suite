@@ -53,7 +53,7 @@ install_al2023_dependencies
 ##  设置 AWS CLI 
 aws_ak_value="xxx"
 aws_sk_value="xxx"
-aws_region_name=$(cloud-init query region)
+aws_region_name=$(ec2-metadata --quiet --region)
 aws configure set aws_access_key_id ${aws_ak_value}
 aws configure set aws_secret_access_key ${aws_sk_value}
 aws configure set default.region ${aws_region_name}
@@ -256,5 +256,5 @@ aws s3 cp ${DATA_DIR}-all.tar.gz ${aws_s3_bucket_name}/pts/ && \
 echo "[INFO] Step3: Result files have been uploaded to s3 bucket. BYE BYE."
 
 ## 终止实例
-INSTANCE_ID=$(cloud-init query ds.meta_data.instance_id)
+INSTANCE_ID=$(ec2-metadata --quiet --instance-id)
 aws ec2 stop-instances --instance-ids "${INSTANCE_ID}"

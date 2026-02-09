@@ -29,7 +29,8 @@ then
     OS_TYPE=al2023
 fi
 
-REGION_NAME=$(cloud-init query region)
+# REGION_NAME=$(ec2-metadata --quiet --region)
+REGION_NAME=$(ec2-metadata --quiet --region)
 echo "" > /tmp/temp-setting
 echo "export REGION_NAME=${REGION_NAME}" >> /tmp/temp-setting
 echo "export INSTANCE_TYPE=${INSTANCE_TYPE}" >> /tmp/temp-setting

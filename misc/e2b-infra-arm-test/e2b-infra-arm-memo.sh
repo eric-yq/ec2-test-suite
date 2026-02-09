@@ -97,7 +97,7 @@ docker image ls
 
 ## 3. 登录到 AWS ECR
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-AWS_REGION=$(cloud-init query region)
+AWS_REGION=$(ec2-metadata --quiet --region)
 aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
 ## 4. 给镜像打 ECR 标签
@@ -133,7 +133,7 @@ docker image ls
 
 ## 3. 登录到 AWS ECR
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-AWS_REGION=$(cloud-init query region)
+AWS_REGION=$(ec2-metadata --quiet --region)
 aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
 ## 4. 给镜像打 ECR 标签
@@ -178,7 +178,7 @@ docker image ls
 
 ## 3. 登录到 AWS ECR
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-AWS_REGION=$(cloud-init query region)
+AWS_REGION=$(ec2-metadata --quiet --region)
 aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
 ## 4. 给镜像打 ECR 标签

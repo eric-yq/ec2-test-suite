@@ -90,14 +90,14 @@ docker buildx inspect --bootstrap
 # 配置 AWS CLI
 aws_ak_value="xxx"
 aws_sk_value="xxx"
-aws_region_name=$(cloud-init query region)
+aws_region_name=$(ec2-metadata --quiet --region)
 aws configure set aws_access_key_id ${aws_ak_value}
 aws configure set aws_secret_access_key ${aws_sk_value}
 aws configure set default.region ${aws_region_name}
 
 # 设置 ECR 信息
-ACCOUNT_ID=$(cloud-init query ds.dynamic.instance_identity.document.accountId)
-AWS_REGION=$(cloud-init query region)
+ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+AWS_REGION=$(ec2-metadata --quiet --region)
 ECR_URL="${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 
 # 登录 ECR Repository 
@@ -128,21 +128,21 @@ docker --version
 # 配置 AWS CLI
 aws_ak_value="xxx"
 aws_sk_value="xxx"
-aws_region_name=$(cloud-init query region)
+aws_region_name=$(ec2-metadata --quiet --region)
 aws configure set aws_access_key_id ${aws_ak_value}
 aws configure set aws_secret_access_key ${aws_sk_value}
 aws configure set default.region ${aws_region_name}
 
 # 设置 ECR 信息
-ACCOUNT_ID=$(cloud-init query ds.dynamic.instance_identity.document.accountId)
-AWS_REGION=$(cloud-init query region)
+ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+AWS_REGION=$(ec2-metadata --quiet --region)
 ECR_URL="${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 
 # 登录 ECR Repository 
-aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_URL
+aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin $ECR_URL
 
 # 启动容器
-INS_TYPE=$(cloud-init query ds.meta_data.instance_type)
+INS_TYPE=$(ec2-metadata --quiet --instance-type)
 docker run -d --name jemalloc-test-${INS_TYPE} ${ECR_URL}/jemalloc-test:latest
 
 docker ps -a

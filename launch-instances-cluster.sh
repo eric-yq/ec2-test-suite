@@ -33,7 +33,7 @@ then
     OS_TYPE=al2
 fi
 
-REGION_NAME=$(cloud-init query region)
+REGION_NAME=$(ec2-metadata --quiet --region)
 echo "" > /tmp/temp-setting
 echo "export REGION_NAME=${REGION_NAME}" >> /tmp/temp-setting
 echo "export INSTANCE_TYPE=${INSTANCE_TYPE}" >> /tmp/temp-setting
@@ -51,15 +51,21 @@ rm -rf tf_cfg_${SUT_NAME}
 cp -rf tf_cfg_template tf_cfg_${SUT_NAME}
 cd tf_cfg_${SUT_NAME}
 
-# 获取 Subnet ID 和 Security Group ID
-MAC=$(cloud-init query ds.meta_data.mac)
-SUBNET_ID_XXX=$(cloud-init query ds.meta_data.network.interfaces.macs.$MAC.subnet_id)
-SG_ID_XXX=$(cloud-init query ds.meta_data.network.interfaces.macs.$MAC.security_group_ids)
-
-# 获取 placement group name
-ins_id=$(cloud-init query ds.meta_data.instance_id)
+# 获取 Subnet ID 和 Security Group ID，placement group name
+# 获取实例 ID 和区域
+INSTANCE_ID=$(ec2-metadata --quiet --instance-id)
+SUBNET_ID_XXX=$(aws ec2 describe-instances \
+  --instance-ids $INSTANCE_ID \
+  --region $REGION_NAME \
+  --query 'Reservations[0].Instances[0].SubnetId' \
+  --output text)
+SG_ID_XXX=$(aws ec2 describe-instances \
+  --instance-ids $INSTANCE_ID \
+  --region $REGION_NAME \
+  --query 'Reservations[0].Instances[0].SecurityGroups[*].GroupId' \
+  --output text)
 PG_NAME_XXX=$(aws ec2 describe-instances \
-  --instance-ids $ins_id \
+  --instance-ids $INSTANCE_ID \
   --query "Reservations[0].Instances[0].Placement.GroupName" \
   --output text)
   

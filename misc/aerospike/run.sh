@@ -7,11 +7,20 @@ COUNT=$2
 WORKLOAD=$3
 
 # AeroSpike 集群公共配置
-REGION=$(cloud-init query ds.meta_data.placement.region)
-MAC=$(cloud-init query ds.meta_data.mac)
-SGID=$(cloud-init query ds.meta_data.network.interfaces.macs.$MAC.security-group-ids)
-SUBID=$(cloud-init query ds.meta_data.network.interfaces.macs.$MAC.subnet-id)
-
+# 获取子网 ID和安全组 ID
+INSTANCE_ID=$(ec2-metadata --quiet --instance-id)
+REGION=$(ec2-metadata --quiet --region)
+SGID=$(aws ec2 describe-instances \
+  --instance-ids $INSTANCE_ID \
+  --region $REGION \
+  --query 'Reservations[0].Instances[0].SubnetId' \
+  --output text)
+SUBID=$(aws ec2 describe-instances \
+  --instance-ids $INSTANCE_ID \
+  --region $REGION \
+  --query 'Reservations[0].Instances[0].SecurityGroups[*].GroupId' \
+  --output text)
+  
 # AWS EC2 实例配置
 # INSTYPE=$1
 # COUNT=$2

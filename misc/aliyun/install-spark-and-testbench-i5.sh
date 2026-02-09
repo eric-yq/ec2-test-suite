@@ -365,7 +365,7 @@ SF=600
 # 待数据全部完成之后，预先准备 Benchmark 过程中需要的一些结果目录：
 cd ~/data
 SUT_NAME="spark-tpcds"
-PN=$(sudo cloud-init query ds.meta_data.instance.instance-type)
+PN=$(sudo ec2-metadata --quiet --instance-type)
 DATA_DIR=~/data/${PN}_${SUT_NAME}
 CFG_DIR=$DATA_DIR/system-infomation
 TPCDS_RESULT_DIR=$DATA_DIR/spark-tpcds-result

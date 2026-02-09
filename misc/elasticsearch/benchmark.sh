@@ -39,7 +39,7 @@ tracks=${1}
 
 # esrally on localhost
 IPADDR="127.0.0.1"
-INSTANCE_TYPE=$(cloud-init query ds.meta_data.instance_type)
+INSTANCE_TYPE=$(ec2-metadata --quiet --instance-type)
 
 # tracks="nested noaa sql pmc http_logs so_vector so geoshape wikipedia k8s_metrics openai_vector github_archive eql"
 
@@ -87,7 +87,7 @@ nohup bash benchmark.sh &
 
 # esrally on localhost
 IPADDR=$(hostname -i)
-INSTANCE_TYPE=$(cloud-init query ds.meta_data.instance_type)
+INSTANCE_TYPE=$(ec2-metadata --quiet --instance-type)
 
 tracks="nested noaa sql pmc http_logs so_vector so geoshape nyc_taxis wikipedia \
         k8s_metrics openai_vector github_archive eql"

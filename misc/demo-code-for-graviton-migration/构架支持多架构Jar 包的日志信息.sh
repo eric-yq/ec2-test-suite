@@ -260,7 +260,7 @@ native/linux-x86_64/libsysteminfo.so
 =========================================
 ###################################################################################################
 # Run on X86
-(.venv) root@ip-172-31-86-86:~/java-native-demo-multiarch-arm64# cloud-init query ds.meta_data.instance_type
+(.venv) root@ip-172-31-86-86:~/java-native-demo-multiarch-arm64# ec2-metadata --quiet --instance-type
 t3.small
 (.venv) root@ip-172-31-86-86:~/java-native-demo-multiarch-arm64# ./run-multiarch.sh 
 =========================================
@@ -390,7 +390,7 @@ Demo completed successfully!
 
 ###################################################################################################
 # Run on Graviton
-root@ip-172-31-44-83:~/java-native-demo-multiarch-arm64# cloud-init query ds.meta_data.instance_type
+root@ip-172-31-44-83:~/java-native-demo-multiarch-arm64# ec2-metadata --quiet --instance-type
 t4g.small
 root@ip-172-31-44-83:~/java-native-demo-multiarch-arm64# ./run-multiarch.sh 
 =========================================

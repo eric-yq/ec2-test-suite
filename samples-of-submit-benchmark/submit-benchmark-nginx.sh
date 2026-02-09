@@ -49,7 +49,7 @@ do
 		sleep 10 && killall ssh dool
 
 		## 停止实例
-		aws ec2 terminate-instances --region $(cloud-init query region) \
+		aws ec2 terminate-instances --region $(ec2-metadata --quiet --region) \
 		--instance-ids ${INSTANCE_ID_LOADBALANCE} ${INSTANCE_ID_WEB1} ${INSTANCE_ID_WEB2} &
 	done
 done

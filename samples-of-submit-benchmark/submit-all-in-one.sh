@@ -58,7 +58,7 @@ do
         # bash benchmark/redis-benchmark_v2.sh ${INSTANCE_IP_MASTER} 8007 180
 
         ## 停止实例
-        aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region) &
+        aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(ec2-metadata --quiet --region) &
     done
 done
 
@@ -91,7 +91,7 @@ do
         bash benchmark/redis-benchmark_v2.sh ${INSTANCE_IP_MASTER} 8007 180
 
         ## 停止实例
-        aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region) &
+        aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(ec2-metadata --quiet --region) &
     done
 done
 
@@ -122,7 +122,7 @@ do
         bash benchmark/nginx-benchmark.sh ${INSTANCE_IP_LOADBALANCE}
 
         ## 停止实例
-        aws ec2 terminate-instances --region $(cloud-init query region) \
+        aws ec2 terminate-instances --region $(ec2-metadata --quiet --region) \
         --instance-ids ${INSTANCE_ID_LOADBALANCE} ${INSTANCE_ID_WEB1} ${INSTANCE_ID_WEB2} &
     done
 done
@@ -166,7 +166,7 @@ do
         bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 30 16 24 ${ins} 
 
         ## 停止实例
-        aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region) &
+        aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(ec2-metadata --quiet --region) &
     done
 done
 
@@ -196,7 +196,7 @@ do
         bash benchmark/mongo-benchmark_v2.sh ${INSTANCE_IP_MASTER}
 
         ## 停止实例
-        aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region) &
+        aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(ec2-metadata --quiet --region) &
     done
 done
 
@@ -226,6 +226,6 @@ do
 		bash benchmark/milvus-benchmark.sh ${INSTANCE_IP_MASTER}
 		
 		## 停止实例
-		aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(cloud-init query region) &
+		aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(ec2-metadata --quiet --region) &
 	done
 done
