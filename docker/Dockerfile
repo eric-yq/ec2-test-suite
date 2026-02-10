@@ -35,6 +35,7 @@ RUN yum -yq groupinstall "Development Tools" && \
         tar \
         which \
         unzip \
+        iputils \
         awscli \
         cloud-init \
         ec2-utils && \
