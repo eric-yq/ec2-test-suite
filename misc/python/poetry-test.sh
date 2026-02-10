@@ -102,3 +102,27 @@ EOF
 
 # 安装
 poetry install --no-root
+
+## 只下载包，不安装
+# 安装插件
+poetry self add poetry-plugin-export
+
+# 检查 pyproject.toml 是否存在
+if [ ! -f "pyproject.toml" ]; then
+    echo "错误: 当前目录没有 pyproject.toml 文件"
+    echo "当前目录: $(pwd)"
+    exit 1
+fi
+
+echo "找到 pyproject.toml，开始导出依赖..."
+
+# 导出依赖（会自动读取当前目录的 pyproject.toml）
+poetry export -f requirements.txt --output requirements.txt --without-hashes
+poetry export -f requirements.txt --output requirements-dev.txt --with dev --without-hashes
+
+echo "导出完成！"
+
+# 下载
+mkdir -p arm-packages
+pip download --dest arm-packages -r requirements.txt
+pip download --dest arm-packages -r requirements-dev.txt

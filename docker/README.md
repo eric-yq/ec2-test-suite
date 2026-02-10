@@ -3,6 +3,7 @@
 ```bash
 yum install -y git docker
 systemctl start docker
+# 配置 awscli......
 
 git clone https://github.com/eric-yq/ec2-test-suite.git
 cd ec2-test-suite/docker
