@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# qdrant Benchmark
+os_types="al2023"
+instance_types="$1"
+# instance_types="r8a.2xlarge r8g.2xlarge r8i.2xlarge r7a.2xlarge r7g.2xlarge r7i.2xlarge r6a.2xlarge r6g.2xlarge r6i.2xlarge"
+# instance_types="m8a.2xlarge m8g.2xlarge m8i.2xlarge m7a.2xlarge m7g.2xlarge m7i.2xlarge m6a.2xlarge m6g.2xlarge m6i.2xlarge"
+
+if [ "$USE_CPG" = "1" ] ; then
+  OPT="USE_CPG=1"
+else
+  OPT=""
+fi
+
+for os in ${os_types} 
+do
+	for ins in ${instance_types} 
+	do
+		## 创建实例、安装软件
+		eval $OPT bash launch-instances-single.sh -s mongo -t ${ins} -o ${os}
+		# 检查实例启动状态：如果失败则跳过后续测试。
+		launch_status=$?
+		if [ $launch_status -ne 0 ]; then
+			echo "\$0: [$(date +%Y%m%d.%H%M%S)] Instance launch failed for OS_TYPE=${os}, INSTANCE_TYPE=${ins}. Continuing with next configuration..."
+			continue
+		fi
+		
+		####################################
+		# 实例类型、IP 地址和实例 ID 记录到文件
+		source /tmp/temp-setting
+		echo "${ins} ${INSTANCE_IP_MASTER} ${INSTANCE_ID}" >> /tmp/servers.txt
+		echo "[$(date +%Y%m%d.%H%M%S)] Sleep 30 seconds ..." && sleep 30
+		# 执行 ping 测试
+		echo "[$(date +%Y%m%d.%H%M%S)] Ping latency test, result shows the avg. latency only. Extra option : ${OPT}"
+		ping_result=$(ping -q -c 60 ${INSTANCE_IP_MASTER} | tail -n 1 | awk -F '/' '{print $5 " ms"}') 
+		echo "[$(date +%Y%m%d.%H%M%S)]   ${ins}, ${INSTANCE_IP_MASTER} : ${ping_result}"
+		sleep 120
+	    ####################################
+		
+		## 执行 Benchmark 测试
+		echo "$0: Star to run benchmark"
+		bash benchmark/mongo-benchmark_v2-timed.sh ${INSTANCE_IP_MASTER}
+		
+		# 停止 dool 监控
+		sleep 10 && killall ssh dool
+		
+		## 停止实例
+		aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(ec2-metadata --quiet --region) &
+	done
+done
+
+
+
+echo "$0: Qdrant benchmark completed."
