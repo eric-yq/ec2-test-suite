@@ -42,7 +42,7 @@ submit_task(){
 	### 加载数据, load
 	echo "[Info] Load data ..." >> ${RESULT_FILE}
 	remove_database
-	/root/ycsb-0.17.0/bin/ycsb.sh load mongodb -P $(dirname $0)/workload_mongo_readonly -p mongodb.url=${MONGO_URL} \
+	/root/ycsb-0.17.0/bin/ycsb.sh load mongodb -P $(dirname $0)/workload_mongo_readheavy -p mongodb.url=${MONGO_URL} \
 		-threads $(nproc) >> ${RESULT_FILE}
 		
     for i in ${THREAD_LIST}
