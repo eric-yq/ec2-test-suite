@@ -38,7 +38,20 @@ echo "export OS_TYPE=${OS_TYPE}" >> /tmp/temp-setting
 echo "export SUT_NAME=${SUT_NAME}" >> /tmp/temp-setting
 
 ## 根据实例类型、OS 类型查找最新的 AMI。
-bash search_latest_ami.sh
+
+
+if [ "$SUT_NAME" = "loadgen" ]; then
+    echo "[INFO] SUT_NAME is loadgen.  "
+    ## 保存变量
+    echo "export CPU_ARCH=$(arch)" >> /tmp/temp-setting
+    echo "export INSTANCE_VCPU_NUM=$(nproc)"  >> /tmp/temp-setting
+    echo "export INSTANCE_MEM_SIZE=$(free -g | grep Mem | awk '{print $2}')"  >> /tmp/temp-setting
+    echo "export AMI_ID=$(ec2-metadata --quiet --ami-id )" >> /tmp/temp-setting
+    echo "export AMI_ID_NAME=$(ec2-metadata --quiet --ami-id)" >> /tmp/temp-setting
+else
+    echo "[INFO] SUT_NAME is $SUT_NAME, executing search_latest_ami.sh"
+    bash search_latest_ami.sh
+fi
 
 source /tmp/temp-setting
 
@@ -48,7 +61,7 @@ rm -rf tf_cfg_${SUT_NAME}
 cp -rf tf_cfg_template tf_cfg_${SUT_NAME}
 cd tf_cfg_${SUT_NAME}
 
-# 获取 Subnet ID，Security Group ID和 placement group name
+## 获取 Subnet ID, Security Group ID 和 placement group name
 read SUBNET_ID_XXX SG_ID_XXX PG_NAME_XXX < <(aws ec2 describe-instances \
   --region ${REGION_NAME} \
   --instance-ids $(ec2-metadata --quiet -i) \
