@@ -46,7 +46,7 @@ do
 		## 执行 Benchmark 测试
 		echo "$0: Star to run benchmark"
 		source /tmp/temp-setting
-		CPU_CORES=$(ssh -o StrictHostKeyChecking=no -i ~/ericyq-global.pem ec2-user@${INSTANCE_IP_MASTER} "nproc")
+		CPU_CORES=$(ssh -o StrictHostKeyChecking=no -i ~/.ssh/ericyq-global.pem ec2-user@${INSTANCE_IP_MASTER} "nproc")
         
 		## 测试 3 种 io-threads 模式：vCPU数量的40%、65%、90%
 		let YYY=${CPU_CORES}*40/100 && let PORT=8000+$YYY

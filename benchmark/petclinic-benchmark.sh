@@ -12,7 +12,7 @@ mkdir -p ${RESULT_PATH}
 
 ## 启动一个后台进程，执行dool命令，获取系统性能信息
 # DOOL_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${SUT_IP_ADDR}_dool.txt"
-# ssh -o StrictHostKeyChecking=no -i ~/ericyq-global.pem ec2-user@${SUT_IP_ADDR} \
+# ssh -o StrictHostKeyChecking=no -i ~/.ssh/ericyq-global.pem ec2-user@${SUT_IP_ADDR} \
 #   "sudo dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 5 100" \
 #   1> ${DOOL_FILE} 2>&1 &
 
