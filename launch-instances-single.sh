@@ -39,15 +39,20 @@ echo "export SUT_NAME=${SUT_NAME}" >> /tmp/temp-setting
 
 ## 根据实例类型、OS 类型查找最新的 AMI。
 
-
 if [ "$SUT_NAME" = "loadgen" ]; then
     echo "[INFO] SUT_NAME is loadgen.  "
     ## 保存变量
     echo "export CPU_ARCH=$(arch)" >> /tmp/temp-setting
     echo "export INSTANCE_VCPU_NUM=$(nproc)"  >> /tmp/temp-setting
     echo "export INSTANCE_MEM_SIZE=$(free -g | grep Mem | awk '{print $2}')"  >> /tmp/temp-setting
-    echo "export AMI_ID=$(ec2-metadata --quiet --ami-id )" >> /tmp/temp-setting
-    echo "export AMI_ID_NAME=$(ec2-metadata --quiet --ami-id)" >> /tmp/temp-setting
+    echo "export AMI_ID=$(aws ec2 describe-images \
+        --owners self --filters "Name=name,Values=loadgen-seed*" \
+        --query 'Images | sort_by(@, &CreationDate) | [-1].ImageId' \
+        --output text)" >> /tmp/temp-setting
+    echo "export AMI_ID_NAME=$(aws ec2 describe-images \
+        --owners self --filters "Name=name,Values=loadgen-seed*" \
+        --query 'Images | sort_by(@, &CreationDate) | [-1].Name' \
+        --output text))" >> /tmp/temp-setting
 else
     echo "[INFO] SUT_NAME is $SUT_NAME, executing search_latest_ami.sh"
     bash search_latest_ami.sh
