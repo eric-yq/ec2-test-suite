@@ -42,10 +42,10 @@ do
 		## 执行 Benchmark 测试
 		echo "[$(date +%Y%m%d.%H%M%S)] Star to run benchmark"
 		source /tmp/temp-setting
-		bash benchmark/redis-benchmark_v1.sh ${INSTANCE_IP_MASTER} 6379 180
-		# bash benchmark/redis-benchmark_v1.sh ${INSTANCE_IP_MASTER} 8003 180
-		bash benchmark/redis-benchmark_v1.sh ${INSTANCE_IP_MASTER} 8005 180
-		# bash benchmark/redis-benchmark_v1.sh ${INSTANCE_IP_MASTER} 8007 180
+		bash benchmark/redis-benchmark_v2.sh ${INSTANCE_IP_MASTER} 6379 180
+		# bash benchmark/redis-benchmark_v2.sh ${INSTANCE_IP_MASTER} 8003 180
+		bash benchmark/redis-benchmark_v2.sh ${INSTANCE_IP_MASTER} 8005 180
+		# bash benchmark/redis-benchmark_v2.sh ${INSTANCE_IP_MASTER} 8007 180
 		
 		# 停止 dool 监控
 		sleep 10 && killall ssh dool
