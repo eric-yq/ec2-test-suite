@@ -34,11 +34,11 @@ do
 		echo "[$(date +%Y%m%d.%H%M%S)] Ping latency test, result shows the avg. latency only. Extra option : ${OPT}"
 		ping_result=$(ping -q -c 60 ${INSTANCE_IP_MASTER} | tail -n 1 | awk -F '/' '{print $5 " ms"}') 
 		echo "[$(date +%Y%m%d.%H%M%S)]   ${ins}, ${INSTANCE_IP_MASTER} : ${ping_result}"
-		sleep 120
+		echo "[$(date +%Y%m%d.%H%M%S)] Sleep 120 seconds before benchmark test..." && sleep 120
 	    ####################################
 		
 		## 执行 Benchmark 测试
-		echo "$0: Star to run benchmark"
+		echo "[$(date +%Y%m%d.%H%M%S)] Star to run benchmark"
 		bash benchmark/mongo-benchmark_v2-timed.sh ${INSTANCE_IP_MASTER}
 		
 		# 停止 dool 监控
