@@ -52,7 +52,7 @@ if [ "$SUT_NAME" = "loadgen" ]; then
     echo "export AMI_ID_NAME=$(aws ec2 describe-images \
         --owners self --filters "Name=name,Values=loadgen-seed*" \
         --query 'Images | sort_by(@, &CreationDate) | [-1].Name' \
-        --output text))" >> /tmp/temp-setting
+        --output text)" >> /tmp/temp-setting
 else
     echo "[INFO] SUT_NAME is $SUT_NAME, executing search_latest_ami.sh"
     bash search_latest_ami.sh
