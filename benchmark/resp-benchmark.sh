@@ -24,7 +24,7 @@ echo "==========================================" >> ${DOOL_FILE}
 ping -q -c 60 ${INSTANCE_IP_MASTER} >> ${DOOL_FILE}
 echo "==========================================" >> ${DOOL_FILE}
 # 启动监控: sut
-ssh -o StrictHostKeyChecking=no -i ~/ericyq-global.pem ec2-user@${SUT_IP_ADDR} \
+ssh -o StrictHostKeyChecking=no -i ~/.ssh/ericyq-global.pem ec2-user@${SUT_IP_ADDR} \
   "dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 10" \
   1>> ${DOOL_FILE} 2>&1 &
 # 启动监控:loadgen
