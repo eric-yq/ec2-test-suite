@@ -31,7 +31,7 @@ redis-cli -h ${SUT_IP_ADDR} flushall
 memtier_benchmark --threads 4 --clients 4 --server ${SUT_IP_ADDR} --port ${SUT_PORT} \
     --ratio 1:0 --requests 100000 --key-maximum 100000 --data-size 512 > /dev/null 2>&1
 
-THREAD_LIST="1 2 4 6 8 12 16 32"
+THREAD_LIST="1 2 4 6 8 12 16 32 64 128"
 
 for i in ${THREAD_LIST}
 do
