@@ -44,7 +44,7 @@ echo "[Info] 正在设置 AWS CLI 的默认 region..."
 aws configure set default.region $(ec2-metadata --quiet --region)
 
 ## 更新 benchmark 代码库
-echo "[Info]正在更新 benchmark 代码库..."
+echo "[Info] 正在更新 benchmark 代码库..."
 cd /root/ec2-test-suite/
 git pull
 
