@@ -39,21 +39,21 @@ sudo mkdir -p /var/run/mongodb
 
 sudo chown -R mongodb:mongodb /data /var/log/mongodb /var/run/mongodb
 
-# Step 3: 生成 keyfile（仅 Node 1 执行，后续启用认证时使用）
-# Node 1 上生成
-sudo openssl rand -base64 756 > /tmp/mongodb-keyfile
-sudo cp /tmp/mongodb-keyfile /etc/mongodb-keyfile
-sudo chmod 400 /etc/mongodb-keyfile
-sudo chown mongodb:mongodb /etc/mongodb-keyfile
+# # Step 3: 生成 keyfile（仅 Node 1 执行，后续启用认证时使用）
+# # Node 1 上生成
+# sudo openssl rand -base64 756 > /tmp/mongodb-keyfile
+# sudo cp /tmp/mongodb-keyfile /etc/mongodb-keyfile
+# sudo chmod 400 /etc/mongodb-keyfile
+# sudo chown mongodb:mongodb /etc/mongodb-keyfile
 
-# 复制到 Node 2 和 Node 3
-scp /tmp/mongodb-keyfile N2:/tmp/
-scp /tmp/mongodb-keyfile N3:/tmp/
+# # 复制到 Node 2 和 Node 3
+# scp /tmp/mongodb-keyfile N2:/tmp/
+# scp /tmp/mongodb-keyfile N3:/tmp/
 
-# Node 2 和 Node 3 上执行
-sudo cp /tmp/mongodb-keyfile /etc/mongodb-keyfile
-sudo chmod 400 /etc/mongodb-keyfile
-sudo chown mongodb:mongodb /etc/mongodb-keyfile
+# # Node 2 和 Node 3 上执行
+# sudo cp /tmp/mongodb-keyfile /etc/mongodb-keyfile
+# sudo chmod 400 /etc/mongodb-keyfile
+# sudo chown mongodb:mongodb /etc/mongodb-keyfile
 
 # Phase 2: 配置文件（3 台机器都创建）
 # Step 4: Config Server 配置
@@ -204,7 +204,8 @@ sudo -u mongodb mongod --config /etc/mongod-shard2.conf
 
 # 验证：
 ss -tlnp | grep 27020
-Step 13: 初始化 Shard 2 Replica Set（仅 Node 2 执行）
+
+# Step 13: 初始化 Shard 2 Replica Set（仅 Node 2 执行）
 mongosh --host 127.0.0.1 --port 27020
 rs.initiate({
   _id: "shard2RS",
@@ -249,11 +250,6 @@ db.adminCommand({ listShards: 1 })
 
 // 查看详细状态
 sh.status()
-# 确认输出中包含：
-# configRS: 3 members
-# shard1RS: 3 members
-# shard2RS: 3 members
-
 
 # Phase 8: 测试分片功能
 mongosh --host 127.0.0.1 --port 27017 -u admin -p admin
