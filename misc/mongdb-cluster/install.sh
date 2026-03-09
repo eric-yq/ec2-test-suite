@@ -10,6 +10,7 @@
 # shard2	27020
 # 以下步骤中 N1、N2、N3 替换为实际私有 IP。
 
+######################################################################
 # Phase 1: 基础环境准备（3 台机器都执行）
 # Step 1: 安装 MongoDB 8.0
 sudo apt-get install -y gnupg curl
@@ -55,103 +56,17 @@ sudo chown -R mongodb:mongodb /data /var/log/mongodb /var/run/mongodb
 # sudo chmod 400 /etc/mongodb-keyfile
 # sudo chown mongodb:mongodb /etc/mongodb-keyfile
 
+######################################################################
 # Phase 2: 配置文件（3 台机器都创建）
-# Step 4: Config Server 配置
-# 创建 /etc/mongod-configsvr.conf
-systemLog:
-  destination: file
-  logAppend: true
-  path: /var/log/mongodb/configsvr.log
+# Step 4: Config Server 配置, 创建 /etc/mongod-configsvr.conf
+# Step 5: Shard 1 配置, 创建 /etc/mongod-shard1.conf
+# Step 6: Shard 2 配置, 创建 /etc/mongod-shard2.conf
+# Step 7: mongos 配置, 创建 /etc/mongos.conf
+cd ~
+git clone https://github.com/eric-yq/ec2-test-suite.git
+sudo cp ec2-test-suite/misc/mongdb-cluster/mongo*.conf /etc/
 
-storage:
-  dbPath: /data/configdb
-
-processManagement:
-  fork: true
-  pidFilePath: /var/run/mongodb/configsvr.pid
-
-net:
-  port: 27019
-  bindIp: 0.0.0.0
-
-replication:
-  replSetName: configRS
-
-sharding:
-  clusterRole: configsvr
-
-# Step 5: Shard 1 配置
-# 创建 /etc/mongod-shard1.conf
-systemLog:
-  destination: file
-  logAppend: true
-  path: /var/log/mongodb/shard1.log
-
-storage:
-  dbPath: /data/shard1
-  wiredTiger:
-    engineConfig:
-      cacheSizeGB: 20
-
-processManagement:
-  fork: true
-  pidFilePath: /var/run/mongodb/shard1.pid
-
-net:
-  port: 27018
-  bindIp: 0.0.0.0
-
-replication:
-  replSetName: shard1RS
-
-sharding:
-  clusterRole: shardsvr
-
-# Step 6: Shard 2 配置
-# 创建 /etc/mongod-shard2.conf
-systemLog:
-  destination: file
-  logAppend: true
-  path: /var/log/mongodb/shard2.log
-
-storage:
-  dbPath: /data/shard2
-  wiredTiger:
-    engineConfig:
-      cacheSizeGB: 20
-
-processManagement:
-  fork: true
-  pidFilePath: /var/run/mongodb/shard2.pid
-
-net:
-  port: 27020
-  bindIp: 0.0.0.0
-
-replication:
-  replSetName: shard2RS
-
-sharding:
-  clusterRole: shardsvr
-
-# Step 7: mongos 配置
-# 创建 /etc/mongos.conf
-systemLog:
-  destination: file
-  logAppend: true
-  path: /var/log/mongodb/mongos.log
-
-processManagement:
-  fork: true
-  pidFilePath: /var/run/mongodb/mongos.pid
-
-net:
-  port: 27017
-  bindIp: 0.0.0.0
-
-sharding:
-  configDB: configRS/N1:27019,N2:27019,N3:27019
-
+######################################################################
 # Phase 3: 启动 Config Server
 # Step 8: 启动 Config Server（3 台机器都执行）
 sudo -u mongodb mongod --config /etc/mongod-configsvr.conf
@@ -177,6 +92,7 @@ rs.status()
 
 # 确认输出中有一个 PRIMARY 和两个 SECONDARY 后继续。
 
+######################################################################
 # Phase 4: 启动 Shard 1
 # Step 10: 启动 Shard 1（3 台机器都执行）
 sudo -u mongodb mongod --config /etc/mongod-shard1.conf
@@ -198,6 +114,7 @@ rs.initiate({
 // 等待几秒后验证
 rs.status()
 
+######################################################################
 # Phase 5: 启动 Shard 2
 # Step 12: 启动 Shard 2（3 台机器都执行）
 sudo -u mongodb mongod --config /etc/mongod-shard2.conf
@@ -219,6 +136,7 @@ rs.initiate({
 // 等待几秒后验证
 rs.status()
 
+######################################################################
 # Phase 6: 启动 mongos 并组建集群
 # Step 14: 启动 mongos（3 台机器都执行）
 sudo -u mongodb mongos --config /etc/mongos.conf
@@ -251,6 +169,7 @@ db.adminCommand({ listShards: 1 })
 // 查看详细状态
 sh.status()
 
+######################################################################
 # Phase 8: 测试分片功能
 mongosh --host 127.0.0.1 --port 27017 -u admin -p admin
 // 启用数据库分片
