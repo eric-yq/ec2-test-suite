@@ -49,6 +49,14 @@ do
 		sleep 10
 		# killall ssh dool
 
+		# 将结果目录打包上传到 S3
+		TIMESTAMP=$(date +%Y%m%d%H%M%S)
+		TARGET_DIR="${SUT_NAME}_${INSTANCE_TYPE}_${TIMESTAMP}"
+		cp -r benchmark-result-files ${TARGET_DIR}	
+		cp screenlog.0 ${TARGET_DIR}/
+		tar czf ${TARGET_DIR}.tar.gz ${TARGET_DIR}
+		aws s3 cp ${TARGET_DIR}.tar.gz s3://ec2-core-benchmark-ericyq/result_${SUT_NAME}/
+
 		## 终止 SUT 实例
 		aws ec2 terminate-instances --region $(ec2-metadata --quiet --region) \
 		  --instance-ids ${INSTANCE_ID_LOADBALANCE} ${INSTANCE_ID_WEB1} ${INSTANCE_ID_WEB2} &		
