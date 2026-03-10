@@ -44,7 +44,7 @@ do
 		source /tmp/temp-setting
 		bash benchmark/redis-benchmark_v2.sh ${INSTANCE_IP_MASTER} 6379 180
 		# bash benchmark/redis-benchmark_v2.sh ${INSTANCE_IP_MASTER} 8003 180
-		bash benchmark/redis-benchmark_v2.sh ${INSTANCE_IP_MASTER} 8005 180
+		# bash benchmark/redis-benchmark_v2.sh ${INSTANCE_IP_MASTER} 8005 180
 		# bash benchmark/redis-benchmark_v2.sh ${INSTANCE_IP_MASTER} 8007 180
 		
 		# 停止 dool 监控
