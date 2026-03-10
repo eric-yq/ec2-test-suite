@@ -49,4 +49,4 @@ cd /root/ec2-test-suite/
 git pull
 
 ## Disable 服务，这样 reboot 后不会再次执行
-systemctl disable userdata.service
+# systemctl disable userdata.service
