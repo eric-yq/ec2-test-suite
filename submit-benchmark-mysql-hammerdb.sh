@@ -59,9 +59,12 @@ do
 		bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 30 16 64 ${ins} 
 
 		# 停止 dool 监控
-		sleep 10 && killall ssh dool
+		sleep 10
+		# killall ssh dool
 		
-		## 停止实例
+		## 终止 SUT 实例
 		aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(ec2-metadata --quiet --region) &
+		## 停止 Loadgen 实例
+		aws ec2 stop-instances --instance-ids $(ec2-metadata --quiet -i) --region $(ec2-metadata --quiet --region) &
 	done
 done
