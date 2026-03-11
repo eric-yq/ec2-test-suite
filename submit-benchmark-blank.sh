@@ -57,8 +57,7 @@ do
 		
 		## 终止实例
 		aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} $(ec2-metadata --quiet -i) \
-		    --region $(ec2-metadata --quiet --region) &
-		
+		    --region $(ec2-metadata --quiet --region)
 	done
 done
 
