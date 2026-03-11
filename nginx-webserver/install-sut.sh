@@ -246,5 +246,3 @@ install_public_tools
 os_configure
 install_nginx
 modify_nginxcnf
-	
-
