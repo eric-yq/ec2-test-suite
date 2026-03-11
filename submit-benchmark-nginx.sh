@@ -31,12 +31,12 @@ do
 		####################################
 		# 实例类型、IP 地址和实例 ID 记录到文件
 		source /tmp/temp-setting
-		echo "${ins} ${INSTANCE_IP_MASTER} ${INSTANCE_ID}" >> /tmp/servers.txt
+		echo "${ins} ${INSTANCE_IP_LOADBALANCE} ${INSTANCE_ID}" >> /tmp/servers.txt
 		echo "[$(date +%Y%m%d.%H%M%S)] Sleep 30 seconds ..." && sleep 30
 		# 执行 ping 测试
 		echo "[$(date +%Y%m%d.%H%M%S)] Ping latency test, result shows the avg. latency only. Extra option : ${OPT}"
-		ping_result=$(ping -q -c 60 ${INSTANCE_IP_MASTER} | tail -n 1 | awk -F '/' '{print $5 " ms"}') 
-		echo "[$(date +%Y%m%d.%H%M%S)]   ${ins}, ${INSTANCE_IP_MASTER} : ${ping_result}"
+		ping_result=$(ping -q -c 60 ${INSTANCE_IP_LOADBALANCE} | tail -n 1 | awk -F '/' '{print $5 " ms"}') 
+		echo "[$(date +%Y%m%d.%H%M%S)]   ${ins}, ${INSTANCE_IP_LOADBALANCE} : ${ping_result}"
 		echo "[$(date +%Y%m%d.%H%M%S)] Sleep 120 seconds before benchmark test..." && sleep 120
 	    ####################################
 		
