@@ -217,8 +217,6 @@ java -showversion -server \
 # 停止 dstat
 # kill -9 $(cat pid_file.txt)
 
-
-
 ## 保存结果并上传到 S3 bucket
 cd /root/
 grep "RUN RESULT: hbIR" ~/specjbb/composite.out >> ${RESULT_SUMMARY_FILE}
