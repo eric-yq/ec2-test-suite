@@ -40,17 +40,25 @@ do
 		## 执行 Benchmark 测试
 		echo "[$(date +%Y%m%d.%H%M%S)] Star to run benchmark"
 		source /tmp/temp-setting
-		echo "[$(date +%Y%m%d.%H%M%S)] Sleep 60s to simulate benchmark......" &&
-		sleep 60
+		echo "[$(date +%Y%m%d.%H%M%S)] Sleep 60s to simulate benchmark......" && sleep 60
+		touch benchmark-result-files/placeholder.txt
+
+		# 将结果目录打包上传到 S3
+		TIMESTAMP=$(date +%Y%m%d%H%M%S)
+		TARGET_DIR="${SUT_NAME}_${INSTANCE_TYPE}_${TIMESTAMP}"
+		cp -r benchmark-result-files ${TARGET_DIR}	
+		cp screenlog.0 ${TARGET_DIR}/
+		tar czf ${TARGET_DIR}.tar.gz ${TARGET_DIR}
+		aws s3 cp ${TARGET_DIR}.tar.gz s3://ec2-core-benchmark-ericyq/result_${SUT_NAME}/
 		
 		# 停止 dool 监控
 		sleep 10
 		# killall ssh dool
 		
-		## 终止 SUT 实例
-		aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} --region $(ec2-metadata --quiet --region) &
-		## 停止 Loadgen 实例
-		aws ec2 stop-instances --instance-ids $(ec2-metadata --quiet -i) --region $(ec2-metadata --quiet --region) &
+		## 终止实例
+		aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} $(ec2-metadata --quiet -i) \
+		    --region $(ec2-metadata --quiet --region) &
+		
 	done
 done
 
