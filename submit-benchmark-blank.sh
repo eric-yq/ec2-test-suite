@@ -56,9 +56,11 @@ do
 		# killall ssh dool
 		
 		## 终止实例
-		aws ec2 terminate-instances --instance-ids ${INSTANCE_ID} $(ec2-metadata --quiet -i) \
-		    --region $(ec2-metadata --quiet --region)
+		aws ec2 terminate-instances --region $(ec2-metadata --quiet --region) --instance-ids ${INSTANCE_ID} && \
+		echo "[$(date +%Y%m%d.%H%M%S)] Terminated instance ${INSTANCE_ID} for OS_TYPE=${os}, INSTANCE_TYPE=${ins}."
 	done
 done
 
 echo "$0: Blank benchmark completed."
+aws ec2 terminate-instances --region $(ec2-metadata --quiet --region) --instance-ids $(ec2-metadata --quiet -i) 
+
