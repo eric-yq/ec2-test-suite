@@ -116,10 +116,11 @@ CPU-高，Network-高；建议 4xlarge 实例
 - redis
 - valkey
 - mongo
+- nginx
 CPU-低，Network-低；建议 2xlarge 实例
-- mysql
+- mysql-hammerdb
 - milvus
 
-- nginx：
+
 
 
