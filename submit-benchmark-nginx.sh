@@ -57,10 +57,12 @@ do
 		tar czf ${TARGET_DIR}.tar.gz ${TARGET_DIR}
 		aws s3 cp ${TARGET_DIR}.tar.gz s3://ec2-core-benchmark-ericyq/result_${SUT_NAME}/
 
-		## 终止 SUT 实例
-		aws ec2 terminate-instances --region $(ec2-metadata --quiet --region) \
-		  --instance-ids ${INSTANCE_ID_LOADBALANCE} ${INSTANCE_ID_WEB1} ${INSTANCE_ID_WEB2} &		
-		## 停止 Loadgen 实例
-		aws ec2 stop-instances --instance-ids $(ec2-metadata --quiet -i) --region $(ec2-metadata --quiet --region) &
+		## 终止实例
+		aws ec2 terminate-instances --region $(ec2-metadata --quiet --region) --instance-ids ${INSTANCE_ID} && \
+		echo "[$(date +%Y%m%d.%H%M%S)] Terminated instance ${INSTANCE_ID} for OS_TYPE=${os}, INSTANCE_TYPE=${ins}."
 	done
 done
+
+echo "$(date +%Y%m%d.%H%M%S)] ${SUT_NAME} benchmark completed. Loadgen instance will be terminicated after 30s." && sleep 30
+aws ec2 terminate-instances --region $(ec2-metadata --quiet --region) --instance-ids $(ec2-metadata --quiet -i) 
+

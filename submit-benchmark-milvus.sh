@@ -65,4 +65,3 @@ done
 echo "$(date +%Y%m%d.%H%M%S)] ${SUT_NAME} benchmark completed. Loadgen instance will be terminicated after 30s." && sleep 30
 aws ec2 terminate-instances --region $(ec2-metadata --quiet --region) --instance-ids $(ec2-metadata --quiet -i) 
 
-
