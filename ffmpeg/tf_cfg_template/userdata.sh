@@ -152,11 +152,33 @@ do
     echo "[INFO] $(date +%Y%m%d%H%M%S): OutputFile：$(du -smh $output)" >> ${RESULT_FILE}
 done
 
+###################################################################################################
+## 执行4K->1080P的转码测试
+cd ~
+wget https://download.blender.org/demo/movies/BBB/bbb_sunflower_2160p_60fps_normal.mp4.zip
+unzip bbb_sunflower_2160p_60fps_normal.mp4.zip
+input="bbb_sunflower_2160p_60fps_normal.mp4"
+
+## x264 转码测试
+output="bbb_sunflower_1080p_libx264.mp4"
+RESULT_FILE="temp-output-4k-1080p-libx264.txt"
+echo "[INFO] $(date +%Y%m%d%H%M%S): perform testcase-4k-1080p-libx264:" > ${RESULT_FILE}
+ffmpeg -y -threads $(nproc) -i $input \
+  -vf scale=1920:1080 -c:v libx264 -preset medium -crf 23 -c:a copy \
+  $output 1>>${RESULT_FILE} 2>&1
+
+## x265转码测试
+output="bbb_sunflower_1080p_libx265.mp4"
+RESULT_FILE="temp-output-4k-1080p-libx265.txt"
+echo "[INFO] $(date +%Y%m%d%H%M%S): perform testcase-4k-1080p-libx265:" > ${RESULT_FILE}
+ffmpeg -y -threads $(nproc) -i $input \
+  -vf scale=1920:1080 -c:v libx265 -preset medium -crf 23 -c:a copy \
+  $output 1>>${RESULT_FILE} 2>&1
+
 ## 汇总结果并打包
 instance_type=$(ec2-metadata --quiet --instance-type)
 timestamp=$(date +%Y%m%d-%H%M%S)
 archive="ffmpeg_result_${instance_type}_${timestamp}"
-
 mkdir -p ${archive}
 cp *.txt *.sh ${archive}
 ffmpeg -version  > ${archive}/filesize.txt
