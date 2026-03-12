@@ -19,7 +19,16 @@ Eric 的日常工作是对 AWS EC2 实例进行性能基准测试，对比 Gravi
 - **Loadgen 实例**：负责发起 benchmark 流量（每次测试临时创建，**每个 SUT 对应一个独立的 Loadgen**）
 - **SUT (System Under Test) 实例**：被测目标实例（由 `submit-benchmark-*.sh` 脚本自动创建，无需手动 launch）
 
-## 标准操作流程
+### Benchmark 类型分类
+
+| 类型 | 说明 | 需要 Loadgen | 脚本 | Workload 示例 |
+|------|------|-------------|------|--------------|
+| **Client-Server 型** | 需要 Loadgen 实例向 SUT 发送测试流量 | ✅ 是 | `submit-benchmark-<workload>.sh` | redis, valkey, mongo, mysql-hammerdb, nginx, milvus |
+| **Single 型** | SUT 单机即可完成，无需外部流量 | ❌ 否 | `submit-benchmark-singles.sh` | specjbb15, ffmpeg, spark, pts |
+
+## Client-Server 型 Benchmark 操作流程
+
+适用于 redis, valkey, mongo, mysql-hammerdb, nginx, milvus 等需要 Loadgen 发送流量的 workload。
 
 ### Step 1: 更新代码库（在管理平台上）
 ```bash
@@ -60,7 +69,7 @@ USE_CPG=1 bash submit-benchmark-<workload类型>.sh <SUT实例类型>
 ssh -i ~/.ssh/ericyq-global.pem ec2-user@<loadgen_ip> "sudo tail -20 /root/ec2-test-suite/screenlog.0"
 ```
 
-### Step 4: 创建监控 Cron Job
+### Step 5: 创建监控 Cron Job
 启动 benchmark 后，创建固定间隔的 cron job 来监控进度（取代 heartbeat 的不定时轮询）：
 ```bash
 openclaw cron add --name "benchmark-monitor" \
@@ -71,7 +80,7 @@ openclaw cron add --name "benchmark-monitor" \
 - 固定 30 分钟间隔，确保通知频率稳定
 - benchmark 全部完成后，删除该 cron job
 
-### Step 5: 结果自动上传 & 实例自动清理
+### Step 6: 结果自动上传 & 实例自动清理
 - 结果目录：~/ec2-test-suite/benchmark-result-files/
 - 包含 benchmark 结果文件 + 系统资源监控文件（*dool.txt）
 - **脚本完成后会自动将结果文件上传到 S3 存储桶**，无需手动打包或 scp 回 loadgen-seed
@@ -82,10 +91,82 @@ openclaw cron add --name "benchmark-monitor" \
 - 整理性能指标（吞吐量、延迟等）
 - 绘制对比表格和趋势图
 
+## Single 型 Benchmark 操作流程
+
+适用于 specjbb15, ffmpeg, spark, pts 等不需要 Loadgen 的 workload。
+
+### Step 1: 更新代码库（在管理平台上）
+```bash
+ssh -i ~/.ssh/ericyq-global.pem ec2-user@54.221.55.45
+sudo su - root
+cd ~/ec2-test-suite && git pull
+```
+
+### Step 2: 直接在管理平台启动 Benchmark
+无需创建 Loadgen 实例，直接在 loadgen-seed 上执行脚本：
+```bash
+bash submit-benchmark-singles.sh <workload> <SUT实例类型>
+```
+- 脚本会自动创建 SUT 实例、执行测试、上传结果到 S3，最后 SUT 自行 terminate
+- ⚠️ **必须串行执行！** 同一 workload 的多个实例类型不能并行跑，因为脚本共用 `tf_cfg_${SUT_NAME}` 目录，并行会导致 Terraform 文件互相覆盖
+
+推荐做法 — 写一个串行脚本，用 screen 后台执行：
+```bash
+cat > /tmp/run-singles-serial.sh << 'SCRIPT'
+#!/bin/bash
+cd /root/ec2-test-suite
+
+tasks=(
+  "specjbb15 r6g.2xlarge"
+  "specjbb15 r6i.2xlarge"
+  "specjbb15 r7g.2xlarge"
+  "ffmpeg r6g.2xlarge"
+  "ffmpeg r6i.2xlarge"
+  "ffmpeg r7g.2xlarge"
+)
+
+for i in "${!tasks[@]}"; do
+  task=${tasks[$i]}
+  workload=$(echo $task | awk '{print $1}')
+  instance=$(echo $task | awk '{print $2}')
+  echo ""
+  echo "[$(date +%Y%m%d.%H%M%S)] === Task $((i+1))/${#tasks[@]}: ${workload} on ${instance} ==="
+  bash submit-benchmark-singles.sh ${workload} ${instance}
+  echo "[$(date +%Y%m%d.%H%M%S)] === Task $((i+1))/${#tasks[@]} completed ==="
+done
+
+echo ""
+echo "[$(date +%Y%m%d.%H%M%S)] === All ${#tasks[@]} tasks completed ==="
+SCRIPT
+
+screen -dmS singles-serial -L -Logfile /root/ec2-test-suite/screenlog-singles-serial.log bash /tmp/run-singles-serial.sh
+```
+
+### Step 3: 监控进度
+Single 型的监控逻辑与 Client-Server 型不同：
+- 脚本完成后会**自动 terminate 自身 SUT 实例**（不是 stop，是 terminate）
+- **screen 会话还在 → 还有任务在跑**
+- **screen 会话消失 → 全部完成**
+- 查看日志中的 `Task X/N completed` 来判断当前进度
+
+```bash
+# 查看进度
+ssh -i ~/.ssh/ericyq-global.pem ec2-user@54.221.55.45 "sudo tail -20 /root/ec2-test-suite/screenlog-singles-serial.log"
+# 查看 screen 会话是否还在
+ssh -i ~/.ssh/ericyq-global.pem ec2-user@54.221.55.45 "sudo screen -ls"
+```
+
+### Step 4: 结果自动上传 & 实例自动清理
+- 脚本完成后自动上传结果到 S3
+- **SUT 实例会自行 terminate**（脚本在上传完成后执行 self-terminate）
+
+---
+
 ## 关键脚本说明
 - `launch-instances-single.sh`：创建单个 EC2 实例
-- `submit-benchmark-<workload>.sh`：提交 benchmark（自动创建 SUT 并执行测试）
-- `USE_CPG=1`：启用 Cluster Placement Group（确保 Loadgen 和 SUT 网络延迟最低）
+- `submit-benchmark-<workload>.sh`：提交 Client-Server 型 benchmark（自动创建 SUT 并执行测试）
+- `submit-benchmark-singles.sh`：提交 Single 型 benchmark（自动创建 SUT、执行测试、上传结果、清理实例）
+- `USE_CPG=1`：启用 Cluster Placement Group（确保 Loadgen 和 SUT 网络延迟最低，仅用于 Client-Server 型）
 
 ## 命名约定
 - 结果文件：~/ec2-test-suite/benchmark-result-files/
@@ -95,6 +176,8 @@ openclaw cron add --name "benchmark-monitor" \
 - 监控文件后缀：*dool.txt
 
 ## 任务请求格式
+
+### Client-Server 型
 ```
 请启动 benchmark：
 1. Workload类型: redis
@@ -102,7 +185,17 @@ openclaw cron add --name "benchmark-monitor" \
 3. SUT实例类型：分别为 r8g.2xlarge, r7i.2xlarge
 ```
 
+### Single 型
+```
+请启动 benchmark：
+1. Workload类型: specjbb15, ffmpeg
+2. Loadgen实例类型：不需要
+3. SUT实例类型：分别为 r6g.2xlarge, r6i.2xlarge, r7g.2xlarge
+```
+
 ## DaVinci 执行流程
+
+### Client-Server 型
 1. SSH 管理平台 → git pull
 2. 为每个 SUT 创建一个 Loadgen 实例 → 用 cron 定时 10 分钟后启动 benchmark
 3. Cron 触发后：分别 SSH 到各 Loadgen → git pull → screen 里并行跑 benchmark
@@ -111,16 +204,10 @@ openclaw cron add --name "benchmark-monitor" \
 6. 某个 benchmark 完成后 → 通知 Eric（结果已自动上传 S3，实例已自动停止）
 7. 全部完成后 → 删除监控 cron job（`openclaw cron rm benchmark-monitor`）
 
-## 附录：各个 workload 的 loadgen 实例 size 需求
-CPU-高，Network-高；建议 4xlarge 实例
-- redis
-- valkey
-- mongo
-- nginx
-CPU-低，Network-低；建议 2xlarge 实例
-- mysql-hammerdb
-- milvus
-
-
-
-
+### Single 型
+1. SSH 管理平台 → git pull
+2. 生成串行执行脚本（所有 workload × SUT 组合按顺序排列），用 screen 后台执行
+3. ⚠️ **不能并行** — 同一 workload 共用 Terraform 目录，并行会冲突
+4. 创建监控 cron job（`--every 30m`），定期 tail 日志检查进度
+5. 某个任务完成后 → 通知 Eric（结果已自动上传 S3，SUT 已 self-terminate）
+6. 全部完成后（screen 会话消失）→ 删除监控 cron job
