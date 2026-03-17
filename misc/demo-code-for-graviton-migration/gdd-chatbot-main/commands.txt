@@ -1,0 +1,53 @@
+# ============================================
+# Graviton4 (c8g.xlarge, ARM64) 构建步骤
+# 2026.03.17 修订。
+# ============================================
+
+# 1. 安装依赖
+sudo apt install cmake build-essential libcurl4-openssl-dev
+
+# 2. 克隆 llama.cpp (锁定 b3145 版本)
+git clone https://github.com/ggerganov/llama.cpp -b b3145
+
+# 3. 验证 ARM64 架构
+uname -m                    # 应输出: aarch64
+
+# 4. 清理旧构建并重新构建（必须 rm -rf build，否则 CMake 缓存会保留旧配置）
+rm -rf build
+cmake -B build
+cmake --build build --config Release -j $(nproc)
+
+# 5. 安装共享库
+cp build/libchatbot-arm64.so ~/kiro_workspace/java-demo/java/chatbot-libs/ && \
+ls -l ~/kiro_workspace/java-demo/java/chatbot-libs/
+
+# 6. 构建容器镜像
+cd ~/kiro_workspace/java-demo/java/
+docker build -t java-chatbot .
+
+# 7. 启动容器:会下载模型
+docker run -d -p 8081:8081 --name chatbot java-chatbot:latest
+docker ps -a
+docker logs chatbot
+
+#  8. 验证功能
+curl -X POST -H "Content-Type: application/json" -d '{"Prompt":"Tell me about AWS Graviton processors", "Tokens":50}' http://localhost:8081/generateResponse 
+
+# 清理
+docker rm -f chatbot
+docker image rm java-chatbot
+rm -rf ~/kiro_workspace/java-demo/java/chatbot-libs/libchatbot-arm64.so \
+       ~/kiro_workspace/java-demo/gdd-chatbot-main/build/
+
+# ============================================
+# 注意事项
+# ============================================
+# - Graviton4 (Neoverse V2) SVE2 向量宽度为 128-bit，不是 256-bit
+# - llama.cpp b3145 的 SVE 内核要求 256-bit (svcntb()==32)
+# - GCC 11 不支持 -mcpu=native+nosve（需要 GCC 12+）
+# - 改用 -march=armv8.4-a+dotprod+i8mm -mtune=neoverse-v2
+# - 不包含 +sve，GCC 不会定义 __ARM_FEATURE_SVE，走 NEON 路径
+# - dotprod 和 i8mm 加速量化推理运算
+# - NEON 在 Graviton4 上是 4x128b，性能依然很好
+# - -mcpu=native 会自动启用 dotprod、i8mm 等加速指令
+# - 需要 libcurl 支持模型下载 (LLAMA_CURL=ON)
