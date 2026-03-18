@@ -26,8 +26,8 @@ nohup dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time
   1>> ${DOOL_FILE_LOADGEN} 2>&1 &
 
 # 预热数据 - 只执行一次
+redis-cli -h ${SUT_IP_ADDR} flushall > /dev/null 2>&1
 echo "预热Redis数据..."
-redis-cli -h ${SUT_IP_ADDR} flushall
 memtier_benchmark --threads 4 --clients 4 --server ${SUT_IP_ADDR} --port ${SUT_PORT} \
     --ratio 1:0 --requests 100000 --key-maximum 100000 --data-size 512 > /dev/null 2>&1
 
