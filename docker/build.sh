@@ -214,9 +214,15 @@ echo "--------------------------------"
 docker build \
     --platform $PLATFORM \
     -f $DOCKERFILE \
-    # -t ${IMAGE_NAME}:${VERSION}${TAG_SUFFIX} \
     -t ${IMAGE_NAME}:latest${TAG_SUFFIX} \
     .
+    
+# docker build \
+#     --platform $PLATFORM \
+#     -f $DOCKERFILE \
+#     -t ${IMAGE_NAME}:${VERSION}${TAG_SUFFIX} \
+#     -t ${IMAGE_NAME}:latest${TAG_SUFFIX} \
+#     .
 
 echo ""
 echo "================================"
