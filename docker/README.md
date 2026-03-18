@@ -32,8 +32,8 @@ docker run -dit --name loadgen --restart=always \
 
 # 进入容器：
 docker attach loadgen
-# 登出容器：macos 快捷键为Shift+Ctrl+P，Q 组合键，
-# 此时登出时，再次 attach 还看到相同的路径和进程状态。
+# 登出容器：macos 快捷键为 Shift + Ctrl + P + Q 组合键；
+# 此方式登出时，再次 attach 还看到相同的路径和进程状态。
 
 # 进入容器后启动 benchmark:
 cd /root/ec2-test-suite
