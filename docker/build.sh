@@ -9,7 +9,7 @@ set -e
 
 # Configuration
 IMAGE_NAME="ec2-loadgen"
-VERSION="1.0.0"
+# VERSION="1.0.0"
 PUSH_TO_ECR="${PUSH_TO_ECR:-}"  # "public", "private", or "both"
 ECR_PUBLIC_ALIAS="${ECR_PUBLIC_ALIAS:-$(aws ecr-public describe-registries --region us-east-1 --query 'registries[0].aliases[?primaryRegistryAlias==`true`].name' --output text 2>/dev/null || echo '')}"
 AWS_REGION="${AWS_REGION:-$(aws configure get region 2>/dev/null || echo 'us-east-1')}"
@@ -79,14 +79,14 @@ push_to_ecr_public() {
 
     echo ""
     echo "Tagging and pushing images..."
-    docker tag ${IMAGE_NAME}:${VERSION}${TAG_SUFFIX} ${registry}/${ECR_REPO_NAME}:${VERSION}${TAG_SUFFIX}
+    # docker tag ${IMAGE_NAME}:${VERSION}${TAG_SUFFIX} ${registry}/${ECR_REPO_NAME}:${VERSION}${TAG_SUFFIX}
     docker tag ${IMAGE_NAME}:latest${TAG_SUFFIX} ${registry}/${ECR_REPO_NAME}:latest${TAG_SUFFIX}
-    docker push ${registry}/${ECR_REPO_NAME}:${VERSION}${TAG_SUFFIX}
+    # docker push ${registry}/${ECR_REPO_NAME}:${VERSION}${TAG_SUFFIX}
     docker push ${registry}/${ECR_REPO_NAME}:latest${TAG_SUFFIX}
 
     echo ""
     echo "✓ ECR Public push complete"
-    echo "  ${registry}/${ECR_REPO_NAME}:${VERSION}${TAG_SUFFIX}"
+    # echo "  ${registry}/${ECR_REPO_NAME}:${VERSION}${TAG_SUFFIX}"
     echo "  ${registry}/${ECR_REPO_NAME}:latest${TAG_SUFFIX}"
     echo "  Pull (no auth): docker pull ${registry}/${ECR_REPO_NAME}:latest${TAG_SUFFIX}"
     echo "  Console: https://gallery.ecr.aws/${ECR_PUBLIC_ALIAS}/${ECR_REPO_NAME}"
@@ -143,14 +143,14 @@ push_to_ecr_private() {
 
     echo ""
     echo "Tagging and pushing images..."
-    docker tag ${IMAGE_NAME}:${VERSION}${TAG_SUFFIX} ${registry}/${ECR_REPO_NAME}:${VERSION}${TAG_SUFFIX}
+    # docker tag ${IMAGE_NAME}:${VERSION}${TAG_SUFFIX} ${registry}/${ECR_REPO_NAME}:${VERSION}${TAG_SUFFIX}
     docker tag ${IMAGE_NAME}:latest${TAG_SUFFIX} ${registry}/${ECR_REPO_NAME}:latest${TAG_SUFFIX}
-    docker push ${registry}/${ECR_REPO_NAME}:${VERSION}${TAG_SUFFIX}
+    #docker push ${registry}/${ECR_REPO_NAME}:${VERSION}${TAG_SUFFIX}
     docker push ${registry}/${ECR_REPO_NAME}:latest${TAG_SUFFIX}
 
     echo ""
     echo "✓ ECR Private push complete"
-    echo "  ${registry}/${ECR_REPO_NAME}:${VERSION}${TAG_SUFFIX}"
+    # echo "  ${registry}/${ECR_REPO_NAME}:${VERSION}${TAG_SUFFIX}"
     echo "  ${registry}/${ECR_REPO_NAME}:latest${TAG_SUFFIX}"
     echo "  Pull: docker pull ${registry}/${ECR_REPO_NAME}:latest${TAG_SUFFIX}"
     echo "  Console: https://${AWS_REGION}.console.aws.amazon.com/ecr/repositories/private/${AWS_ACCOUNT_ID}/${ECR_REPO_NAME}"
@@ -168,22 +168,22 @@ create_manifest() {
     echo "================================"
     echo ""
 
-    docker manifest create ${registry}/${ECR_REPO_NAME}:${VERSION} \
-        --amend ${registry}/${ECR_REPO_NAME}:${VERSION}-amd64 \
-        --amend ${registry}/${ECR_REPO_NAME}:${VERSION}-arm64 2>/dev/null || \
-        echo "Note: Both amd64 and arm64 images must be pushed to create manifest"
+    # docker manifest create ${registry}/${ECR_REPO_NAME}:${VERSION} \
+    #     --amend ${registry}/${ECR_REPO_NAME}:${VERSION}-amd64 \
+    #     --amend ${registry}/${ECR_REPO_NAME}:${VERSION}-arm64 2>/dev/null || \
+    #     echo "Note: Both amd64 and arm64 images must be pushed to create manifest"
 
     docker manifest create ${registry}/${ECR_REPO_NAME}:latest \
         --amend ${registry}/${ECR_REPO_NAME}:latest-amd64 \
         --amend ${registry}/${ECR_REPO_NAME}:latest-arm64 2>/dev/null || \
         echo "Note: Both amd64 and arm64 images must be pushed to create manifest"
 
-    docker manifest push ${registry}/${ECR_REPO_NAME}:${VERSION} || true
+    # docker manifest push ${registry}/${ECR_REPO_NAME}:${VERSION} || true
     docker manifest push ${registry}/${ECR_REPO_NAME}:latest || true
 
     echo ""
     echo "✓ Manifest pushed:"
-    echo "  ${registry}/${ECR_REPO_NAME}:${VERSION}"
+    # echo "  ${registry}/${ECR_REPO_NAME}:${VERSION}"
     echo "  ${registry}/${ECR_REPO_NAME}:latest"
     echo "  (Docker will automatically pull the correct architecture)"
     echo ""
@@ -214,7 +214,7 @@ echo "--------------------------------"
 docker build \
     --platform $PLATFORM \
     -f $DOCKERFILE \
-    -t ${IMAGE_NAME}:${VERSION}${TAG_SUFFIX} \
+    # -t ${IMAGE_NAME}:${VERSION}${TAG_SUFFIX} \
     -t ${IMAGE_NAME}:latest${TAG_SUFFIX} \
     .
 
@@ -224,7 +224,7 @@ echo "Build complete!"
 echo "================================"
 echo ""
 echo "Local image tags:"
-echo "  ${IMAGE_NAME}:${VERSION}${TAG_SUFFIX}"
+# echo "  ${IMAGE_NAME}:${VERSION}${TAG_SUFFIX}"
 echo "  ${IMAGE_NAME}:latest${TAG_SUFFIX}"
 echo ""
 echo "To run the container:"
