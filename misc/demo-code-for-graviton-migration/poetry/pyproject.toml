@@ -1,0 +1,209 @@
+[tool.poetry]
+name = "notification-api"
+version = "0.3.0"
+description = "Service to deliver notifications"
+authors = ["eblyumska <elizabeth.blyumska@wpp.com>"]
+packages = [
+    { include = "app" },
+]
+include = [ { path = "notification-templates", format = ["sdist", "wheel"] } ]
+
+[tool.mypy]
+python_version = "3.11"
+plugins = [
+  "pydantic.mypy"
+]
+
+ignore_missing_imports = true
+no_implicit_optional = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_decorators = true
+disallow_any_generics = true
+check_untyped_defs = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unused_ignores = true
+
+[tool.black]
+line-length = 100
+target-version = ['py311']
+include = '\.pyi?$'
+exclude = '''
+(
+    \.git
+  | env
+  | dev
+  | docker-specs
+  | migrations/versions
+)
+'''
+
+[tool.isort]
+# isort Settings
+profile = "black"
+multi_line_output=3
+
+indent='    '
+line_length=100
+lines_after_imports=2
+
+sections=["FUTURE", "STDLIB","THIRDPARTY","COMPANY","FIRSTPARTY","LOCALFOLDER"]
+default_section="THIRDPARTY"
+no_lines_before=["LOCALFOLDER"]
+extra_standard_library=["typing_extensions"]
+known_third_party=["pydantic", "sqlalchemy"]
+known_company=["az_auth", "base_http_client", "wpp_core_logging", "notification_service", "wpp_core_kit"]
+known_first_party=["app", "tests"]
+
+use_parentheses=true
+include_trailing_comma=true
+
+order_by_type=false
+combine_star=true
+combine_as_imports=true
+
+skip=["tests/conftest.py", ]
+skip_glob=["migrations/versions/*.py", "migrations/*.py"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "strict"
+
+[tool.coverage.run]
+omit = ["*tests*"]
+
+[tool.flake8]
+# general rules {
+indent-size=4
+max-line-length=100
+max-complexity=12
+classmethod-decorators = ["classmethod", "cls_validator", "cls_declared_attr"]
+
+exclude = ".git,__pycache__,docs/,old,build,dist,.venv,venv,.env,env,.history,.gitlab,migrations,dev,docker-specs,out,tests/test_migrations.py"
+
+# }
+
+
+# split ignores by plugin with list of errors (comment/code).
+ignore= [
+    # [flake8] {
+    # line break after binary operator
+    "W504",
+    # line break before binary operator
+    # Arbitrary preference to break before the operator, as it makes easy to
+    # match operators with operands.
+    # See: The preferred place to break around a binary operator is after the operator, not before it · Issue #
+    "W503",
+
+    # black-conflict in slice colon operator
+    # See:
+    # * E203: False positive "whitespace before ':' " on list slice. · Issue #373 · PyCQA/pycodestyle
+    # * https://black.readthedocs.io/en/stable/faq.html#why-are-flake8-s-e203-and-w503-violated
+    "E203",
+
+    # }
+
+    # [flake8-bugbear] {
+    # Do not perform function calls in argument defaults.
+    "B008",
+    # }
+
+    # [flake8-bandit] {
+    # Use of assert detected
+    "S101",
+    # }
+    "S113",  # Call to httpx without timeout
+]
+
+# [flake8-annotations-complexity] rules {
+max-annotations-complexity=6
+# }
+
+
+# [flake8-flake8-quotes] rules {
+inline-quotes="double"
+multiline-quotes="double"
+docstring-quotes="double"
+avoid-escape = false
+# }
+
+
+per-file-ignores = [
+    # list rules exclusion with format
+    # [then-name-of-flake8-plugin] {
+    # short rule description
+    # filepath/to/ignore:RULE_CODE
+    # }
+    # We allow commented out code here
+    "migrations/env.py:E800"
+]
+
+[[tool.poetry.source]]
+name = "nexus"
+url = "https://nexus.wppopen.cn/repository/wpp-open-libs-python/simple"
+priority = "primary"
+
+
+[tool.poetry.dependencies]
+python = "^3.11"
+sendgrid = "^6.9.7"
+Jinja2 = "^3.1.2"
+pydantic = {version = "^1.10.14", extras = ["email"]}
+wpp-core-kit = {extras = ["notifications", "markdown"], version = "0.3.3+china1"}
+wpp-core-logging = "^0.1.1"
+object-storage-sdk-python = "0.4.1+chinap2"
+az-auth = "~1.0.12"
+httpx = "^0.27.0"
+python-dotenv = "^0.20.0"
+PyYAML = "^6.0"
+google-cloud-pubsub = "^2.17.1"
+dependency-injector = "^4.41.0"
+sqlalchemy = {version = "^2.0.13", extras = ["postgresql", "postgresql-asyncpg"]}
+alembic = "^1.11.1"
+fastapi = "^0.98.0"
+uvicorn = "^0.22.0"
+gcloud-aio-storage = "^9.0.0"
+cairosvg = "^2.7.1"
+aiohttp = "^3.9.3"
+alibabacloud-dm20151123 = "^1.7.2"
+alibabacloud-credentials = "^1.0.4"
+alibabacloud-tea-openapi = "^0.4.2"
+alibabacloud-tea-util = "^0.3.14"
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "^4.0.1"
+flake8-bugbear = "^22.3.20"
+flake8-bandit = "^3.0.0"
+flake8-annotations-complexity = "^0.0.7"
+flake8-commas = "^2.1.0"
+flake8-quotes = "^3.3.1"
+flake8-isort = "^4.1.1"
+pep8-naming = "^0.12.1"
+flake8-eradicate = "^1.2.0"
+mypy = "^1.3.0"
+black = "^22.1.0"
+pytest = "^7.1.1"
+pytest-asyncio = "^0.21.0"
+pytest-cov = "^3.0.0"
+pytest-mock = "^3.10.0"
+pyproject-flake8 = "^0.0.1-alpha.4"
+factory-boy = "^3.2.1"
+PyJWT = "^2.3.0"
+debugpy = "^1.6.2"
+types-PyYAML = "^6.0.11"
+pytest-alembic = "^0.8.3"
+respx = "^0.20.1"
+faker-enum = "^0.0.2"
+asgi-lifespan = "^2.1.0"
+fastapi = "^0.98.0"
+uvicorn = "^0.22.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.poetry.scripts]
+preview-template = 'dev.preview_template:main'
+populate-feeds = 'dev.populate_feeds:main'
