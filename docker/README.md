@@ -8,7 +8,15 @@ systemctl start docker
 git clone https://github.com/eric-yq/ec2-test-suite.git
 cd ec2-test-suite/docker
 
-PUSH_TO_ECR=true ./build.sh
+# 推送到私有仓库
+PUSH_TO_ECR=private ./build.sh
+
+# 推送到公有仓库
+PUSH_TO_ECR=publich ./build.sh
+
+# 同时推送 私有和公有仓库
+PUSH_TO_ECR=both ./build.sh
+
 ```
 
 启动容器:
