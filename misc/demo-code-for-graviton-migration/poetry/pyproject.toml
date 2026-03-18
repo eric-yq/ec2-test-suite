@@ -2,7 +2,7 @@
 name = "notification-api"
 version = "0.3.0"
 description = "Service to deliver notifications"
-authors = ["eblyumska <elizabeth.blyumska@wpp.com>"]
+authors = ["abcdef <abcdef@xyz.com>"]
 packages = [
     { include = "app" },
 ]
@@ -54,7 +54,7 @@ default_section="THIRDPARTY"
 no_lines_before=["LOCALFOLDER"]
 extra_standard_library=["typing_extensions"]
 known_third_party=["pydantic", "sqlalchemy"]
-known_company=["az_auth", "base_http_client", "wpp_core_logging", "notification_service", "wpp_core_kit"]
+known_company=["az_auth", "base_http_client", "aapp_core_logging", "notification_service", "aapp_core_kit"]
 known_first_party=["app", "tests"]
 
 use_parentheses=true
@@ -141,7 +141,7 @@ per-file-ignores = [
 
 [[tool.poetry.source]]
 name = "nexus"
-url = "https://nexus.wppopen.cn/repository/wpp-open-libs-python/simple"
+url = "https://nexus.acompany.cn/repository/aapp-open-libs-python/simple"
 priority = "primary"
 
 
@@ -150,8 +150,8 @@ python = "^3.11"
 sendgrid = "^6.9.7"
 Jinja2 = "^3.1.2"
 pydantic = {version = "^1.10.14", extras = ["email"]}
-wpp-core-kit = {extras = ["notifications", "markdown"], version = "0.3.3+china1"}
-wpp-core-logging = "^0.1.1"
+aapp-core-kit = {extras = ["notifications", "markdown"], version = "0.3.3+china1"}
+aapp-core-logging = "^0.1.1"
 object-storage-sdk-python = "0.4.1+chinap2"
 az-auth = "~1.0.12"
 httpx = "^0.27.0"
