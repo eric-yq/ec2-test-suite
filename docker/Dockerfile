@@ -3,7 +3,7 @@
 
 FROM public.ecr.aws/amazonlinux/amazonlinux:2023
 
-LABEL maintainer="your-email@example.com"
+LABEL maintainer="ericyq@amazon.com"
 LABEL description="Load generation and benchmark tools for various databases and services"
 
 # Set working directory
