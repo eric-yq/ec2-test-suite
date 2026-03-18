@@ -8,7 +8,7 @@
 set -e
 
 # Configuration
-IMAGE_NAME="loadgen-tools"
+IMAGE_NAME="ec2-loadgen"
 VERSION="1.0.0"
 PUSH_TO_ECR="${PUSH_TO_ECR:-}"  # "public", "private", or "both"
 ECR_PUBLIC_ALIAS="${ECR_PUBLIC_ALIAS:-$(aws ecr-public describe-registries --region us-east-1 --query 'registries[0].aliases[?primaryRegistryAlias==`true`].name' --output text 2>/dev/null || echo '')}"
