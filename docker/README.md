@@ -35,4 +35,20 @@ docker attach loadgen
 # 登出容器：macos 快捷键为Shift+Ctrl+P，Q 组合键，
 # 此时登出时，再次 attach 还看到相同的路径和进程状态。
 
+# 进入容器后启动 benchmark:
+cd /root/ec2-test-suite
+# Single 型 Benchmark：specjbb15, ffmpeg, spark, pts 等
+bash submit-benchmark-singles.sh specjbb15 r8g.4xlarge
+bash submit-benchmark-singles.sh ffmpeg r8g.4xlarge
+bash submit-benchmark-singles.sh spark r8g.4xlarge
+bash submit-benchmark-singles.sh pts r8g.4xlarge
+# C-S 型 Benchmark：redis, valkey, mysql-ebs, mongo, milvus, nginx 等
+bash submit-benchmark-redis.sh r8g.2xlarge
+bash submit-benchmark-valkey.sh r8g.2xlarge
+bash submit-benchmark-mysql-hammerdb.sh r8g.2xlarge
+bash submit-benchmark-mongo.sh r8g.2xlarge
+bash submit-benchmark-milvus.sh r8g.2xlarge
+bash submit-benchmark-nginx.sh r8g.2xlarge
+# 1. 也可以选择使用 screen 执行。
+# 2. ......
 ```
