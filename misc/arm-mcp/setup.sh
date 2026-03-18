@@ -11,15 +11,19 @@ ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 ECR_URL=${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com
 echo $ECR_URL
 
-1. 创建 ECR 仓库（如果还没有）
+# 1. 创建 ECR 仓库（如果还没有）
 aws ecr create-repository --repository-name arm-mcp --region ${REGION}
 
-2. 登录 ECR
+# 2. 登录 ECR
 aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${ECR_URL}
 
-3. Tag 并推送
+# 3. Tag 并推送
 docker tag armlimited/arm-mcp:latest ${ECR_URL}/arm-mcp:latest
 docker push ${ECR_URL}/arm-mcp:latest
 
-4. 拉取镜像
+# 4. 拉取镜像（macos）
 docker pull ${ECR_URL}/arm-mcp:latest
+# 5. 打 tag
+docker tag ${ECR_URL}/arm-mcp:latest armlimited/arm-mcp:latest
+docker image ls
+dice
