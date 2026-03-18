@@ -26,4 +26,3 @@ docker pull ${ECR_URL}/arm-mcp:latest
 # 5. 打 tag
 docker tag ${ECR_URL}/arm-mcp:latest armlimited/arm-mcp:latest
 docker image ls
-dice
