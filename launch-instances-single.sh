@@ -94,8 +94,10 @@ fi
 ## USE_CPG 通过 调用脚本 launch-instances-single.sh 时传递过来 USE_cpg=1 表示使用 CPG， 否则不使用。
 if [ "$USE_CPG" = "1" ] && [ -n "$PG_NAME_XXX" ]; then
   sed -i "s/PG_NAME_XXX/\"${PG_NAME_XXX}\"/g" variables.tf
+  echo "export PG_NAME=${PG_NAME_XXX}" >> /tmp/temp-setting
 else
   sed -i "s/PG_NAME_XXX/null/g" variables.tf
+  echo "export PG_NAME=null" >> /tmp/temp-setting
 fi
 
 ## 使用 terraform 启动实例
@@ -109,7 +111,6 @@ echo "export INSTANCE_ID=${INSTANCE_ID}" >> /tmp/temp-setting
 echo "export INSTANCE_IP_MASTER=${INSTANCE_IP_MASTER}" >> /tmp/temp-setting
 echo "export SUBNET_ID=${SUBNET_ID_XXX}" >> /tmp/temp-setting
 echo "export SG_ID=${SG_ID_XXX}" >> /tmp/temp-setting
-echo "export PG_NAME=${PG_NAME_XXX}" >> /tmp/temp-setting
 echo "export KEY_NAME=${KEY_NAME_XXX}" >> /tmp/temp-setting
 
 # 保存 Benchmark 结果的 S3 桶名称

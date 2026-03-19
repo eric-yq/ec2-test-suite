@@ -28,6 +28,7 @@ aws configure set default.region ${aws_region_name}
 # 将当前实例的 Key Pair 的 pem 文件，上传到的 ~/.aws 目录，
 # 后续在启动的 loadgen 容器中，会使用这个 key 采集 sut 的 dool 监控信息。
 # 如果 ~/.aws 目录下没有 pem 文件，sut 的 dool 监控信息将采集失败。
+# 另外，有些测试用例中也需要 pem 文件登录到 SUT 实例获取一些配置信息。
 #################################################################
 
 
