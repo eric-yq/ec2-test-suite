@@ -160,7 +160,7 @@ echo always > /sys/kernel/mm/transparent_hugepage/enabled
 
 ## 下载安装包
 cd /root/
-aws s3 cp ${aws_s3_bucket_name}/software/specjbb2015-1.02.tar.gz .
+aws s3 cp s3://${aws_s3_bucket_name}/software/specjbb2015-1.02.tar.gz .
 tar -xzf specjbb2015-1.02.tar.gz
 
 ## 获取 CPU数 和 内存数量（KB）
@@ -229,9 +229,9 @@ cp -r result specjbb/
 cp /tmp/dool-sut.txt specjbb/
 DATATIME=$(date +%Y%m%d%H%M%S)
 tar czf specjbb15-${JDK_VERSION}-${PN}-${DATATIME}.tar.gz specjbb/
-aws s3 cp specjbb15-${JDK_VERSION}-${PN}-${DATATIME}.tar.gz ${aws_s3_bucket_name}/result_specjbb15/
-aws s3 ls ${aws_s3_bucket_name}
-echo "Upload specjbb15-${JDK_VERSION}-${PN}-${DATATIME}.tar.gz to ${aws_s3_bucket_name} ."
+aws s3 cp specjbb15-${JDK_VERSION}-${PN}-${DATATIME}.tar.gz s3://${aws_s3_bucket_name}/result_specjbb15/
+aws s3 ls s3://${aws_s3_bucket_name}
+echo "Upload specjbb15-${JDK_VERSION}-${PN}-${DATATIME}.tar.gz to s3://${aws_s3_bucket_name} ."
 
 sleep 30
 
