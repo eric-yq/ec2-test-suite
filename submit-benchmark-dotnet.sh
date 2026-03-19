@@ -52,6 +52,7 @@ do
 		TARGET_DIR="${SUT_NAME}_${INSTANCE_TYPE}_${TIMESTAMP}"
 		cp -r benchmark-result-files ${TARGET_DIR}	
 		cp screenlog.0 ${TARGET_DIR}/
+		wget http://${INSTANCE_IP_MASTER}:9527/dool-sut.txt -O ${TARGET_DIR}/dool-sut.txt
 		tar czf ${TARGET_DIR}.tar.gz ${TARGET_DIR}
 		aws s3 cp ${TARGET_DIR}.tar.gz s3://${BENCHMARK_RESULT_BUCKET}/result_${SUT_NAME}/
 		
