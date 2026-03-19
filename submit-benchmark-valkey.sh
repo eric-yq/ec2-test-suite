@@ -57,7 +57,7 @@ do
 		cp -r benchmark-result-files ${TARGET_DIR}	
 		cp screenlog.0 ${TARGET_DIR}/
 		tar czf ${TARGET_DIR}.tar.gz ${TARGET_DIR}
-		aws s3 cp ${TARGET_DIR}.tar.gz s3://ec2-core-benchmark-ericyq/result_${SUT_NAME}/
+		aws s3 cp ${TARGET_DIR}.tar.gz s3://${BENCHMARK_RESULT_BUCKET}/result_${SUT_NAME}/
 		
 		## 终止实例
 		aws ec2 terminate-instances --region $(ec2-metadata --quiet --region) --instance-ids ${INSTANCE_ID} && \
