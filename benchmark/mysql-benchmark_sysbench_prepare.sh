@@ -19,7 +19,7 @@ RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_I
 
 ## 启动一个后台进程，执行dool命令，获取系统性能信息
 DOOL_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}_dool-sut.txt"
-ssh -o StrictHostKeyChecking=no -i ~/.ssh/ericyq-global.pem ec2-user@${SUT_IP_ADDR} \
+ssh -o StrictHostKeyChecking=no -i ~/.aws/${KEY_NAME}.pem ec2-user@${SUT_IP_ADDR} \
   "dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60" \
   1>> ${DOOL_FILE} 2>&1 &
 DOOL_FILE_LOADGEN="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_MASTER}_dool-loadgen.txt"
@@ -28,7 +28,7 @@ nohup dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time
 
 ## 远程输出 /etc/my.cnf 内容
 echo "Export MySQL configuration /etc/my.cnf first... " >> ${RESULT_FILE}
-ssh -o StrictHostKeyChecking=no -i ~/.ssh/ericyq-global.pem ec2-user@${SUT_IP_ADDR} "sudo cat /etc/my.cnf" >> ${RESULT_FILE}
+ssh -o StrictHostKeyChecking=no -i ~/.aws/${KEY_NAME}.pem ec2-user@${SUT_IP_ADDR} "sudo cat /etc/my.cnf" >> ${RESULT_FILE}
 
 # 测试延迟
 bash ~/ec2-test-suite/tools/mysql_latency_test.sh ${SUT_IP_ADDR} >> ${RESULT_FILE}

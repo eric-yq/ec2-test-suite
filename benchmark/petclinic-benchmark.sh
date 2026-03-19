@@ -11,10 +11,10 @@ RESULT_PATH="/root/ec2-test-suite/benchmark-result-files"
 mkdir -p ${RESULT_PATH}
 
 ## 启动一个后台进程，执行dool命令，获取系统性能信息
-# DOOL_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${SUT_IP_ADDR}_dool.txt"
-# ssh -o StrictHostKeyChecking=no -i ~/.ssh/ericyq-global.pem ec2-user@${SUT_IP_ADDR} \
-#   "sudo dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 5 100" \
-#   1> ${DOOL_FILE} 2>&1 &
+DOOL_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${SUT_IP_ADDR}_dool.txt"
+ssh -o StrictHostKeyChecking=no -i ~/.aws/${KEY_NAME}.pem ec2-user@${SUT_IP_ADDR} \
+  "sudo dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 5 100" \
+  1> ${DOOL_FILE} 2>&1 &
 
 RESULT_FILE="${RESULT_PATH}/${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${SUT_IP_ADDR}_${SUT_PORT}_${i}.jtl"
 echo "[Info] Start jmeter test for PETCLINIC_HOST=${SUT_IP_ADDR}, USERS=$i ..."
