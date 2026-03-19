@@ -107,7 +107,8 @@ aws_region_name=$(ec2-metadata --quiet --region)
 aws configure set aws_access_key_id ${aws_ak_value}
 aws configure set aws_secret_access_key ${aws_sk_value}
 aws configure set default.region ${aws_region_name}
-aws_s3_bucket_name="s3://ec2-core-benchmark-ericyq"
+aws_s3_bucket_name=$(aws s3 ls | awk '{print $3}' | grep ec2-core-benchmark | head -1)
+
 ## 下载 3 个视频文件 
 cd /root/
 aws s3 cp --recursive s3://ec2-core-benchmark-ericyq/insta360-videos/ .

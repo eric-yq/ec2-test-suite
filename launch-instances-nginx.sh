@@ -105,6 +105,20 @@ echo "export INSTANCE_IP_WEB2=${INSTANCE_IP_WEB2}" >> /tmp/temp-setting
 echo "export INSTANCE_PUBLIC_IP_WEB1=${INSTANCE_PUBLIC_IP_WEB1}" >> /tmp/temp-setting
 echo "export INSTANCE_PUBLIC_IP_WEB2=${INSTANCE_PUBLIC_IP_WEB2}" >> /tmp/temp-setting
 
+# 保存 Benchmark 结果的 S3 桶名称
+BENCHMARK_RESULT_BUCKET=$(aws s3 ls | awk '{print $3}' | grep ec2-core-benchmark | head -1)
+if [ -z "$BENCHMARK_RESULT_BUCKET" ]; then
+    ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+    REGION=$(aws configure get region)
+    BENCHMARK_RESULT_BUCKET="ec2-core-benchmark-${ACCOUNT_ID}"
+    aws s3 mb "s3://${BENCHMARK_RESULT_BUCKET}" --region "${REGION}"
+    echo "Created bucket: ${BENCHMARK_RESULT_BUCKET}"
+else
+    echo "Found bucket: ${BENCHMARK_RESULT_BUCKET}"
+fi
+echo "export BENCHMARK_RESULT_BUCKET=${BENCHMARK_RESULT_BUCKET}" >> /tmp/temp-setting
+
+# 保存实例信息
 cd ..
 mv tf_cfg_${SUT_NAME}  tf_cfg_${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_WEB1}
 cp /tmp/temp-setting tf_cfg_${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_WEB1}/temp-setting
@@ -165,6 +179,21 @@ echo "export INSTANCE_ID_LOADBALANCE=${INSTANCE_ID_LOADBALANCE}" >> /tmp/temp-se
 echo "export INSTANCE_IP_LOADBALANCE=${INSTANCE_IP_LOADBALANCE}" >> /tmp/temp-setting
 echo "export INSTANCE_PUBLIC_IP_LOADBALANCE=${INSTANCE_PUBLIC_IP_LOADBALANCE}" >> /tmp/temp-setting
 
+# 保存 Benchmark 结果的 S3 桶名称
+BENCHMARK_RESULT_BUCKET=$(aws s3 ls | awk '{print $3}' | grep ec2-core-benchmark | head -1)
+if [ -z "$BENCHMARK_RESULT_BUCKET" ]; then
+    ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+    REGION=$(aws configure get region)
+    BENCHMARK_RESULT_BUCKET="ec2-core-benchmark-${ACCOUNT_ID}"
+    aws s3 mb "s3://${BENCHMARK_RESULT_BUCKET}" --region "${REGION}"
+    echo "Created bucket: ${BENCHMARK_RESULT_BUCKET}"
+else
+    echo "Found bucket: ${BENCHMARK_RESULT_BUCKET}"
+fi
+echo "export BENCHMARK_RESULT_BUCKET=${BENCHMARK_RESULT_BUCKET}" >> /tmp/temp-setting
+
+# 保存实例信息
 cd ..
 mv tf_cfg_${SUT_NAME}  tf_cfg_${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_LOADBALANCE}
 cp /tmp/temp-setting tf_cfg_${SUT_NAME}_${INSTANCE_TYPE}_${OS_TYPE}_${INSTANCE_IP_LOADBALANCE}/temp-setting
+
