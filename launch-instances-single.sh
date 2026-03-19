@@ -107,6 +107,10 @@ INSTANCE_ID=$(terraform output -raw instance_id)
 INSTANCE_IP_MASTER=$(terraform output -raw instance_private_ip)
 echo "export INSTANCE_ID=${INSTANCE_ID}" >> /tmp/temp-setting
 echo "export INSTANCE_IP_MASTER=${INSTANCE_IP_MASTER}" >> /tmp/temp-setting
+echo "export SUBNET_ID=${SUBNET_ID_XXX}" >> /tmp/temp-setting
+echo "export SG_ID=${SG_ID_XXX}" >> /tmp/temp-setting
+echo "export PG_NAME=${PG_NAME_XXX}" >> /tmp/temp-setting
+echo "export KEY_NAME=${KEY_NAME_XXX}" >> /tmp/temp-setting
 
 # 保存 Benchmark 结果的 S3 桶名称
 BENCHMARK_RESULT_BUCKET=$(aws s3 ls | awk '{print $3}' | grep ec2-core-benchmark | head -1)

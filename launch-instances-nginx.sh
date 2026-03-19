@@ -38,7 +38,6 @@ echo "export INSTANCE_TYPE=${INSTANCE_TYPE}" >> /tmp/temp-setting
 echo "export OS_TYPE=${OS_TYPE}" >> /tmp/temp-setting
 echo "export SUT_NAME=${SUT_NAME}" >> /tmp/temp-setting
 
-
 ## 根据实例类型、OS 类型查找最新的 AMI。
 bash search_latest_ami.sh
 
@@ -104,6 +103,10 @@ echo "export INSTANCE_IP_WEB1=${INSTANCE_IP_WEB1}" >> /tmp/temp-setting
 echo "export INSTANCE_IP_WEB2=${INSTANCE_IP_WEB2}" >> /tmp/temp-setting
 echo "export INSTANCE_PUBLIC_IP_WEB1=${INSTANCE_PUBLIC_IP_WEB1}" >> /tmp/temp-setting
 echo "export INSTANCE_PUBLIC_IP_WEB2=${INSTANCE_PUBLIC_IP_WEB2}" >> /tmp/temp-setting
+echo "export SUBNET_ID=${SUBNET_ID_XXX}" >> /tmp/temp-setting
+echo "export SG_ID=${SG_ID_XXX}" >> /tmp/temp-setting
+echo "export PG_NAME=${PG_NAME_XXX}" >> /tmp/temp-setting
+echo "export KEY_NAME=${KEY_NAME_XXX}" >> /tmp/temp-setting
 
 # 保存 Benchmark 结果的 S3 桶名称
 BENCHMARK_RESULT_BUCKET=$(aws s3 ls | awk '{print $3}' | grep ec2-core-benchmark | head -1)
@@ -178,6 +181,10 @@ INSTANCE_PUBLIC_IP_LOADBALANCE=$(terraform output -raw instance_public_ip)
 echo "export INSTANCE_ID_LOADBALANCE=${INSTANCE_ID_LOADBALANCE}" >> /tmp/temp-setting
 echo "export INSTANCE_IP_LOADBALANCE=${INSTANCE_IP_LOADBALANCE}" >> /tmp/temp-setting
 echo "export INSTANCE_PUBLIC_IP_LOADBALANCE=${INSTANCE_PUBLIC_IP_LOADBALANCE}" >> /tmp/temp-setting
+echo "export SUBNET_ID=${SUBNET_ID_XXX}" >> /tmp/temp-setting
+echo "export SG_ID=${SG_ID_XXX}" >> /tmp/temp-setting
+echo "export PG_NAME=${PG_NAME_XXX}" >> /tmp/temp-setting
+echo "export KEY_NAME=${KEY_NAME_XXX}" >> /tmp/temp-setting
 
 # 保存 Benchmark 结果的 S3 桶名称
 BENCHMARK_RESULT_BUCKET=$(aws s3 ls | awk '{print $3}' | grep ec2-core-benchmark | head -1)

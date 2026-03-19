@@ -175,3 +175,9 @@ install_public_tools
 install_mysql
 modify_mycnf
 init_start_mysql
+
+# 启动 dool 监控
+cd /tmp/ && python3 -m http.server 9527 &
+DOOL_FILE="/tmp/dool-sut.txt"
+nohup dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 \
+  1> ${DOOL_FILE} 2>&1 &
