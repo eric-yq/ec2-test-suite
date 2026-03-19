@@ -1,7 +1,12 @@
 # 启动容器:
 
-首先启动一台 EC2 实例，例如 c6i.4xlarge，建议使用 Amazon Linux 2023，EBS 为 20G gp3。
-登录到 EC2 实例进行必要的软件安装和配置：
+首先启动一台 EC2 实例，作为管理平台
+- 实例类型：例如，c7i.4xlarge，
+- AMI：Amazon Linux 2023，
+- EBS：gp3，20G
+- Key Pair：选择常用或新建
+
+实例启动成功后，通过 SSH 登录到 EC2 实例进行必要的软件安装和配置：
 
 ```bash
 sudo yum update
@@ -18,7 +23,13 @@ aws_region_name=$(cloud-init query region)
 aws configure set aws_access_key_id ${aws_ak_value}
 aws configure set aws_secret_access_key ${aws_sk_value}
 aws configure set default.region ${aws_region_name}
-#aws_s3_bucket_name="s3://..."
+
+#################################################################
+# 将当前实例的 Key Pair 的 pem 文件，上传到的 ~/.aws 目录，
+# 后续在启动的 loadgen 容器中，会使用这个 key 采集 sut 的 dool 监控信息。
+# 如果 ~/.aws 目录下没有 pem 文件，sut 的 dool 监控信息将采集失败。
+#################################################################
+
 
 # 从 ECR 存储库拉起镜像，启动容器
 cd ~
