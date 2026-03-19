@@ -121,6 +121,11 @@ java -version
 yum  install -y htop dmidecode python3-pip
 pip3 install dool
 
+# 启动 dool 监控
+DOOL_FILE="/tmp/dool-sut.txt"
+nohup dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 \
+  1> ${DOOL_FILE} 2>&1 &
+
 ## 系统配置
 PN=$(ec2-metadata --quiet --instance-type)
 cat << EOF >> /etc/sysctl.conf
@@ -221,6 +226,7 @@ java -showversion -server \
 cd /root/
 grep "RUN RESULT: hbIR" ~/specjbb/composite.out >> ${RESULT_SUMMARY_FILE}
 cp -r result specjbb/
+cp /tmp/dool-sut.txt specjbb/
 DATATIME=$(date +%Y%m%d%H%M%S)
 tar czf specjbb15-${JDK_VERSION}-${PN}-${DATATIME}.tar.gz specjbb/
 aws s3 cp specjbb15-${JDK_VERSION}-${PN}-${DATATIME}.tar.gz ${aws_s3_bucket_name}/result_specjbb15/

@@ -44,7 +44,6 @@ SUT_NAME="SUT_XXX"
 ## 安装依赖包
 yum install -yq awscli autoconf automake bzip2 bzip2-devel cmake freetype-devel zip python3-pip \
   gcc gcc-c++ git libtool make pkgconfig zlib-devel nasm yasm p7zip htop git cmake screen
-pip3 install dool 
 
 ## 使用 GCC 14 编译
 yum install -y gcc14 gcc14-c++
@@ -98,6 +97,12 @@ ffmpeg -version
 ffmpeg -hide_banner -codecs |grep 265
 ffmpeg -hide_banner -codecs |grep 264
 
+# 启动 dool 监控
+sudo pip3 install dool
+DOOL_FILE="/tmp/dool-sut.txt"
+nohup dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 \
+  1> ${DOOL_FILE} 2>&1 &
+
 ################################################################################
 ## 测试 ffmpeg 编码性能
 # 配置 AWS CLI
@@ -111,7 +116,7 @@ aws_s3_bucket_name=$(aws s3 ls | awk '{print $3}' | grep ec2-core-benchmark | he
 
 ## 下载 3 个视频文件 
 cd /root/
-aws s3 cp --recursive s3://ec2-core-benchmark-ericyq/insta360-videos/ .
+aws s3 cp --recursive s3://${aws_s3_bucket_name}/insta360-videos/ .
 mv PRO_VID_20220121_143251_00_005.mp4 input1.mp4
 mv PRO_VID_20220129_120530_00_055.mp4 input2.mp4
 mv VID_20180105_184256_00_172.mp4 input3.mp4
@@ -181,12 +186,12 @@ instance_type=$(ec2-metadata --quiet --instance-type)
 timestamp=$(date +%Y%m%d-%H%M%S)
 archive="ffmpeg_result_${instance_type}_${timestamp}"
 mkdir -p ${archive}
-cp *.txt *.sh ${archive}
-ffmpeg -version  > ${archive}/filesize.txt
-ffmpeg -hide_banner -codecs > ${archive}/filesize.txt
-du -smh *.mp4 > ${archive}/filesize.txt
+cp *.txt *.sh ${DOOL_FILE} ${archive}
+ffmpeg -version  >> ${archive}/filesize.txt
+ffmpeg -hide_banner -codecs >> ${archive}/filesize.txt
+du -smh *.mp4 >> ${archive}/filesize.txt
 tar czf ${archive}.tar.gz ${archive}/
-aws s3 cp ${archive}.tar.gz s3://ec2-core-benchmark-ericyq/result_ffmpeg/
+aws s3 cp ${archive}.tar.gz s3://${aws_s3_bucket_name}/result_ffmpeg/
 
 ## Disable 服务，这样 reboot 后不会再次执行
 systemctl disable userdata.service
