@@ -17,7 +17,7 @@ variable "vpc_security_group_ids" {
 }
 
 variable "ami_key_pair_name" {
-	default = "ericyq-global"
+	default = "KEY_NAME_XXX"
 }
 
 ## 不要手工修改。

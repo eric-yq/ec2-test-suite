@@ -16,7 +16,7 @@ variable "placement_group_name" {
 }
 
 variable "ami_key_pair_name" {
-	default = "ericyq-global"
+	default = "KEY_NAME_XXX"
 }
 
 

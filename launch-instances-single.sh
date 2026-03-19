@@ -66,11 +66,12 @@ rm -rf tf_cfg_${SUT_NAME}
 cp -rf tf_cfg_template tf_cfg_${SUT_NAME}
 cd tf_cfg_${SUT_NAME}
 
-## 获取 Subnet ID, Security Group ID 和 placement group name
-read SUBNET_ID_XXX SG_ID_XXX PG_NAME_XXX < <(aws ec2 describe-instances \
+## 获取 Subnet ID, Security Group ID, placement group name, Key Pair Name 等信息
+# 这些信息在后续 terraform 启动实例时会用到。
+read SUBNET_ID_XXX SG_ID_XXX PG_NAME_XXX KEY_NAME_XXX < <(aws ec2 describe-instances \
   --region ${REGION_NAME} \
   --instance-ids $(ec2-metadata --quiet -i) \
-  --query 'Reservations[0].Instances[0].[SubnetId,SecurityGroups[0].GroupId,Placement.GroupName]' \
+  --query 'Reservations[0].Instances[0].[SubnetId,SecurityGroups[0].GroupId,Placement.GroupName,KeyName]' \
   --output text)
 
 ## 修改 variables.tf 内容 
@@ -81,6 +82,7 @@ sed -i "s/INSTANCE_NAME_XXX/SUT_${SUT_NAME}/g" variables.tf
 sed -i "s/INSTANCE_TYPE_XXX/${INSTANCE_TYPE}/g" variables.tf
 sed -i "s/AMI_ID_XXX/${AMI_ID}/g" variables.tf
 sed -i "s/USERDATA_FILE_XXX/userdata.sh/g" variables.tf
+sed -i "s/KEY_NAME_XXX/${KEY_NAME_XXX}/g" variables.tf
 
 ## 修改 userdata.sh: 设置 AWC CLI 的 AK/SK
 sed -i "s/SUT_XXX/${SUT_NAME}/g" userdata.sh
