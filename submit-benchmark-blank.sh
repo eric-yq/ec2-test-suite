@@ -49,7 +49,7 @@ do
 		cp -r benchmark-result-files ${TARGET_DIR}	
 		cp screenlog.0 ${TARGET_DIR}/
 		tar czf ${TARGET_DIR}.tar.gz ${TARGET_DIR}
-		aws s3 cp ${TARGET_DIR}.tar.gz s3://ec2-core-benchmark-ericyq/result_${SUT_NAME}/
+		aws s3 cp ${TARGET_DIR}.tar.gz s3://${BENCHMARK_RESULT_BUCKET}/result_${SUT_NAME}/
 		
 		# 停止 dool 监控
 		sleep 10
