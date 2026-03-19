@@ -79,11 +79,10 @@ aws --version
 aws_ak_value="akxxx"
 aws_sk_value="skxxx"
 aws_region_name=$(ec2-metadata --quiet --region)
-aws_s3_bucket_name="s3://ec2-core-benchmark-ericyq"
+aws_s3_bucket_name=$(aws s3 ls | awk '{print $3}' | grep ec2-core-benchmark | head -1)
 aws configure set aws_access_key_id ${aws_ak_value}
 aws configure set aws_secret_access_key ${aws_sk_value}
 aws configure set default.region ${aws_region_name}
-aws s3 ls
 
 # 主要流程
 OS_NAME=$(egrep ^NAME /etc/os-release | awk -F "\"" '{print $2}')
