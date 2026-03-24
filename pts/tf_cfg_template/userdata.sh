@@ -48,7 +48,7 @@ install_al2023_dependencies () {
   yum -yq groupinstall "Development Tools"
   yum install -yq glibc blas blas-devel openssl-devel libXext-devel libX11-devel libXaw libXaw-devel mesa-libGL-devel 
   yum install -yq python3 python3-pip python3-devel cargo java-17-amazon-corretto java-17-amazon-corretto-devel
-  yum install -yq php php-cli php-json php-xml perl-IPC-Cmd
+  yum install -yq php8.4 php8.4-cli php-json php8.4-xml perl-IPC-Cmd
   pip3 install dool
 
   echo "------ INSTALLING HIGH LEVEL PERFORMANCE TOOLS ------"
