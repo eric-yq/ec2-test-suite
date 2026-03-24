@@ -50,7 +50,7 @@ yum install -y gcc14 gcc14-c++
 export CC=/usr/bin/gcc14-cc
 export CXX=/usr/bin/gcc14-g++
 
-cd /root/ && rm -rf x264 x265_git ffmpeg-*
+cd /root/ && rm -rf x264 x265_* ffmpeg-*
 
 ## 编译安装 x264
 cd /root/

@@ -31,7 +31,6 @@ aws configure set default.region ${aws_region_name}
 # 另外，有些测试用例中也需要 pem 文件登录到 SUT 实例获取一些配置信息。
 #################################################################
 
-
 # 从 ECR 存储库拉起镜像，启动容器
 cd ~
 git clone https://github.com/eric-yq/ec2-test-suite.git
