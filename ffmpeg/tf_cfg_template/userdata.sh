@@ -56,7 +56,11 @@ cd /root/ && rm -rf x264 x265_* ffmpeg-*
 cd /root/
 git clone https://code.videolan.org/videolan/x264.git
 cd /root/x264/
-./configure --prefix="/root/ffmpeg_build" --bindir="/root/ffmpeg_build/bin" --enable-static 
+./configure \
+  --prefix="/root/ffmpeg_build" \
+  --bindir="/root/ffmpeg_build/bin" \
+  --enable-static \
+  --extra-cflags="-O3 -g"
 make -j $(nproc) && make install && \
  echo "[INFO] $(date +%Y%m%d%H%M%S): x264 complied." 
 
@@ -68,8 +72,8 @@ tar zxf x265_$ver.tar.gz
 cd /root/x265_$ver/build/linux
 cmake -G "Unix Makefiles" \
  -DCMAKE_INSTALL_PREFIX="/root/ffmpeg_build" \
- -DCMAKE_C_FLAGS="-Wno-unused-variable -Wunused-parameter" \
- -DCMAKE_CXX_FLAGS="-Wno-unused-variable -Wunused-parameter" \
+ -DCMAKE_C_FLAGS="-Wno-unused-variable -Wunused-parameter -O3 -g" \
+ -DCMAKE_CXX_FLAGS="-Wno-unused-variable -Wunused-parameter -O3 -g" \
  -DENABLE_SHARED:bool=off ../../source
 make -j && make install && \
  echo "[INFO] $(date +%Y%m%d%H%M%S): x265 complied."
