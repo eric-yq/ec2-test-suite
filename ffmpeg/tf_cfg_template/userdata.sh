@@ -66,10 +66,14 @@ make -j $(nproc) && make install && \
 
 ## 编译安装 x265， arm 上安装 gcc14
 cd /root/
-ver=4.1
-wget https://bitbucket.org/multicoreware/x265_git/downloads/x265_$ver.tar.gz
-tar zxf x265_$ver.tar.gz
-cd /root/x265_$ver/build/linux
+# 方案1: 主用 main 分支
+git clone https://bitbucket.org/multicoreware/x265_git.git
+cd /root/x265_git/build/linux
+# 方案2: 使用 x265 4.1 稳定版本
+# ver=4.1
+# wget https://bitbucket.org/multicoreware/x265_git/downloads/x265_$ver.tar.gz
+# tar zxf x265_$ver.tar.gz
+# cd /root/x265_$ver/build/linux
 cmake -G "Unix Makefiles" \
  -DCMAKE_INSTALL_PREFIX="/root/ffmpeg_build" \
  -DCMAKE_C_FLAGS="-Wno-unused-variable -Wunused-parameter -O3 -g" \
@@ -80,7 +84,8 @@ make -j && make install && \
  
 ## 编译安装 ffmpeg
 cd 
-ver="6.1.3"
+ver="7.1.3"
+# ver="6.1.3"
 wget https://ffmpeg.org/releases/ffmpeg-$ver.tar.xz
 tar xf ffmpeg-$ver.tar.xz
 cd /root/ffmpeg-$ver/
@@ -88,11 +93,13 @@ PATH="/root/bin:$PATH" PKG_CONFIG_PATH="/root/ffmpeg_build/lib/pkgconfig" \
  ./configure \
  --prefix="/root/ffmpeg_build" --bindir="/root/ffmpeg_build/bin" \
  --pkg-config-flags="--static" \
+ --cc=gcc14-cc --cxx=gcc14-g++ \
  --extra-cflags="-I/root/ffmpeg_build/include" \
  --extra-ldflags="-L/root/ffmpeg_build/lib" \
- --extra-libs=-lpthread --extra-libs=-lm \
- --enable-gpl --enable-libx264 --enable-libx265 \
- --enable-nonfree
+ --extra-libs="-lpthread -lm" \
+ --enable-gpl --enable-nonfree \
+ --enable-libx264 --enable-libx265 \
+ --disable-doc
 make -j  && make install &&
  echo "[INFO] $(date +%Y%m%d%H%M%S): ffmpeg complied" 
 echo "PATH=/root/ffmpeg_build/bin:$PATH" >> /etc/profile
@@ -191,6 +198,8 @@ timestamp=$(date +%Y%m%d-%H%M%S)
 archive="ffmpeg_result_${instance_type}_${timestamp}"
 mkdir -p ${archive}
 cp *.txt *.sh ${DOOL_FILE} ${archive}
+x264 --version  >> ${archive}/filesize.txt
+x265 --version  >> ${archive}/filesize.txt
 ffmpeg -version  >> ${archive}/filesize.txt
 ffmpeg -hide_banner -codecs >> ${archive}/filesize.txt
 du -smh *.mp4 >> ${archive}/filesize.txt
