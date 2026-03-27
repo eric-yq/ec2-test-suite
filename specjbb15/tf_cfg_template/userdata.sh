@@ -190,6 +190,14 @@ echo "THREADS_PROBE=${THREADS_PROBE}" >> ${RESULT_SUMMARY_FILE}
 # echo "Testcase: THREADS_PROBE=${THREADS_PROBE}......"
 # nohup dstat -cmndryt 60 > $DSTAT_LOGFILE 2>&1 & echo $! > pid_file.txt
 # # kill -9 $(cat pid_file.txt)
+EXTRA_OPTS="-XX:MaxGCPauseMillis=500 \
+  -XX:+TieredCompilation \
+  -XX:ReservedCodeCacheSize=256m \
+  -XX:InitialCodeCacheSize=256m \
+  -XX:MaxInlineSize=256 \
+  -XX:FreqInlineSize=512 \
+  -XX:+UseCompressedOops \
+  -XX:+UseCompressedClassPointers"
 
 java -showversion -server \
 -Xms${XMS}m \
@@ -197,16 +205,17 @@ java -showversion -server \
 -Xmn${XMN}m \
 -XX:SurvivorRatio=20 \
 -XX:MaxTenuringThreshold=15 \
+-XX:ObjectAlignmentInBytes=32 \
+-XX:+AlwaysPreTouch \
 -XX:+UseLargePages \
 -XX:LargePageSizeInBytes=2m \
 -XX:+UseParallelGC \
--XX:+AlwaysPreTouch \
--XX:-UseAdaptiveSizePolicy \
--XX:-UsePerfData \
 -XX:ParallelGCThreads=${GC_THREADS} \
 -XX:+UseTransparentHugePages \
 -XX:+UseCompressedOops \
--XX:ObjectAlignmentInBytes=32 \
+-XX:-UseAdaptiveSizePolicy \
+-XX:-UsePerfData \
+${EXTRA_OPTS} \
 -Dspecjbb.comm.connect.timeouts.connect=700000 \
 -Dspecjbb.comm.connect.timeouts.read=700000 \
 -Dspecjbb.comm.connect.timeouts.write=700000 \
