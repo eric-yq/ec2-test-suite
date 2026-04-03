@@ -1,6 +1,6 @@
 #!/bin/bash
 
-yum install -y docker git htop python3-pip
+yum install -yq docker git htop python3-pip
 pip3 install dool
 sleep 10
 
@@ -16,8 +16,10 @@ curl -SL https://github.com/docker/compose/releases/download/v2.12.2/docker-comp
       -o /usr/bin/docker-compose
 chmod +x /usr/bin/docker-compose
 
+ver="2.6.13"
+# ver="2.6.5"
 mkdir /root/milvus && cd /root/milvus
-wget https://github.com/milvus-io/milvus/releases/download/v2.6.5/milvus-standalone-docker-compose.yml \
+wget https://github.com/milvus-io/milvus/releases/download/${ver}/milvus-standalone-docker-compose.yml \
   -O docker-compose.yml
 
 ## 启动 milvus 容器
