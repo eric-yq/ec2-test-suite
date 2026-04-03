@@ -16,8 +16,8 @@ curl -SL https://github.com/docker/compose/releases/download/v2.12.2/docker-comp
       -o /usr/bin/docker-compose
 chmod +x /usr/bin/docker-compose
 
-ver="2.6.13"
-# ver="2.6.5"
+ver="v2.6.13"
+# ver="v2.6.5"
 mkdir /root/milvus && cd /root/milvus
 wget https://github.com/milvus-io/milvus/releases/download/${ver}/milvus-standalone-docker-compose.yml \
   -O docker-compose.yml
