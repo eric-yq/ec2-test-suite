@@ -6,7 +6,7 @@
 # set -e
 
 SUT_IP_ADDR=${1}
-CASE_TYPE=${2}
+CASE_TYPE=${2:-Performance768D1M}
 SUT_NAME="milvus"
 
 INSTANCE_TYPE=$(ec2-metadata --quiet --instance-type)
@@ -25,7 +25,7 @@ echo "Start to perform test: SUT_IP_ADDR=${1}, CASE_TYPE=${2}" >> ${RESULT_FILE}
 
 # 设置数据集的保存目录
 export DATASET_LOCAL_DIR="/root/vectordb_bench/dataset"
-mkdir -p $DATASET_LOCAL_DIR
+mkdir -p ${DATASET_LOCAL_DIR}
 
 ## 执行 benchmark
 timestamp="$(date +%Y%m%d%H%M%S)"
