@@ -1,6 +1,7 @@
 #!/bin/bash
 
-## 使用方法： bash milvus-benchmark.sh <IP地址>
+## 使用方法： bash milvus-benchmark.sh <IP地址> <CASETYPE>
+# CASE_TYPE: Performance768D10M, Performance1024D1M, Performance768D1M
 
 # set -e
 
@@ -21,6 +22,10 @@ dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bit
 
 echo "Test Detail on $(date)====================================================================================" >> ${RESULT_FILE}
 echo "Start to perform test: SUT_IP_ADDR=${1}, CASE_TYPE=${2}" >> ${RESULT_FILE}
+
+# 设置数据集的保存目录
+export DATASET_LOCAL_DIR="/root/vectordb_bench/dataset"
+mkdir -p $DATASET_LOCAL_DIR
 
 ## 执行 benchmark
 timestamp="$(date +%Y%m%d%H%M%S)"

@@ -30,6 +30,10 @@ nohup dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time
 echo "Test Detail on $(date)====================================================================================" >> ${RESULT_FILE}
 echo "Start to perform test: SUT_IP_ADDR=${1}" >> ${RESULT_FILE}
 
+# 设置数据集的保存目录
+export DATASET_LOCAL_DIR="/root/vectordb_bench/dataset"
+mkdir -p $DATASET_LOCAL_DIR
+
 ## 执行 benchmark
 timestamp="$(date +%Y%m%d%H%M%S)"
 vectordbbench milvushnsw \
