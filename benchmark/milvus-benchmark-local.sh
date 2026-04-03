@@ -37,7 +37,7 @@ vectordbbench milvushnsw \
   --task-label milvus-${INSTANCE_TYPE}-${timestamp} \
   --uri http://${INSTANCE_IP_MASTER}:19530 1>>${RESULT_FILE} 2>&1
 
-cat /usr/local/lib/python3.13/site-packages/vectordb_bench/results/Milvus/result*milvus-${INSTANCE_TYPE}-${timestamp}*.json \
-  >> ${RESULT_FILE}
+# cat /usr/local/lib/python3.13/site-packages/vectordb_bench/results/Milvus/result*milvus-${INSTANCE_TYPE}-${timestamp}*.json \
+#   >> ${RESULT_FILE}
   
-echo "Test End on $(date)====================================================================================" >> ${RESULT_FILE}
+echo "Test End on $(date)====================================================" >> ${RESULT_FILE}
