@@ -5,7 +5,7 @@
 
 # set -e
 
-SUT_IP_ADDR=${1}
+SUT_IP_ADDR=${1:-127.0.0.1}
 CASE_TYPE=${2:-Performance768D1M}
 SUT_NAME="milvus"
 
