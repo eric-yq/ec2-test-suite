@@ -24,7 +24,7 @@ wget https://github.com/milvus-io/milvus/releases/download/${ver}/milvus-standal
 
 ## 启动 milvus 容器
 docker-compose up -d
-sleep 60
+sleep 90
 
 ## 查看状态
 docker-compose ps
