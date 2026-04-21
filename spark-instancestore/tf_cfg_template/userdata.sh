@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# set -e
-# 因为 q30.sql 会报错退出，导致整个脚本退出，所以这里不使用 set -e 选项。
-
 ## 暂时关闭补丁更新流程
 sudo systemctl stop amazon-ssm-agent
 sudo systemctl disable amazon-ssm-agent
@@ -10,7 +7,7 @@ sudo systemctl disable amazon-ssm-agent
 # 实例启动成功之后的首次启动 OS， /home/ec2-user/userdata.sh 不存在，创建该 userdata.sh 文件并设置开启自动执行该脚本。
 # !!! Spark 比较特殊，需要使用 ec2-user 执行。
 if [ ! -f "/home/ec2-user/userdata.sh" ]; then
-    echo "首次启动 OS, 未找到 /root/userdata.sh, 准备创建..."
+    echo "首次启动 OS, 未找到 userdata.sh, 准备创建..."
     # 复制文件
     cp /var/lib/cloud/instance/scripts/part-001 /home/ec2-user/userdata.sh
     chmod 755 /home/ec2-user/userdata.sh
@@ -43,7 +40,6 @@ EOF
 fi
 
 ################################################################################################################       
-# Reference：https://aws.amazon.com/cn/blogs/china/aws-graviton3-accelerates-spark-job-execution-benchmark/
 # Amazon Linux 2023, 使用 ec2-user 账号登录.
 
 SUT_NAME="SUT_XXX"
@@ -79,13 +75,6 @@ echo "export HADOOP_VERSION=3.3.1" >> ~/.bashrc
 echo "export HIVE_VERSION=3.1.3" >> ~/.bashrc
 echo "export SPARK_VERSION=3.3.1" >> ~/.bashrc
 echo "export SCALA_VERSION=2.12.18" >> ~/.bashrc
-
-# 生成密钥用于无密码登录：
-# ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
-# cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
-# chmod 0600 ~/.ssh/authorized_keys
-# ssh localhost
-# exit
 
 # Generate SSH key
 ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa || exit 1
@@ -185,7 +174,7 @@ source  ~/.bashrc
 mkdir $HADOOP_HOME/tmp
 # mkdir $HADOOP_HOME/hdfs
 # for instance store - begin
-ln -s /data/nvme1n1p1 $HADOOP_HOME/hdfs
+sudo ln -s /data/nvme1n1p1 $HADOOP_HOME/hdfs
 # for instance store - end
 mkdir $HADOOP_HOME/hdfs/name
 mkdir $HADOOP_HOME/hdfs/data
