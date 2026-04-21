@@ -375,7 +375,7 @@ sed -i.bak "s/hive.optimize.sort.dynamic.partition.threshold=0/hive.optimize.sor
 ################################################################################################
 # 生成测试数据集，SF=600 表示生成 100GB 的数据量。
 cd $TEST_TOOL_FOLDER/hive-testbench
-SF=600
+SF=100
 ./tpcds-setup.sh $SF
 
 echo "[Info] Complete to generate $SF GB data for TPC-DS benchmark."
