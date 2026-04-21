@@ -4,6 +4,23 @@
 sudo systemctl stop amazon-ssm-agent
 sudo systemctl disable amazon-ssm-agent
 
+## (optional) mount nvme disk
+disks="nvme1n1" 
+for disk in $disks
+do
+    echo "[INFO] Start to create partition on $disk..."
+    echo -e "g\nn\n1\n\n\nw" | fdisk /dev/$disk
+
+    echo "[INFO] Start to create filesystem on $device..."
+    partition=${disk}p1 && mkdir -p /data/$partition
+    device="/dev/$partition" && mkfs -t xfs -f $device
+
+    echo "[INFO] Start to modify /etc/fstab..."
+    uuid=$(blkid | grep $partition | awk -F "\"" '{print $2}')
+    echo "UUID=$uuid /data/$partition xfs  defaults,nofail  0  2" >> /etc/fstab
+done
+mount -a && df -h && sleep 5
+
 # 实例启动成功之后的首次启动 OS， /home/ec2-user/userdata.sh 不存在，创建该 userdata.sh 文件并设置开启自动执行该脚本。
 # !!! Spark 比较特殊，需要使用 ec2-user 执行。
 if [ ! -f "/home/ec2-user/userdata.sh" ]; then
@@ -43,23 +60,6 @@ fi
 # Amazon Linux 2023, 使用 ec2-user 账号登录.
 
 SUT_NAME="SUT_XXX"
-
-## (optional) mount nvme disk
-disks="nvme1n1" 
-for disk in $disks
-do
-    echo "[INFO] Start to create partition on $disk..."
-    echo -e "g\nn\n1\n\n\nw" | fdisk /dev/$disk
-
-    echo "[INFO] Start to create filesystem on $device..."
-    partition=${disk}p1 && mkdir -p /data/$partition
-    device="/dev/$partition" && mkfs -t xfs -f $device
-
-    echo "[INFO] Start to modify /etc/fstab..."
-    uuid=$(blkid | grep $partition | awk -F "\"" '{print $2}')
-    echo "UUID=$uuid /data/$partition xfs  defaults,nofail  0  2" >> /etc/fstab
-done
-mount -a && df -h && sleep 5
 
 ## 配置 AWSCLI
 aws_ak_value="akxxx"
