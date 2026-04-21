@@ -151,7 +151,6 @@ EOF
 mysql -uroot -p'gv2mysql' < create_hive_user.sql
 
 # 安装和配置 Hadoop 软件
-# 首先确定实例的架构（x86_64 或 aarch64），后续会下载对应架构的 Hadoop 软件包：
 cd ~
 ARCH=$(arch)
 if [[ "$ARCH" == "aarch64" ]]; then
@@ -340,15 +339,9 @@ TEST_TOOL_FOLDER=/data/nvme1n1p1
 cd $TEST_TOOL_FOLDER
 git clone https://github.com/hortonworks/hive-testbench.git
 
-## 方法 2： 如果上述方法有问题，可能是  tpcds_kit.zip 下载失败导致的，可以尝试下面的方法
+## 手动下载 tpcds_kit.zip
 cd $TEST_TOOL_FOLDER/hive-testbench/tpcds-gen
 sed -i.bak '/^tpcds_kit\.zip:/,+2 s/^/#/' Makefile
-cat Makefile
-# （1）将 Makefile 中的下面 3 行注释掉
-#tpcds_kit.zip:
-#       curl https://public-repo-1.hortonworks.com/hive-testbench/tpcds/README
-#       curl --output tpcds_kit.zip https://public-repo-1.hortonworks.com/hive-testbench/tpcds/TPCDS_Tools.zip
-# （2）手动下载 tpcds_kit.zip
 wget https://github.com/eric-yq/ec2-test-suite/raw/refs/heads/main/misc/spark-tpcds/tpcds_kit.zip
 
 ## gcc 10 以上版本，需要做如下修改
@@ -379,9 +372,7 @@ sed -i.bak "s/localhost:2181\/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace
 sed -i.bak "s/hive.optimize.sort.dynamic.partition.threshold=0/hive.optimize.sort.dynamic.partition=true/" $TEST_TOOL_FOLDER/hive-testbench/settings/*.sql
 
 ################################################################################################
-# 生成测试数据集
-# 通过指定 SF 的值，设置程序需要生成的数据量，本文中 SF=100 表示生成 100GB 的数据量。
-# 根据生成的数据量大小差异，此过程可能会持续数分钟到数小时不等。
+# 生成测试数据集，SF=600 表示生成 600GB 的数据量。
 cd $TEST_TOOL_FOLDER/hive-testbench
 SF=10
 ./tpcds-setup.sh $SF
