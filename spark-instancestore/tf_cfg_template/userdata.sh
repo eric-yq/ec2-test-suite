@@ -164,8 +164,8 @@ else
 fi
 
 # 下载指定架构的 Hadoop 软件包：
-wget https://archive.apache.org/dist/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION$ARCH.tar.gz
-#aws s3 cp ${aws_s3_bucket_name}/software/spark-local/hadoop-$HADOOP_VERSION$ARCH.tar.gz .
+# wget https://archive.apache.org/dist/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION$ARCH.tar.gz
+aws s3 cp ${aws_s3_bucket_name}/software/spark-local/hadoop-$HADOOP_VERSION$ARCH.tar.gz .
 tar zxf hadoop-$HADOOP_VERSION$ARCH.tar.gz
 ln -s hadoop-$HADOOP_VERSION $HOME/hadoop 
 echo "export HADOOP_HOME=$HOME/hadoop" >> ~/.bashrc
@@ -280,8 +280,8 @@ jps
 
 # 安装和配置 Hive 软件
 cd ~
-wget https://archive.apache.org/dist/hive/hive-$HIVE_VERSION/apache-hive-$HIVE_VERSION-bin.tar.gz
-# aws s3 cp ${aws_s3_bucket_name}/software/spark-local/apache-hive-$HIVE_VERSION-bin.tar.gz .
+# wget https://archive.apache.org/dist/hive/hive-$HIVE_VERSION/apache-hive-$HIVE_VERSION-bin.tar.gz
+aws s3 cp ${aws_s3_bucket_name}/software/spark-local/apache-hive-$HIVE_VERSION-bin.tar.gz .
 tar zxf apache-hive-$HIVE_VERSION-bin.tar.gz
 ln -s $HOME/apache-hive-$HIVE_VERSION-bin hive
 echo "export HIVE_HOME=$HOME/hive" >> ~/.bashrc
@@ -311,8 +311,8 @@ hive -e "show databases;"
 
 # 安装和配置 Spark 软件
 cd ~
-wget https://archive.apache.org/dist/spark/spark-$SPARK_VERSION/spark-$SPARK_VERSION-bin-hadoop3.tgz
-# aws s3 cp ${aws_s3_bucket_name}/software/spark-local/spark-$SPARK_VERSION-bin-hadoop3.tgz .
+# wget https://archive.apache.org/dist/spark/spark-$SPARK_VERSION/spark-$SPARK_VERSION-bin-hadoop3.tgz
+aws s3 cp ${aws_s3_bucket_name}/software/spark-local/spark-$SPARK_VERSION-bin-hadoop3.tgz .
 tar zxf spark-$SPARK_VERSION-bin-hadoop3.tgz
 ln -s spark-$SPARK_VERSION-bin-hadoop3 spark
 echo "export SPARK_HOME=$HOME/spark" >> ~/.bashrc
