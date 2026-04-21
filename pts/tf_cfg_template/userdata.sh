@@ -123,10 +123,11 @@ dmidecode > ${CFG_DIR}/cfg_dmidecode.txt
 cat /proc/cpuinfo > ${CFG_DIR}/cfg_proc-cpuinfo.txt
 lscpu > ${CFG_DIR}/cfg_lscpu.txt
 lscpu --extended > ${CFG_DIR}/cfg_lscpu-extended.txt
-lstopo -p --no-io --of png > ${CFG_DIR}/cfg_lstopo-physical.png
-lstopo -l --no-io --of png > ${CFG_DIR}/cfg_lstopo-logical.png
+lstopo -p --of png > ${CFG_DIR}/cfg_lstopo-physical.png
+lstopo -l --of png > ${CFG_DIR}/cfg_lstopo-logical.png
 lstopo -l > ${CFG_DIR}/cfg_lstopo-l.txt
 lstopo -p > ${CFG_DIR}/cfg_lstopo-p.txt
+lstopo --of png > ${CFG_DIR}/cfg_lstopo-all.png
 numactl -H > ${CFG_DIR}/cfg_numactl-H.txt
 uname -a > ${CFG_DIR}/cfg_uname-a.txt
 
