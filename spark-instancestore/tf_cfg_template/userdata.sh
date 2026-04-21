@@ -20,6 +20,7 @@ do
     echo "UUID=$uuid /data/$partition xfs  defaults,nofail  0  2" >> /etc/fstab
 done
 mount -a && df -h && sleep 5
+chmod 777 /data/*
 
 # 实例启动成功之后的首次启动 OS， /home/ec2-user/userdata.sh 不存在，创建该 userdata.sh 文件并设置开启自动执行该脚本。
 # !!! Spark 比较特殊，需要使用 ec2-user 执行。
@@ -372,7 +373,7 @@ sed -i.bak "s/localhost:2181\/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace
 sed -i.bak "s/hive.optimize.sort.dynamic.partition.threshold=0/hive.optimize.sort.dynamic.partition=true/" $TEST_TOOL_FOLDER/hive-testbench/settings/*.sql
 
 ################################################################################################
-# 生成测试数据集，SF=600 表示生成 600GB 的数据量。
+# 生成测试数据集，SF=600 表示生成 100GB 的数据量。
 cd $TEST_TOOL_FOLDER/hive-testbench
 SF=10
 ./tpcds-setup.sh $SF
