@@ -68,10 +68,10 @@ cd tf_cfg_${SUT_NAME}
 
 ## 获取 Subnet ID, Security Group ID, placement group name, Key Pair Name 等信息
 # 这些信息在后续 terraform 启动实例时会用到。
-read SUBNET_ID_XXX SG_ID_XXX PG_NAME_XXX KEY_NAME_XXX < <(aws ec2 describe-instances \
+read SUBNET_ID_XXX SG_ID_XXX KEY_NAME_XXX PG_NAME_XXX < <(aws ec2 describe-instances \
   --region ${REGION_NAME} \
   --instance-ids $(ec2-metadata --quiet -i) \
-  --query 'Reservations[0].Instances[0].[SubnetId,SecurityGroups[0].GroupId,Placement.GroupName,KeyName]' \
+  --query 'Reservations[0].Instances[0].[SubnetId,SecurityGroups[0].GroupId,KeyName,Placement.GroupName]' \
   --output text)
 
 ## 修改 variables.tf 内容 
