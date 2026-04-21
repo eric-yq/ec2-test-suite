@@ -336,7 +336,6 @@ spark-submit --class org.apache.spark.examples.SparkPi \
 
 ################################################################################################
 # 安装和配置 TPC-DS 测试工具
-# cd ~
 TEST_TOOL_FOLDER=/data/nvme1n1p1
 cd $TEST_TOOL_FOLDER
 git clone https://github.com/hortonworks/hive-testbench.git
