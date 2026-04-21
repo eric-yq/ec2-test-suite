@@ -36,13 +36,13 @@ variable "root_block_volume_type" {
 	default = "gp3"
 }
 variable "root_block_volume_size" {
-	default = "1000"
+	default = "80"
 }
 variable "root_block_iops" {
-	default = "8000"
+	default = "3000"
 }
 variable "root_block_throughput" {
-	default = "1000"
+	default = "125"
 }
 
 ## 
