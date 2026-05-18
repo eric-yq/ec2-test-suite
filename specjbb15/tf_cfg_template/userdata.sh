@@ -156,7 +156,7 @@ vm.zone_reclaim_mode = 1
 EOF
 
 sysctl -p
-echo always > /sys/kernel/mm/transparent_hugepage/enabled
+# echo always > /sys/kernel/mm/transparent_hugepage/enabled
 
 ## 下载安装包
 cd /root/
