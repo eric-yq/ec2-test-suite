@@ -98,8 +98,8 @@ nohup dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time
 
 # 安装 Scala
 cd ~
-wget https://downloads.lightbend.com/scala/${SCALA_VERSION}/scala-${SCALA_VERSION}.tgz
-# aws s3 cp ${aws_s3_bucket_name}/software/spark-local/scala-${SCALA_VERSION}.tgz .
+# wget https://downloads.lightbend.com/scala/${SCALA_VERSION}/scala-${SCALA_VERSION}.tgz
+aws s3 cp ${aws_s3_bucket_name}/software/spark-local/scala-${SCALA_VERSION}.tgz .
 tar zxf scala-${SCALA_VERSION}.tgz
 ln -s $HOME/scala-${SCALA_VERSION} scala
 echo "export SCALA_HOME=$HOME/scala" >> ~/.bashrc
@@ -286,8 +286,8 @@ wget https://github.com/eric-yq/ec2-test-suite/raw/refs/heads/main/misc/spark-tp
 
 # 配置 MySQL Connector
 cd ~
-wget https://downloads.mysql.com/archives/get/p/3/file/mysql-connector-java-5.1.49.tar.gz
-# aws s3 cp ${aws_s3_bucket_name}/software/spark-local/mysql-connector-java-5.1.49.tar.gz .
+# wget https://downloads.mysql.com/archives/get/p/3/file/mysql-connector-java-5.1.49.tar.gz
+aws s3 cp ${aws_s3_bucket_name}/software/spark-local/mysql-connector-java-5.1.49.tar.gz .
 tar zxf mysql-connector-java-5.1.49.tar.gz
 cp mysql-connector-java-5.1.49/mysql-connector-java-5.1.49.jar $HIVE_HOME/lib/
 sudo ln -s $HIVE_HOME/lib/mysql-connector-java-5.1.49.jar /usr/share/java/mysql-connector-java.jar
