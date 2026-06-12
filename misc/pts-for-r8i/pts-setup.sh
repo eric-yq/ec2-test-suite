@@ -1,9 +1,5 @@
 #!/bin/bash
 
-## 暂时关闭补丁更新流程
-sudo systemctl stop amazon-ssm-agent
-sudo systemctl disable amazon-ssm-agent
-
 install_al2023_dependencies () {
   echo "------ INSTALLING UTILITIES ------"
   yum -yq update
