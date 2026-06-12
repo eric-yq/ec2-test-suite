@@ -1,5 +1,17 @@
 #!/bin/bash
 
+#########################################################################################################
+## Usage: 
+# yum install -y git
+# git clone https://github.com/eric-yq/ec2-test-suite.git
+# cp ec2-test-suite/misc/pts-for-r8i/pts-setup.sh .
+
+# bash pts-setup.sh
+
+# source .bashrc
+# echo "yuanquan: TEST_RESULTS_IDENTIFIER=${PN}, TEST_RESULTS_DESCRIPTION=${PN}, TEST_RESULTS_NAME=${PN}"
+#########################################################################################################
+
 install_al2023_dependencies () {
   echo "------ INSTALLING UTILITIES ------"
   yum -yq update
@@ -97,12 +109,12 @@ curl -o ~/heatmap.py https://raw.githubusercontent.com/eric-yq/ec2-test-suite/re
 ## 测试 core-to-core-latency，并通过 heatmap.py 生成热力图，执行3次。
 cpu_model=$(dmidecode -t Processor | grep -i Version | awk -F':'  '{print $2}' | sed s"/^ //g")
 NPROCS=$(nproc)
-for i in {1..3} 
-do
-	~/.cargo/bin/core-to-core-latency 5000 --csv > ${CFG_DIR}/perf-core-to-core-latency-${i}.csv
-	python3 ~/heatmap.py -f "${CFG_DIR}/perf-core-to-core-latency-${i}.csv" -o "${CFG_DIR}/perf-core-to-core-latency-heatmap-${i}.png" -c "${cpu_model}" -n ${NPROCS}
-	sleep 5
-done
+# for i in {1..3} 
+# do
+# 	~/.cargo/bin/core-to-core-latency 5000 --csv > ${CFG_DIR}/perf-core-to-core-latency-${i}.csv
+# 	python3 ~/heatmap.py -f "${CFG_DIR}/perf-core-to-core-latency-${i}.csv" -o "${CFG_DIR}/perf-core-to-core-latency-heatmap-${i}.png" -c "${cpu_model}" -n ${NPROCS}
+# 	sleep 5
+# done
 
 ##############################################################################################
 ## PTS（Phoronix-Test-Suite）基准测试
@@ -132,4 +144,3 @@ DOWNLOAD_URL="https://github.com/BtbN/FFmpeg-Builds/releases/download/latest"
 wget ${DOWNLOAD_URL}/${DOWNLOAD_FILE}.tar.xz
 tar xf ${DOWNLOAD_FILE}.tar.xz
 cp ${DOWNLOAD_FILE}/bin/ffmpeg /usr/local/bin/ && rm -rf ${DOWNLOAD_FILE}*
-
