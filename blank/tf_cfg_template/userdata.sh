@@ -6,5 +6,6 @@ echo "This is a blank EC2 instance userdata script. No actions performed."
 sudo systemctl stop amazon-ssm-agent
 sudo systemctl disable amazon-ssm-agent
 
+yum install -y git
 cd /root/
 git clone https://github.com/eric-yq/ec2-test-suite.git
