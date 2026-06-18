@@ -5,11 +5,10 @@
 # yum install -y git
 # git clone https://github.com/eric-yq/ec2-test-suite.git
 # cp ec2-test-suite/misc/pts-for-r8i/pts-setup.sh .
-
 # bash pts-setup.sh
-
 # source .bashrc
 # echo "yuanquan: TEST_RESULTS_IDENTIFIER=${PN}, TEST_RESULTS_DESCRIPTION=${PN}, TEST_RESULTS_NAME=${PN}"
+# phoronix-test-suite batch-benchmark stream
 #########################################################################################################
 
 install_al2023_dependencies () {
