@@ -50,6 +50,7 @@ aws_s3_bucket_name=$(aws s3 ls | awk '{print $3}' | grep ec2-core-benchmark | he
 cd /root/
 cp ${DOOL_FILE} ${RESULT_PATH}/
 tar czf ${SUT_NAME}_${INSTANCE_TYPE}_${SUT_IP_ADDR}_${CASE_TYPE}.tar.gz ${RESULT_PATH}
-aws s3 cp ${SUT_NAME}_${INSTANCE_TYPE}_${SUT_IP_ADDR}_${CASE_TYPE}.tar.gz s3://${aws_s3_bucket_name}/
+aws s3 cp ${SUT_NAME}_${INSTANCE_TYPE}_${SUT_IP_ADDR}_${CASE_TYPE}.tar.gz s3://${aws_s3_bucket_name}/result_milvus/
 aws s3 ls s3://${aws_s3_bucket_name}
 echo "Upload ${SUT_NAME}_${INSTANCE_TYPE}_${SUT_IP_ADDR}_${CASE_TYPE}.tar.gz to s3://${aws_s3_bucket_name} ."
+
