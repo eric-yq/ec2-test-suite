@@ -6,6 +6,8 @@ os_types="al2023"
 instance_types="$1"
 # instance_types="r8a.2xlarge r8g.2xlarge r8i.2xlarge r7a.2xlarge r7g.2xlarge r7i.2xlarge r6a.2xlarge r6g.2xlarge r6i.2xlarge"
 # instance_types="m8a.2xlarge m8g.2xlarge m8i.2xlarge m7a.2xlarge m7g.2xlarge m7i.2xlarge m6a.2xlarge m6g.2xlarge m6i.2xlarge"
+# instance_types="m7i.4xlarge m8a.4xlarge m8g.4xlarge m8i.4xlarge m9g.4xlarge"
+
 
 if [ "$USE_CPG" = "1" ] ; then
   OPT="USE_CPG=1"
@@ -42,10 +44,15 @@ do
 		## 执行 Benchmark 测试
 		echo "[$(date +%Y%m%d.%H%M%S)] Star to run benchmark"
 		source /tmp/temp-setting
-		# bash benchmark/redis-benchmark_v2.sh ${INSTANCE_IP_MASTER} 6379 180
+		bash benchmark/redis-benchmark_v2.sh ${INSTANCE_IP_MASTER} 6379 180
+		# for 2xlarge
 		# bash benchmark/redis-benchmark_v2.sh ${INSTANCE_IP_MASTER} 8003 180
 		# bash benchmark/redis-benchmark_v2.sh ${INSTANCE_IP_MASTER} 8005 180
-		bash benchmark/redis-benchmark_v2.sh ${INSTANCE_IP_MASTER} 8007 180
+		# bash benchmark/redis-benchmark_v2.sh ${INSTANCE_IP_MASTER} 8007 180
+		# for 4xlarge
+		# bash benchmark/redis-benchmark_v2.sh ${INSTANCE_IP_MASTER} 8006 180
+		# bash benchmark/redis-benchmark_v2.sh ${INSTANCE_IP_MASTER} 8010 180
+		bash benchmark/redis-benchmark_v2.sh ${INSTANCE_IP_MASTER} 8014 180
 		
 		# 停止 dool 监控
 		sleep 10
