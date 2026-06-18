@@ -180,7 +180,7 @@ echo "[INFO] Step1: Start to perform PTS tests ..."
 tests="gmpbench primesieve stream cachebench ramspeed compress-zstd compress-lz4 blosc \
   botan john-the-ripper cython-bench ffmpeg x264 x265 tjbench vvenc blogbench nginx \
   graphics-magick smallpt draco renaissance dacapobench java-scimark2 scimark2 \
-  redis memtier-benchmark valkey keydb dragonflydb pogocache \
+  redis memtier-benchmark valkey keydb dragonflydb pogocache sonicjson simdjson \
   cassandra scylladb rocksdb influxdb clickhouse duckdb leveldb \
   stockfish mt-dgemm perf-bench mlpack mnn whisper-cpp whisperfile opencv \
   "
