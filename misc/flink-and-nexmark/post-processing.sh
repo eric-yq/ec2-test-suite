@@ -1,25 +1,24 @@
 #!/bin/bash
 
-# for Amazon Linux 2023，使用 ec2-user 用户登录执行
+# 在使用 flink-nexmark AMI 启动 3 台实例后，使用 ec2-user 用户登录执行
 
 su - ec2-user
 
-# 在使用 flink-nexmark AMI 启动 3 台实例后，
-# 分别通过 SSH 登录到 Master 和 2 个 Worker 节点，执行下面命令完成 Flink 和 Nexmark 的安装与基准测试。
-
+#####################################################################
+## 在 所有 3 个节点执行下面操作
+#####################################################################
 ## 将 下列 3 个 IPADDR_xxx 变量设置为 3 台 EC2 实例的 VPC IP 地址，并保存在 /etc/hosts 文件中
 hostname -I
-IPADDR_MASTER="172.31.80.14"
-IPADDR_WORKER1="172.31.88.126"
-IPADDR_WORKER2="172.31.94.228"
+IPADDR_MASTER="172.31.0.236"
+IPADDR_WORKER1="172.31.8.150"
+IPADDR_WORKER2="172.31.5.93"
 cat << EOF | sudo tee -a /etc/hosts
 $IPADDR_MASTER  master
 $IPADDR_WORKER1 worker1
 $IPADDR_WORKER2 worker2
 EOF
 
-## 生成密钥, 将 master 和 worker1,2 节点的 
-## id_rsa.pub 添加到所有节点的 authorized_keys 文件
+## 生成密钥, 将 master 和 worker1,2 节点的 id_rsa.pub 添加到所有节点的 authorized_keys 文件
 ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
 cat ~/.ssh/id_rsa.pub 
 chmod 0600 ~/.ssh/authorized_keys
@@ -34,19 +33,21 @@ vim ~/.ssh/authorized_keys
 cd /home/ec2-user/flink-benchmark
 CPU_CORES=$(nproc)
 MEM_TOTAL_GB=$(free -g |grep Mem | awk -F " " '{print $2}')
+# 修改内存
 let XXX=${MEM_TOTAL_GB}*75/100
 sed -i "s/48G/${XXX}G/g" nexmark-flink/conf/config.yaml
-# 或者：修改slot
+# 修改slot
 sed -i "s/taskmanager.numberOfTaskSlots: 8/taskmanager.numberOfTaskSlots: ${CPU_CORES}/g" nexmark-flink/conf/config.yaml
-
+# 修改并行度
+let YYY=${CPU_CORES}*3
+sed -i "s/parallelism.default: 24/parallelism.default: ${YYY}/g" nexmark-flink/conf/config.yaml
 
 # 启动 Flink 集群和 Benchmark
 bash ~/flink-benchmark/flink/bin/start-cluster.sh
 bash ~/flink-benchmark/nexmark-flink/bin/setup_cluster.sh
 
-# 开始执行 Benchmark
 #####################################################################
-## 在 Master 节点继续执行下面操作
+## 在 Master 节点继续执行下面操作，开始执行 Benchmark
 #####################################################################
 # 试跑一个查询:
 bash ~/flink-benchmark/nexmark-flink/bin/run_query.sh q7
