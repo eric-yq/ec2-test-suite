@@ -9,9 +9,9 @@ su - ec2-user
 #####################################################################
 ## 将 下列 3 个 IPADDR_xxx 变量设置为 3 台 EC2 实例的 VPC IP 地址，并保存在 /etc/hosts 文件中
 hostname -I
-IPADDR_MASTER="172.31.0.236"
-IPADDR_WORKER1="172.31.8.150"
-IPADDR_WORKER2="172.31.5.93"
+IPADDR_MASTER="172.31.5.11"
+IPADDR_WORKER1="172.31.6.180"
+IPADDR_WORKER2="172.31.5.63"
 cat << EOF | sudo tee -a /etc/hosts
 $IPADDR_MASTER  master
 $IPADDR_WORKER1 worker1
@@ -35,7 +35,7 @@ CPU_CORES=$(nproc)
 MEM_TOTAL_GB=$(free -g |grep Mem | awk -F " " '{print $2}')
 # 修改内存
 let XXX=${MEM_TOTAL_GB}*75/100
-sed -i "s/48G/${XXX}G/g" nexmark-flink/conf/config.yaml
+sed -i.bak "s/48G/${XXX}G/g" nexmark-flink/conf/config.yaml
 # 修改slot
 sed -i "s/taskmanager.numberOfTaskSlots: 8/taskmanager.numberOfTaskSlots: ${CPU_CORES}/g" nexmark-flink/conf/config.yaml
 # 修改并行度
