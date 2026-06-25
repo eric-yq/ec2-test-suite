@@ -9,9 +9,9 @@ su - ec2-user
 #####################################################################
 ## 将 下列 3 个 IPADDR_xxx 变量设置为 3 台 EC2 实例的 VPC IP 地址，并保存在 /etc/hosts 文件中
 hostname -I
-IPADDR_MASTER="172.31.5.11"
-IPADDR_WORKER1="172.31.6.180"
-IPADDR_WORKER2="172.31.5.63"
+IPADDR_MASTER="172.31.74.169"
+IPADDR_WORKER1="172.31.66.176"
+IPADDR_WORKER2="172.31.68.55"
 cat << EOF | sudo tee -a /etc/hosts
 $IPADDR_MASTER  master
 $IPADDR_WORKER1 worker1
@@ -41,6 +41,10 @@ sed -i "s/taskmanager.numberOfTaskSlots: 8/taskmanager.numberOfTaskSlots: ${CPU_
 # 修改并行度
 let YYY=${CPU_CORES}*3
 sed -i "s/parallelism.default: 24/parallelism.default: ${YYY}/g" nexmark-flink/conf/config.yaml
+# 同步到 worker1/2
+scp -r nexmark-flink/conf/config.yaml worker1:/home/ec2-user/flink-benchmark/nexmark-flink/conf/config.yaml
+scp -r nexmark-flink/conf/config.yaml worker2:/home/ec2-user/flink-benchmark/nexmark-flink/conf/config.yaml
+
 
 # 启动 Flink 集群和 Benchmark
 bash ~/flink-benchmark/flink/bin/start-cluster.sh
