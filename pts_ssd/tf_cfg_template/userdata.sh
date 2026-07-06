@@ -168,10 +168,24 @@ wget ${DOWNLOAD_URL}/${DOWNLOAD_FILE}.tar.xz
 tar xf ${DOWNLOAD_FILE}.tar.xz
 cp ${DOWNLOAD_FILE}/bin/ffmpeg /usr/local/bin/ && rm -rf ${DOWNLOAD_FILE}*
 
+# 安装 sysbench
+cd /root/
+rpm -Uvh https://repo.mysql.com//mysql80-community-release-el9.rpm
+yum install -y mysql-devel --nogpgcheck
+wget https://github.com/akopytov/sysbench/archive/refs/tags/1.0.20.tar.gz
+tar zxf 1.0.20.tar.gz && rm -rf 1.0.20.tar.gz && cd sysbench-1.0.20
+./autogen.sh
+./configure --with-mysql
+make -j
+make install
+sysbench --version
+
 ## 执行基准测试(标准)
 echo "[INFO] Step1: Start to perform PTS tests ..."
 
-tests="mariadb clickhouse cassandra scylladb"
+tests="clickhouse cassandra scylladb mariadb hammerdb-postgresql tidb \
+       rocksdb speedb dragonflydb keydb leveldb cockroach couchdb duckdb influxdb \
+       spark spark-tpcds spark-tpch"
 for testname in ${tests} 
 do
     # 启动一个监控
