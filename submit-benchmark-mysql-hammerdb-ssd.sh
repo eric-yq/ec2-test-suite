@@ -4,10 +4,8 @@ set -e
 
 ## 待测 EC2 规格和 OS
 os_types="al2023"
-instance_types="$1"
-data_size=$2 
-# instance_types="r8a.2xlarge r8g.2xlarge r8i.2xlarge r7a.2xlarge r7g.2xlarge r7i.2xlarge r6a.2xlarge r6g.2xlarge r6i.2xlarge"
-# instance_types="m8a.2xlarge m8g.2xlarge m8i.2xlarge m7a.2xlarge m7g.2xlarge m7i.2xlarge m6a.2xlarge m6g.2xlarge m6i.2xlarge"
+instance_types="$1" ## 待测 EC2 规格，多个规格用空格分隔
+data_size=$2 ## 数据量大小，单位为 GB
 
 if [ "$USE_CPG" = "1" ] ; then
   OPT="USE_CPG=1"
@@ -21,7 +19,7 @@ do
 	do
 		## 创建实例、安装软件
 		echo "$0: OS_TYPE=${os}, INSTANCE_TYPE=${ins}"
-		eval $OPT bash launch-instances-single.sh -s mysql-ebs -t ${ins} -o ${os}
+		eval $OPT bash launch-instances-single.sh -s mysql-instancestore -t ${ins} -o ${os}
 		launch_status=$?
 
 		# 检查启动状态
@@ -57,7 +55,7 @@ do
 		bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 60  8 ${data_size} ${ins} 
 		bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 30 10 ${data_size} ${ins} 
 		bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 30 12 ${data_size} ${ins} 
-		bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 30 16 ${data_size} ${ins} 
+		bash benchmark/mysql-benchmark_v2_run.sh ${INSTANCE_IP_MASTER} 30 16 ${data_size} ${ins}
 
 		# 停止 dool 监控
 		sleep 10
