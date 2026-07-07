@@ -183,7 +183,7 @@ sysbench --version
 ## 执行基准测试(标准)
 echo "[INFO] Step1: Start to perform PTS tests ..."
 
-tests="clickhouse cassandra scylladb mariadb hammerdb-postgresql tidb \
+tests="clickhouse cassandra scylladb mariadb  \
        rocksdb speedb dragonflydb keydb leveldb cockroach couchdb duckdb influxdb \
        spark spark-tpcds spark-tpch"
 for testname in ${tests} 

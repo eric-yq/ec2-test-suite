@@ -116,6 +116,8 @@ echo "export PN=${PN}" >> /root/.bashrc
 echo "export TEST_RESULTS_IDENTIFIER=${PN}" >> /root/.bashrc
 echo "export TEST_RESULTS_DESCRIPTION=${PN}" >> /root/.bashrc
 echo "export TEST_RESULTS_NAME=${PN}" >> /root/.bashrc
+## 设置测试项执行结束后，删除测试项以节省空间
+echo "export REMOVE_TESTS_ON_COMPLETION=TRUE" >> /root/.bashrc
 source /root/.bashrc
 
 ## 收集系统信息
@@ -153,17 +155,17 @@ wget https://github.com/phoronix-test-suite/phoronix-test-suite/releases/downloa
 tar zxf phoronix-test-suite-10.8.4.tar.gz
 cd ~/phoronix-test-suite/pts-core/commands/
 cp ./batch_setup.php ./batch_setup.php.original.bak
-sed s:"test identifier', true":"test identifier', false":g ./batch_setup.php > ./batch_setup.php.1
-sed s:"test description', true":"test description', false":g ./batch_setup.php.1 > ./batch_setup.php.2
-sed s:"saved results file-name', true":"saved results file-name', false":g ./batch_setup.php.2 > ./batch_setup.php
+sed -i.original.bak \
+  -e "s:test identifier', true:test identifier', false:g" \
+  -e "s:test description', true:test description', false:g" \
+  -e "s:saved results file-name', true:saved results file-name', false:g" \
+  ./batch_setup.php
 cd ~/phoronix-test-suite/
 ./install-sh
 ## PTS：setup default user-configuration in /etc/phoronix-test-suite.xml
 ### following command use /usr/share/phoronix-test-suite/pts-core/commands/batch_setup.php
 phoronix-test-suite batch-setup
-export TEST_RESULTS_IDENTIFIER=${PN}
-export TEST_RESULTS_DESCRIPTION=${PN}
-export TEST_RESULTS_NAME=${PN}
+
 
 # 安装新测试项目需要的软件包
 yum install -yq lz4-devel lzo-devel libcurl-devel bzip2-devel
