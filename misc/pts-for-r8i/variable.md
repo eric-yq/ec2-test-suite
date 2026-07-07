@@ -31,7 +31,7 @@ Used in conjunction with the FORCE_MIN_TIMES_TO_RUN, the FORCE_MIN_TIMES_TO_RUN_
 The value can be of type: positive integer.
 The variable is relevant for: test execution / benchmarking.
 
-FORCE_TIMES_TO_RUN
+**FORCE_TIMES_TO_RUN**
 This option can be used to override the default number of times a given test is run. Rather than being specified by the individual test profile, FORCE_TIMES_TO_RUN allows for specifying the number of times to run each benchmark.
 The value can be of type: positive integer.
 The variable is relevant for: test execution / benchmarking.
@@ -134,7 +134,7 @@ PTS_DISPLAY_MODE
 If you wish to load a non-default display mode for a single instance, specify the mode in this variable as an alternative to adjusting the user configuration file.
 The value can be of type: enumeration (BASIC, BATCH, CONCISE, SHORT, DEFAULT).
 
-PTS_DOWNLOAD_CACHE
+**PTS_DOWNLOAD_CACHE**
 PTS_DOWNLOAD_CACHE can be used for setting a path to a directory on the system containing a Phoronix Test Suite download cache if located outside one of the default locations.
 The value can be of type: string.
 The variable is relevant for: test installation.
@@ -163,7 +163,7 @@ PTS_SILENT_MODE
 This option when enabled will yield slightly less verbose Phoronix Test Suite terminal output by silencing unnecessary messages / prompts.
 The value can be of type: boolean (TRUE / FALSE).
 
-PTS_TEST_INSTALL_ROOT_PATH
+**PTS_TEST_INSTALL_ROOT_PATH**
 This option can be used for overriding where tests are installed to on the system. An absolute writable directory path can be the value if wanting to override the default (or user configuration file specified) test installation directory path.
 The value can be of type: string.
 The variable is relevant for: test installation, test execution / benchmarking, stress-run mode.
@@ -223,17 +223,17 @@ This option can be used if wanting to specify a binary (e.g. sudo, cgroup or oth
 The value can be of type: string.
 The variable is relevant for: test execution / benchmarking.
 
-TEST_RESULTS_DESCRIPTION: c6gd.4xlarge
+**TEST_RESULTS_DESCRIPTION: c6gd.4xlarge**
 This option can be used for specifying the result file description for saving that string and not be prompted for providing a description during the test execution process.
 The value can be of type: string.
 The variable is relevant for: test execution / benchmarking, stress-run mode.
 
-TEST_RESULTS_IDENTIFIER: c6gd.4xlarge
+**TEST_RESULTS_IDENTIFIER: c6gd.4xlarge**
 This option can be used for specifying the result identifier for distinguishing this run within the saved result file.
 The value can be of type: string.
 The variable is relevant for: test execution / benchmarking, stress-run mode.
 
-TEST_RESULTS_NAME: c6gd.4xlarge
+**TEST_RESULTS_NAME: c6gd.4xlarge**
 This option can be used for specifying the result file name for saving the test/benchmark results automatically to the given name.
 The value can be of type: string.
 The variable is relevant for: test execution / benchmarking, stress-run mode.
@@ -279,4 +279,4 @@ The value can be of type: positive integer.
 The variable is relevant for: test execution / benchmarking.
 The variable depends upon functionality provided by the Phoronix Test Suite module: watchdog.
 
-[root@ip-172-31-95-196 phoronix-test-suite]# 
+(END)
