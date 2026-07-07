@@ -92,7 +92,7 @@ ARCH=$(arch)
 install_al2023_dependencies
 
 # 设置磁盘lvm stripe
-cd ~
+cd /root/
 git clone https://github.com/eric-yq/ec2-test-suite.git
 bash ec2-test-suite/tools/setup_nvme_instance_store.sh
 
@@ -159,6 +159,11 @@ cd ~/phoronix-test-suite/
 ### following command use /usr/share/phoronix-test-suite/pts-core/commands/batch_setup.php
 phoronix-test-suite batch-setup
 
+# PTS 安装路径
+# /var/cache/phoronix-test-suite
+# /var/lib/phoronix-test-suite
+# /usr/share/phoronix-test-suite
+
 # 安装新测试项目需要的软件包
 yum install -yq lz4-devel lzo-devel libcurl-devel bzip2-devel
 python3 -m pip install sklearn scons
@@ -183,8 +188,8 @@ sysbench --version
 ## 执行基准测试(标准)
 echo "[INFO] Step1: Start to perform PTS tests ..."
 
-tests="clickhouse cassandra scylladb mariadb  \
-       rocksdb speedb dragonflydb keydb leveldb cockroach couchdb duckdb influxdb \
+tests="clickhouse cassandra scylladb mariadb cockroach couchdb duckdb \
+       rocksdb speedb dragonflydb keydb leveldb    influxdb \
        spark spark-tpcds spark-tpch"
 for testname in ${tests} 
 do

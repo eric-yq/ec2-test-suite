@@ -3,21 +3,8 @@
 SUT_NAME=${1}
 echo "$0: Install SUT_NAME: ${SUT_NAME}"
 
-## (optional) mount nvme disk
-disks="nvme1n1" 
-for disk in $disks
-do
-    echo "[INFO] Start to create partition on $disk..."
-    echo -e "g\nn\n1\n\n\nw" | fdisk /dev/$disk
-
-    echo "[INFO] Start to create filesystem on $device..."
-    partition=${disk}p1 && mkdir -p /data/$partition
-    device="/dev/$partition" && mkfs -t xfs -f $device
-
-    echo "[INFO] Start to modify /etc/fstab..."
-    uuid=$(blkid | grep $partition | awk -F "\"" '{print $2}')
-    echo "UUID=$uuid /data/$partition xfs  defaults,nofail  0  2" >> /etc/fstab
-done
+## setup and mount nvme disk
+bash ../tools/setup_nvme_instance_store.sh
 mount -a && df -h
 
 ## functions
@@ -47,13 +34,14 @@ modify_mycnf(){
 
 	## 变量计算
 	let XXX=${MEM_TOTAL_MB}*75/100
-
-    mkdir -p /data/nvme1n1p1
+    
+	DATADIR="/data/mysql"
+    mkdir -p ${DATADIR}
     cat << EOF > ${MYSQL_CONF}
 [mysqld]
 server-id=123
-datadir=/data/nvme1n1p1
-log-bin=/data/nvme1n1p1/mysql-bin
+datadir=${DATADIR}
+log-bin=${DATADIR}/mysql-bin
 socket=/var/lib/mysql/mysql.sock
 log-error=/var/log/mysqld.log
 pid-file=/var/run/mysqld/mysqld.pid
