@@ -226,7 +226,7 @@ kill -9 ${DOOL_PID}
 sleep 5
 
 ################################################################################################
-# spark-tpch:只测试 PRESET_OPTIONS_VALUES='spark-tpcds.scale=10,50,100'
+# spark-tpch:只测试 PRESET_OPTIONS_VALUES='spark-tpch.scale=10,50,100'
 testname="spark-tpch"
 # 启动一个监控
 DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
