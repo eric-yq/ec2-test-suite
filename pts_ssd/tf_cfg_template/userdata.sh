@@ -188,9 +188,7 @@ sysbench --version
 ## 执行基准测试(标准)
 echo "[INFO] Step1: Start to perform PTS tests ..."
 
-tests="clickhouse cassandra scylladb mariadb cockroach couchdb duckdb \
-       rocksdb speedb dragonflydb keydb leveldb    influxdb \
-       spark spark-tpcds spark-tpch"
+tests="clickhouse cassandra scylladb mariadb cockroach couchdb duckdb influxdb"
 for testname in ${tests} 
 do
     # 启动一个监控
@@ -208,7 +206,44 @@ do
 
     sleep 5
 done
-# 执行时间太长的，设置为只执行1次或者2次: FORCE_TIMES_TO_RUN=1 或者 2
+
+################################################################################################
+# spark-tpcds: 只测试 PRESET_OPTIONS_VALUES='spark-tpcds.scale=10,50,100'
+testname="spark-tpcds"
+# 启动一个监控
+DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
+dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 30 > ${DOOL_FILE} 2>&1 &
+DOOL_PID=$!
+# 执行基准测试
+FORCE_TIMES_TO_RUN=3 PRESET_OPTIONS_VALUES='${testname}.scale=10,50,100' \
+  phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
+# 保存结果 URL
+echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
+phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
+grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
+# 停止监控
+kill -9 ${DOOL_PID}
+sleep 5
+
+################################################################################################
+# spark-tpch:只测试 PRESET_OPTIONS_VALUES='spark-tpcds.scale=10,50,100'
+testname="spark-tpch"
+# 启动一个监控
+DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
+dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 30 > ${DOOL_FILE} 2>&1 &
+DOOL_PID=$!
+# 执行基准测试
+FORCE_TIMES_TO_RUN=3 PRESET_OPTIONS_VALUES='${testname}.scale=10,50,100' \
+  phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
+# 保存结果 URL
+echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
+phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
+grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
+# 停止监控
+kill -9 ${DOOL_PID}
+sleep 5
+
+################################################################################################
 
 echo "[INFO] Step: Complete ALL PTS TESTS."
 
@@ -228,8 +263,3 @@ systemctl disable userdata.service
 ## 停止实例
 INSTANCE_ID=$(ec2-metadata --quiet --instance-id )
 aws ec2 stop-instances --instance-ids "${INSTANCE_ID}"
-
-################################################################################################################
-# failed tests:
-# memcached
-################################################################################################################
