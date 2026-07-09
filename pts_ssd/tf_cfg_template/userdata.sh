@@ -261,5 +261,5 @@ echo "[INFO] Step3: Result files have been uploaded to s3 bucket. BYE BYE."
 systemctl disable userdata.service
 
 ## 停止实例
-INSTANCE_ID=$(ec2-metadata --quiet --instance-id )
-aws ec2 stop-instances --instance-ids "${INSTANCE_ID}"
+INSTANCE_ID=$(ec2-metadata --quiet --instance-id)
+aws ec2 terminate-instances --instance-ids "${INSTANCE_ID}"
