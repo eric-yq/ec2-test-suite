@@ -262,4 +262,4 @@ systemctl disable userdata.service
 
 ## 停止实例
 INSTANCE_ID=$(ec2-metadata --quiet --instance-id)
-aws ec2 stop-instances --instance-ids "${INSTANCE_ID}"
+# aws ec2 stop-instances --instance-ids "${INSTANCE_ID}"
