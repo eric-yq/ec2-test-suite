@@ -7,11 +7,15 @@ apt install -y python3-full python3-venv htop screen git curl
 apt install -y build-essential
 apt install -y docker.io
 systemctl enable --now docker
+mkdir -p ~/.docker/cli-plugins
+curl -sL https://github.com/docker/buildx/releases/download/v0.14.1/buildx-v0.14.1.linux-arm64 -o ~/.docker/cli-plugins/docker-buildx
+chmod +x ~/.docker/cli-plugins/docker-buildx
+docker buildx version
 
 # 准备虚拟环境
-python3 -m venv ~/aenv-venv
-source ~/aenv-venv/bin/activate
-pip3 install dool
+# python3 -m venv ~/aenv-venv
+# source ~/aenv-venv/bin/activate
+# pip3 install dool
 
 #####################################################################################################
 ## 创建 aenv 用户和组
@@ -26,17 +30,22 @@ chmod 440 /etc/sudoers.d/aenv
 su - aenv -c "sudo whoami"
 # 输出: root
 
-#
-# kvcache-ai/firecracker 编译构建 aarch64 版本
-# https://github.com/kvcache-ai/firecracker 
-git clone https://github.com/firecracker-microvm/firecracker
-cd firecracker
-tools/devtool build
-toolchain="$(uname -m)-unknown-linux-musl"
-ll build/cargo_target/${toolchain}/debug/firecracker
+# 下载 aarch64 的 firecracker
 mkdir -p /var/lib/aenv/deps/firecracker/1.15.1-patch-v1/
-cp ~/firecracker/build/cargo_target/aarch64-unknown-linux-musl/debug/firecracker \
-   /var/lib/aenv/deps/firecracker/1.15.1-patch-v1/firecracker
+mkdir -p /var/lib/aenv/deps/kernel/vmlinux-6.1.175/
+cd /tmp
+# 1. Firecracker
+wget https://github.com/kvcache-ai/firecracker/releases/download/v0.1.0/firecracker-1.15.1-patch-v1-aarch64.tgz
+tar -xzf firecracker-1.15.1-patch-v1-aarch64.tgz
+ls -la
+cp firecracker /var/lib/aenv/deps/firecracker/1.15.1-patch-v1/firecracker
+chmod +x /var/lib/aenv/deps/firecracker/1.15.1-patch-v1/firecracker
+# 2. Kernel
+wget https://github.com/kvcache-ai/firecracker/releases/download/v0.1.0/vmlinux-6.1.175-aarch64
+cp vmlinux-6.1.175-aarch64 /var/lib/aenv/deps/kernel/vmlinux-6.1.175/vmlinux.bin
+# 3. 确认架构
+file /var/lib/aenv/deps/firecracker/1.15.1-patch-v1/firecracker
+file /var/lib/aenv/deps/kernel/vmlinux-6.1.175/vmlinux.bin
 
 # arm64：编译 aenv-server
 cd
@@ -50,7 +59,17 @@ git clone https://github.com/kvcache-ai/AgentENV.git
 cd AgentENV
 make release
 
+
+# 构建 aarch64 架构的 tools.ext4
+cd ~/AgentENV/tools-image/
+sed -i.bak \
+  's|ARG TARGETPLATFORM=linux/amd64|ARG TARGETPLATFORM=linux/arm64|' \
+  Dockerfile
+make
+cp out/tools-0.1.0-arm64.ext4 /var/lib/aenv/deps/tools/0.1.0/tools.ext4
+
 # 
+cd ~/AgentENV/
 mkdir -p /var/lib/aenv/deps/overlaybd/etc/overlaybd
 mkdir -p /var/lib/aenv/cache/overlaybd
 cat > /var/lib/aenv/deps/overlaybd/etc/overlaybd/overlaybd.json << 'EOF'
