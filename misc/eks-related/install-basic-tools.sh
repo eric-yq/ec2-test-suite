@@ -24,6 +24,9 @@ sudo mv /tmp/eksctl /usr/local/bin
 eksctl completion bash > eksctl_completion
 sudo mv eksctl_completion /etc/bash_completion.d/eksctl
 
+## 安装 helm
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
 ####################################################################################################
 ## 其他小工具
 sudo curl -L -o /etc/bash_completion.d/docker https://raw.githubusercontent.com/docker/cli/master/contrib/completion/bash/docker
