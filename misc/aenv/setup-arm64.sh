@@ -57,6 +57,7 @@ apt install -y libssl-dev pkg-config clang lld protobuf-compiler umoci
 # 编译 AgentENV
 git clone https://github.com/kvcache-ai/AgentENV.git
 cd AgentENV
+ulimit -n 65536
 make release
 
 
@@ -66,6 +67,7 @@ sed -i.bak \
   's|ARG TARGETPLATFORM=linux/amd64|ARG TARGETPLATFORM=linux/arm64|' \
   Dockerfile
 make
+mkdir -p /var/lib/aenv/deps/tools/0.1.0/
 cp out/tools-0.1.0-arm64.ext4 /var/lib/aenv/deps/tools/0.1.0/tools.ext4
 
 # 
@@ -105,7 +107,4 @@ aenv pull ubuntu:22.04 --name ubuntu
 aenv start ubuntu            # starts a sandbox and attaches an interactive shell
 
 
-
-
-python3 ./aenv_quickstart.py
 
