@@ -1,6 +1,8 @@
 #!/bin/bash
 
 # for ubuntu 24.04, root user
+# 20260817： AgentENV 已经发布支持 arm64 的 server 版本，不需要自己编译了，直接安装即可。
+
 
 apt update
 apt install -y python3-full python3-venv htop screen git curl 
