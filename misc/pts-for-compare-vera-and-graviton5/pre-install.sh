@@ -124,3 +124,5 @@ FORCE_TIMES_TO_RUN=3 phoronix-test-suite batch-benchmark 2605268-PTS-2605245P37
 ##结果
 # https://openbenchmarking.org/result/2608052-NE-2605268PT64
 # https://openbenchmarking.org/result/2608052-NE-2605268PT20
+# m9gd.48xlarge 和 Grace/Vera 结果对比（过滤掉NVIDIA Vera 杂音选型，保留 1 x NVIDIA Vera）
+# https://openbenchmarking.org/result/2608052-NE-2605268PT64&hni=1&sgm=1&nor=1&rmm=2+x+EPYC+9455%2C2+x+EPYC+9475F%2C1+x+EPYC+9575F%2C2+x+EPYC+9575F%2C1+x+EPYC+9755%2C2+x+EPYC+9755%2C1+x+Xeon+6980P%2C2+x+Xeon+6980P%2CNVIDIA+Vera&ppt=D&sor#r-31f7120546092697a338db0afea1913679ec9502

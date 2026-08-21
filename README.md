@@ -14,7 +14,7 @@ In this repository there are some benchmark test suites for AWS EC2 instance.
 - EBS configration: `80 GB gp3`
 - Placement Group: `pg-cluster` with type `cluster`
 
-### 2. Login with SSH session
+### 2. Login with SSH session 
 
 ### 3. Install Software Dependency and Test Tools
 ```bash
