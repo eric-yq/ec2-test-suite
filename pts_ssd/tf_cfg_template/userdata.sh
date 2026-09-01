@@ -31,15 +31,15 @@ EOF
     
     echo "已创建并启用 systemd 服务 userdata.service"
 
-    ### 等待 60 秒再执行 userdata 脚本
-    sleep 60
+    ### 等待 180 秒再执行 userdata 脚本
+    sleep 180
     systemctl start userdata.service
     exit 0
 fi
 
 ################################################################################################################ 
 
-SUT_NAME="SUT_XXX"
+SUT_NAME="SUT_PTS_SSD"
 
 install_al2023_dependencies () {
   echo "------ INSTALLING UTILITIES ------"
@@ -58,10 +58,7 @@ install_al2023_dependencies () {
   yum install -yq perf kernel-devel-$(uname -r) bcc
 
   echo "------ INSTALL ANALYSIS TOOLS AND DEPENDENCIES ------"
-#   curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-#   python3 get-pip.py
   python3 -m pip install pandas numpy scipy matplotlib sh seaborn plotext
-#   git clone https://github.com/brendangregg/FlameGraph.git FlameGraph
   
   echo "------ DONE ------"
 }
@@ -144,7 +141,6 @@ uname -a > ${CFG_DIR}/cfg_uname-a.txt
 ##############################################################################################
 ## PTS（Phoronix-Test-Suite）基准测试
 ## 安装依赖包,master 分支的代码需要修改才能正常运行，使用 10.8.4 的稳定版本。
-# git clone https://github.com/phoronix-test-suite/phoronix-test-suite.git ~/phoronix-test-suite
 wget https://github.com/phoronix-test-suite/phoronix-test-suite/releases/download/v10.8.4/phoronix-test-suite-10.8.4.tar.gz
 tar zxf phoronix-test-suite-10.8.4.tar.gz
 cd ~/phoronix-test-suite/pts-core/commands/
@@ -188,7 +184,14 @@ sysbench --version
 ## 执行基准测试(标准)
 echo "[INFO] Step1: Start to perform PTS tests ..."
 
-tests="clickhouse cassandra scylladb mariadb cockroach couchdb duckdb influxdb"
+tests="gmpbench primesieve stream cachebench ramspeed compress-zstd compress-lz4 blosc \
+  botan john-the-ripper cython-bench ffmpeg x264 x265 tjbench vvenc blogbench nginx \
+  graphics-magick smallpt draco renaissance dacapobench java-scimark2 scimark2 \
+  redis memtier-benchmark valkey keydb dragonflydb pogocache sonicjson simdjson \
+  cassandra scylladb mariadb rocksdb influxdb clickhouse duckdb leveldb cockroach couchdb \
+  stockfish mt-dgemm perf-bench mlpack mnn whisper-cpp whisperfile opencv \
+  "
+
 for testname in ${tests} 
 do
     # 启动一个监控
@@ -197,6 +200,46 @@ do
     DOOL_PID=$!
     # 执行基准测试
     FORCE_TIMES_TO_RUN=3 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
+    # 保存结果 URL
+    echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
+    phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
+    grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
+    # 停止监控
+    kill -9 ${DOOL_PID}
+
+    sleep 5
+done
+
+## 执行时间太长的，设置为只执行 1 次的tests:
+tests1="openssl pyperformance cpp-perf-bench c-ray lczero arrayfire hpcg quantlib"
+for testname in ${tests1} 
+do
+    # 启动一个监控
+    DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
+    dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
+    DOOL_PID=$!
+    # 执行基准测试
+    FORCE_TIMES_TO_RUN=1 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
+    # 保存结果 URL
+    echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
+    phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
+    grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
+    # 停止监控
+    kill -9 ${DOOL_PID}
+
+    sleep 5
+done
+
+## 特殊任务：执行2次的tests。
+tests2="scikit-learn"
+for testname in ${tests2} 
+do
+    # 启动一个监控
+    DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
+    dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
+    DOOL_PID=$!
+    # 执行基准测试
+    FORCE_TIMES_TO_RUN=2 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
     # 保存结果 URL
     echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
     phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
@@ -243,6 +286,7 @@ grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test
 kill -9 ${DOOL_PID}
 sleep 5
 
+
 ################################################################################################
 
 echo "[INFO] Step: Complete ALL PTS TESTS."
@@ -262,4 +306,4 @@ systemctl disable userdata.service
 
 ## 停止实例
 INSTANCE_ID=$(ec2-metadata --quiet --instance-id)
-# aws ec2 stop-instances --instance-ids "${INSTANCE_ID}"
+aws ec2 stop-instances --instance-ids "${INSTANCE_ID}"
