@@ -60,7 +60,7 @@ fi
 ################################################################################################################       
 # Amazon Linux 2023, 使用 ec2-user 账号登录.
 
-SUT_NAME="SUT_XXX"
+SUT_NAME="spark-tpcds-instancestore"
 
 ## 配置 AWSCLI
 aws_ak_value="akxxx"
@@ -385,7 +385,6 @@ sleep 60
 # 执行全部的 SQL 分析任务
 # 待数据全部完成之后，预先准备 Benchmark 过程中需要的一些结果目录：
 cd ~
-SUT_NAME="spark-tpcds"
 PN=$(sudo ec2-metadata --quiet --instance-type)
 DATA_DIR=~/${PN}_${SUT_NAME}
 CFG_DIR=$DATA_DIR/system-infomation
