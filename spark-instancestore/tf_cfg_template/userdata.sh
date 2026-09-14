@@ -420,7 +420,7 @@ timestamp=$(date +%Y%m%d-%H%M%S)
 archive="${DATA_DIR}_${timestamp}"
 cp ${DOOL_FILE} ${DATA_DIR}/
 tar czf ${archive}.tar.gz ${DATA_DIR}/
-aws s3 cp ${archive}.tar.gz s3://${aws_s3_bucket_name}/result_spark/
+aws s3 cp ${archive}.tar.gz s3://${aws_s3_bucket_name}/result_spark-instancestore/
 
 ## Disable 服务，这样 reboot 后不会再次执行
 systemctl disable userdata.service
