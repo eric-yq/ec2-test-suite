@@ -133,24 +133,31 @@ mv PRO_VID_20220129_120530_00_055.mp4 input2.mp4
 mv VID_20180105_184256_00_172.mp4 input3.mp4
 
 ### X265 用例 -- CPU
-# test0: x265, input1, ultrafast
+# test0: x265, input1, veryfast
 # test1: x265, input1, medium
-# test2: x265, input2, ultrafast
-# test3: x265, input3, medium
-# test4: x265, input3, ultrafast
-# test5: x265, input3, medium
+# test2: x265, input1, slow
+# test3: x265, input2, veryfast
+# test4: x265, input2, medium
+# test5: x265, input2, slow
+# test6: x265, input3, veryfast
+# test7: x265, input3, medium
+# test8: x265, input3, slow
 ### X264 用例 -- CPU
-# test6: x264, input1, ultrafast
-# test7: x264, input1, medium
-# test8: x264, input2, ultrafast
-# test9: x264, input3, medium
-# test10: x264, input3, ultrafast
-# test11: x264, input3, medium
-declare -a tests=(0 1 2 3 4 5 6 7 8 9 10 11)
-declare -a c=(libx265 libx265 libx265 libx265 libx265 libx265 libx264 libx264 libx264 libx264 libx264 libx264)
-declare -a r=(input1.mp4 input1.mp4 input2.mp4 input2.mp4 input3.mp4 input3.mp4 \
-              input1.mp4 input1.mp4 input2.mp4 input2.mp4 input3.mp4 input3.mp4)
-declare -a p=(ultrafast medium ultrafast medium ultrafast medium ultrafast medium ultrafast medium ultrafast medium)
+# test9: x264, input1, veryfast
+# test10: x264, input1, medium
+# test11: x264, input1, slow
+# test12: x264, input2, veryfast
+# test13: x264, input2, medium
+# test14: x264, input2, slow
+# test15: x264, input3, veryfast
+# test16: x264, input3, medium
+# test17: x264, input3, slow
+declare -a tests=(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17)
+declare -a c=(libx265 libx265 libx265 libx265 libx265 libx265 libx265 libx265 libx265 \
+              libx264 libx264 libx264 libx264 libx264 libx264 libx264 libx264 libx264)
+declare -a r=(input1.mp4 input1.mp4 input1.mp4 input2.mp4 input2.mp4 input2.mp4 input3.mp4 input3.mp4 input3.mp4 \
+              input1.mp4 input1.mp4 input1.mp4 input2.mp4 input2.mp4 input2.mp4 input3.mp4 input3.mp4 input3.mp4)
+declare -a p=(veryfast medium slow veryfast medium slow veryfast medium slow veryfast medium slow veryfast medium slow veryfast medium slow)
 
 ## 执行测试
 for t in ${tests[@]}
