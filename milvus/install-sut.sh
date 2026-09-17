@@ -19,7 +19,10 @@ chmod +x /usr/bin/docker-compose
 ver="v2.6.24"
 # ver="v2.6.18"
 # ver="v2.6.5"
-mkdir /root/milvus && cd /root/milvus
+# 如果有本地SSD 盘，脚本执行后会挂载在/data
+bash  /root/ec2-test-suite/tools/setup_nvme_instance_store.sh
+mkdir -p /data 
+cd /data
 wget https://github.com/milvus-io/milvus/releases/download/${ver}/milvus-standalone-docker-compose.yml \
   -O docker-compose.yml
 
