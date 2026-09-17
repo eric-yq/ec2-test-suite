@@ -16,7 +16,8 @@ curl -SL https://github.com/docker/compose/releases/download/v2.12.2/docker-comp
       -o /usr/bin/docker-compose
 chmod +x /usr/bin/docker-compose
 
-ver="v2.6.18"
+ver="v3.0.1"
+# ver="v2.6.18"
 # ver="v2.6.5"
 mkdir /root/milvus && cd /root/milvus
 wget https://github.com/milvus-io/milvus/releases/download/${ver}/milvus-standalone-docker-compose.yml \
@@ -30,7 +31,7 @@ sleep 90
 docker-compose ps
 
 # 启动 dool 监控
-cd /tmp/ && python3 -m http.server 9527 &
-DOOL_FILE="/tmp/dool-sut.txt"
-nohup dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 \
-  1> ${DOOL_FILE} 2>&1 &
+# cd /tmp/ && python3 -m http.server 9527 &
+# DOOL_FILE="/tmp/dool-sut.txt"
+# nohup dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 \
+#   1> ${DOOL_FILE} 2>&1 &

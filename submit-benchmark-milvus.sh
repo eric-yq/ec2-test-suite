@@ -2,7 +2,9 @@
 
 # 待测 EC2 规格和 OS
 os_types="al2023"
-instance_types="$1"
+# instance_types="$1"
+instance_types="r9g.4xlarge r8a.4xlarge r8g.4xlarge r8i.4xlarge r7a.4xlarge r7g.4xlarge r7i.4xlarge r6a.4xlarge r6g.4xlarge r6i.4xlarge"
+
 
 ## CPG 选项
 if [ "$USE_CPG" = "1" ] ; then
@@ -46,14 +48,14 @@ do
 		
 		# 停止 dool 监控
 		sleep 10
-		# killall ssh dool
+		killall ssh dool
 
 		# 将结果目录打包上传到 S3
 		TIMESTAMP=$(date +%Y%m%d%H%M%S)
 		TARGET_DIR="${SUT_NAME}_${INSTANCE_TYPE}_${TIMESTAMP}"
 		cp -r benchmark-result-files ${TARGET_DIR}	
 		cp screenlog.0 ${TARGET_DIR}/
-		wget http://${INSTANCE_IP_MASTER}:9527/dool-sut.txt -O ${TARGET_DIR}/dool-sut.txt
+		# wget http://${INSTANCE_IP_MASTER}:9527/dool-sut.txt -O ${TARGET_DIR}/dool-sut.txt
 		tar czf ${TARGET_DIR}.tar.gz ${TARGET_DIR}
 		aws s3 cp ${TARGET_DIR}.tar.gz s3://${BENCHMARK_RESULT_BUCKET}/result_${SUT_NAME}/
 		
@@ -63,6 +65,6 @@ do
 	done
 done
 
-echo "$(date +%Y%m%d.%H%M%S)] ${SUT_NAME} benchmark completed. Loadgen instance will be terminicated after 30s." && sleep 30
-aws ec2 terminate-instances --region $(ec2-metadata --quiet --region) --instance-ids $(ec2-metadata --quiet -i) 
+# echo "$(date +%Y%m%d.%H%M%S)] ${SUT_NAME} benchmark completed. Loadgen instance will be terminicated after 30s." && sleep 30
+# aws ec2 terminate-instances --region $(ec2-metadata --quiet --region) --instance-ids $(ec2-metadata --quiet -i) 
 
