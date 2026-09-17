@@ -16,13 +16,16 @@ curl -SL https://github.com/docker/compose/releases/download/v2.12.2/docker-comp
       -o /usr/bin/docker-compose
 chmod +x /usr/bin/docker-compose
 
-# ver="v3.0.1"
-ver="v2.6.24"
+ver="v3.0.1"
+# ver="v2.6.24"
 # ver="v2.6.18"
 # ver="v2.6.5"
 mkdir /root/milvus && cd /root/milvus
 wget https://github.com/milvus-io/milvus/releases/download/${ver}/milvus-standalone-docker-compose.yml \
   -O docker-compose.yml
+
+# minio 在 dockerhub 镜像问题，替换信息
+sed -i "s/image: minio/image: quay.io\/minio/g" docker-compose.yml
 
 ## 启动 milvus 容器
 docker-compose up -d
