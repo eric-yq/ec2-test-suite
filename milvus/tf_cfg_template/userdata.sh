@@ -59,13 +59,13 @@ cd ec2-test-suite/${SUT_NAME}
 bash install-sut.sh ${SUT_NAME}
 
 # 执行 benchmark
-cd /root/ec2-test-suite/benchmark
-bash milvus-benchmark-local.sh 127.0.0.1 Performance768D1M
+# cd /root/ec2-test-suite/benchmark
+# bash milvus-benchmark-local.sh 127.0.0.1 Performance768D1M
 
 ## Disable 服务，这样 reboot 后不会再次执行
 systemctl disable userdata.service
 
-# 停止实例
-INSTANCE_ID=$(ec2-metadata --quiet --instance-id)
-REGION_ID=$(ec2-metadata --quiet --region)
-aws ec2 terminate-instances --instance-ids "${INSTANCE_ID}" --region "${REGION_ID}"
+# # 停止实例
+# INSTANCE_ID=$(ec2-metadata --quiet --instance-id)
+# REGION_ID=$(ec2-metadata --quiet --region)
+# aws ec2 terminate-instances --instance-ids "${INSTANCE_ID}" --region "${REGION_ID}"
