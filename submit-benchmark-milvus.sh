@@ -39,7 +39,7 @@ do
 		echo "[$(date +%Y%m%d.%H%M%S)] Ping latency test, result shows the avg. latency only. Extra option : ${OPT}"
 		ping_result=$(ping -q -c 60 ${INSTANCE_IP_MASTER} | tail -n 1 | awk -F '/' '{print $5 " ms"}') 
 		echo "[$(date +%Y%m%d.%H%M%S)]   ${ins}, ${INSTANCE_IP_MASTER} : ${ping_result}"
-		echo "[$(date +%Y%m%d.%H%M%S)] Sleep 120 seconds before benchmark test..." && sleep 120
+		echo "[$(date +%Y%m%d.%H%M%S)] Sleep 300 seconds before benchmark test..." && sleep 300
 	    ####################################
 		
 		## 执行 Benchmark 测试
