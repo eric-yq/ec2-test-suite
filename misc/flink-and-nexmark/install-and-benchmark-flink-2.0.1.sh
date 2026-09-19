@@ -91,7 +91,7 @@ cp -f nexmark-flink/conf/config.yaml flink/conf/
 
 ## 编辑 Nexmark 配置文件 nexmark-flink/conf/nexmark.yaml
 sed -i "s/nexmark.metric.reporter.host: localhost/nexmark.metric.reporter.host: master/g" nexmark-flink/conf/nexmark.yaml
-sed -i "s/#nexmark.metric.monitor.delay: 3min/nexmark.metric.monitor.delay: 3s/g" nexmark-flink/conf/nexmark.yaml
+sed -i "s/#nexmark.metric.monitor.delay: 3min/nexmark.metric.monitor.delay: 1s/g" nexmark-flink/conf/nexmark.yaml
 
 ## 将 master 节点已安装的软件包通过 scp 命令传输到 worker1/2 节点
 scp -r ~/flink-benchmark ec2-user@worker1:~/
