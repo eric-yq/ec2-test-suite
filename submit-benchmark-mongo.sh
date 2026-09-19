@@ -3,7 +3,7 @@
 # qdrant Benchmark
 os_types="al2023"
 instance_types="$1"
-# instance_types="r8a.2xlarge r8g.2xlarge r8i.2xlarge r7a.2xlarge r7g.2xlarge r7i.2xlarge r6a.2xlarge r6g.2xlarge r6i.2xlarge"
+instance_types="r9g.2xlarge r8a.2xlarge r8g.2xlarge r8i.2xlarge r7a.2xlarge r7g.2xlarge r7i.2xlarge r6a.2xlarge r6g.2xlarge r6i.2xlarge"
 # instance_types="m8a.2xlarge m8g.2xlarge m8i.2xlarge m7a.2xlarge m7g.2xlarge m7i.2xlarge m6a.2xlarge m6g.2xlarge m6i.2xlarge"
 
 if [ "$USE_CPG" = "1" ] ; then
@@ -43,14 +43,14 @@ do
 		
 		# 停止 dool 监控
 		sleep 10
-		# killall ssh dool
+		killall ssh dool
 
 		# 将结果目录打包上传到 S3
 		TIMESTAMP=$(date +%Y%m%d%H%M%S)
 		TARGET_DIR="${SUT_NAME}_${INSTANCE_TYPE}_${TIMESTAMP}"
 		cp -r benchmark-result-files ${TARGET_DIR}	
 		cp screenlog.0 ${TARGET_DIR}/
-		wget http://${INSTANCE_IP_MASTER}:9527/dool-sut.txt -O ${TARGET_DIR}/dool-sut.txt
+		# wget http://${INSTANCE_IP_MASTER}:9527/dool-sut.txt -O ${TARGET_DIR}/dool-sut.txt
 		tar czf ${TARGET_DIR}.tar.gz ${TARGET_DIR}
 		aws s3 cp ${TARGET_DIR}.tar.gz s3://${BENCHMARK_RESULT_BUCKET}/result_${SUT_NAME}/
 		
