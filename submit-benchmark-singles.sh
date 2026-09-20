@@ -3,7 +3,7 @@
 # 待测 EC2 规格和 OS
 os_types="al2023"
 sut_name="$1"  ## specjbb15, ffmpeg, spark, pts, pts_ssd
-instance_types="$2"
+# instance_types="$2"
 
 # instance_types="r8a.2xlarge r8g.2xlarge r8i.2xlarge r7a.2xlarge r7g.2xlarge r7i.2xlarge r6a.2xlarge r6g.2xlarge r6i.2xlarge"
 # instance_types="r9g.4xlarge r8a.4xlarge r8g.4xlarge r8i.4xlarge r7a.4xlarge r7g.4xlarge r7i.4xlarge r6a.4xlarge r6g.4xlarge r6i.4xlarge"
