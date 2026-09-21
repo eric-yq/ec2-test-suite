@@ -92,8 +92,6 @@ install_al2023_dependencies
 cd /root/
 git clone https://github.com/eric-yq/ec2-test-suite.git
 bash ec2-test-suite/tools/setup_nvme_instance_store.sh
-## SSD实例，下列命令不会重复创建/data 目录；如果是 EBS 实例，发现没有本地盘时，将创建/data 目录。
-mkdir -p /data
 
 ## 更新 cmake
 ARCH=$(arch) 
@@ -189,7 +187,7 @@ echo "[INFO] Step1: Start to perform PTS tests ..."
 tests="gmpbench primesieve stream cachebench ramspeed compress-zstd compress-lz4 blosc \
   botan john-the-ripper cython-bench ffmpeg x264 x265 tjbench vvenc blogbench nginx \
   graphics-magick smallpt draco renaissance dacapobench java-scimark2 scimark2 \
-  redis memtier-benchmark valkey keydb dragonflydb pogocache sonicjson simdjson \
+  redis memtier-benchmark valkey keydb dragonflydb pogocache tidb etcd sonicjson simdjson \
   cassandra scylladb mariadb rocksdb influxdb clickhouse duckdb leveldb cockroach couchdb \
   stockfish mt-dgemm perf-bench mlpack mnn whisper-cpp whisperfile opencv \
   "
