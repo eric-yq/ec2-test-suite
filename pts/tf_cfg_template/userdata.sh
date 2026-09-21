@@ -49,6 +49,9 @@ install_al2023_dependencies () {
   yum install -yq glibc blas blas-devel openssl-devel libXext-devel libX11-devel libXaw libXaw-devel mesa-libGL-devel 
   yum install -yq python3 python3-pip python3-devel cargo java-17-amazon-corretto java-17-amazon-corretto-devel
   yum install -yq php8.4 php8.4-cli php-json php8.4-xml perl-IPC-Cmd
+  # 使用 GCC 14 编译
+  yum install -yq gcc14*
+
   pip3 install dool
 
   echo "------ INSTALLING HIGH LEVEL PERFORMANCE TOOLS ------"
@@ -58,11 +61,8 @@ install_al2023_dependencies () {
   yum install -yq perf kernel-devel-$(uname -r) bcc
 
   echo "------ INSTALL ANALYSIS TOOLS AND DEPENDENCIES ------"
-#   curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-#   python3 get-pip.py
   python3 -m pip install pandas numpy scipy matplotlib sh seaborn plotext
-#   git clone https://github.com/brendangregg/FlameGraph.git FlameGraph
-  
+
   echo "------ DONE ------"
 }
 
@@ -118,6 +118,9 @@ echo "export TEST_RESULTS_DESCRIPTION=${PN}" >> /root/.bashrc
 echo "export TEST_RESULTS_NAME=${PN}" >> /root/.bashrc
 ## 设置测试项执行结束后，删除测试项以节省空间
 echo "export REMOVE_TESTS_ON_COMPLETION=TRUE" >> /root/.bashrc
+## 设置 GCC14
+echo "export CC=/usr/bin/gcc14-cc" >> /root/.bashrc
+echo "export CXX=/usr/bin/gcc14-g++" >> /root/.bashrc
 source /root/.bashrc
 
 ## 收集系统信息
@@ -166,7 +169,6 @@ cd ~/phoronix-test-suite/
 ### following command use /usr/share/phoronix-test-suite/pts-core/commands/batch_setup.php
 phoronix-test-suite batch-setup
 
-
 # 安装新测试项目需要的软件包
 yum install -yq lz4-devel lzo-devel libcurl-devel bzip2-devel
 python3 -m pip install sklearn scons
@@ -175,6 +177,8 @@ DOWNLOAD_URL="https://github.com/BtbN/FFmpeg-Builds/releases/download/latest"
 wget ${DOWNLOAD_URL}/${DOWNLOAD_FILE}.tar.xz
 tar xf ${DOWNLOAD_FILE}.tar.xz
 cp ${DOWNLOAD_FILE}/bin/ffmpeg /usr/local/bin/ && rm -rf ${DOWNLOAD_FILE}*
+
+
 
 ## 执行基准测试(标准)
 echo "[INFO] Step1: Start to perform PTS tests ..."

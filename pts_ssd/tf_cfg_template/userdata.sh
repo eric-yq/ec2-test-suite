@@ -49,6 +49,9 @@ install_al2023_dependencies () {
   yum install -yq glibc blas blas-devel openssl-devel libXext-devel libX11-devel libXaw libXaw-devel mesa-libGL-devel 
   yum install -yq python3 python3-pip python3-devel cargo java-17-amazon-corretto java-17-amazon-corretto-devel
   yum install -yq php8.4 php8.4-cli php-json php8.4-xml perl-IPC-Cmd
+  # 使用 GCC 14 编译
+  yum install -yq gcc14*
+  
   pip3 install dool
 
   echo "------ INSTALLING HIGH LEVEL PERFORMANCE TOOLS ------"
@@ -123,6 +126,9 @@ echo "export PTS_DOWNLOAD_CACHE=/data/" >> /root/.bashrc
 echo "export PTS_TEST_INSTALL_ROOT_PATH=/data/" >> /root/.bashrc
 ## 设置测试项执行结束后，删除测试项以节省空间
 echo "export REMOVE_TESTS_ON_COMPLETION=TRUE" >> /root/.bashrc
+## 设置 GCC14
+echo "export CC=/usr/bin/gcc14-cc" >> /root/.bashrc
+echo "export CXX=/usr/bin/gcc14-g++" >> /root/.bashrc
 source /root/.bashrc
 
 ## 收集系统信息
