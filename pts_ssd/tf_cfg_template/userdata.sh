@@ -92,6 +92,8 @@ install_al2023_dependencies
 cd /root/
 git clone https://github.com/eric-yq/ec2-test-suite.git
 bash ec2-test-suite/tools/setup_nvme_instance_store.sh
+## SSD实例，下列命令不会重复创建/data 目录；如果是 EBS 实例，发现没有本地盘时，将创建/data 目录。
+mkdir -p /data
 
 ## 更新 cmake
 ARCH=$(arch) 
@@ -108,7 +110,7 @@ DATA_DIR=~/${PN}_hwinfo_${KERNEL_RELEASE}
 CFG_DIR=${DATA_DIR}/system-infomation
 PTS_RESULT_DIR=${DATA_DIR}/pts-result
 LOG_DIR=${DATA_DIR}/logs
-mkdir -p ${DATA_DIR}  ${CFG_DIR} ${PTS_RESULT_DIR} ${LOG_DIR} /data
+mkdir -p ${DATA_DIR}  ${CFG_DIR} ${PTS_RESULT_DIR} ${LOG_DIR}
 
 echo "export DATA_DIR=${DATA_DIR}" >> /root/.bashrc
 echo "export CFG_DIR=${CFG_DIR}" >> /root/.bashrc
