@@ -108,7 +108,7 @@ DATA_DIR=~/${PN}_hwinfo_${KERNEL_RELEASE}
 CFG_DIR=${DATA_DIR}/system-infomation
 PTS_RESULT_DIR=${DATA_DIR}/pts-result
 LOG_DIR=${DATA_DIR}/logs
-mkdir -p ${DATA_DIR}  ${CFG_DIR} ${PTS_RESULT_DIR} ${LOG_DIR} 
+mkdir -p ${DATA_DIR}  ${CFG_DIR} ${PTS_RESULT_DIR} ${LOG_DIR} /data
 
 echo "export DATA_DIR=${DATA_DIR}" >> /root/.bashrc
 echo "export CFG_DIR=${CFG_DIR}" >> /root/.bashrc
