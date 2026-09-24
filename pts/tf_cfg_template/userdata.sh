@@ -118,6 +118,8 @@ echo "export TEST_RESULTS_DESCRIPTION=${PN}" >> /root/.bashrc
 echo "export TEST_RESULTS_NAME=${PN}" >> /root/.bashrc
 ## 设置测试项执行结束后，删除测试项以节省空间
 echo "export REMOVE_TESTS_ON_COMPLETION=TRUE" >> /root/.bashrc
+## 关闭 checksum
+echo "export NO_FILE_HASH_CHECKS=1" >> /root/.bashrc
 ## 设置 GCC14
 echo "export CC=/usr/bin/gcc14-cc" >> /root/.bashrc
 echo "export CXX=/usr/bin/gcc14-g++" >> /root/.bashrc
@@ -229,24 +231,24 @@ do
 done
 
 ## 特殊任务：执行2次的tests。
-# tests2="scikit-learn"
-# for testname in ${tests2} 
-# do
-#     # 启动一个监控
-#     DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
-#     dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
-#     DOOL_PID=$!
-#     # 执行基准测试
-#     FORCE_TIMES_TO_RUN=2 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
-#     # 保存结果 URL
-#     echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
-#     phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
-#     grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
-#     # 停止监控
-#     kill -9 ${DOOL_PID}
+tests2="scikit-learn"
+for testname in ${tests2} 
+do
+    # 启动一个监控
+    DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
+    dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
+    DOOL_PID=$!
+    # 执行基准测试
+    FORCE_TIMES_TO_RUN=2 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
+    # 保存结果 URL
+    echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
+    phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
+    grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
+    # 停止监控
+    kill -9 ${DOOL_PID}
 
-#     sleep 5
-# done
+    sleep 5
+done
 
 echo "[INFO] Step: Complete ALL PTS TESTS."
 
