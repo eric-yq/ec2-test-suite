@@ -229,24 +229,24 @@ do
 done
 
 ## 特殊任务：执行2次的tests。
-tests2="scikit-learn"
-for testname in ${tests2} 
-do
-    # 启动一个监控
-    DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
-    dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
-    DOOL_PID=$!
-    # 执行基准测试
-    FORCE_TIMES_TO_RUN=2 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
-    # 保存结果 URL
-    echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
-    phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
-    grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
-    # 停止监控
-    kill -9 ${DOOL_PID}
+# tests2="scikit-learn"
+# for testname in ${tests2} 
+# do
+#     # 启动一个监控
+#     DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
+#     dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
+#     DOOL_PID=$!
+#     # 执行基准测试
+#     FORCE_TIMES_TO_RUN=2 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
+#     # 保存结果 URL
+#     echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
+#     phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
+#     grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
+#     # 停止监控
+#     kill -9 ${DOOL_PID}
 
-    sleep 5
-done
+#     sleep 5
+# done
 
 echo "[INFO] Step: Complete ALL PTS TESTS."
 
@@ -257,6 +257,7 @@ df -h  >> ${DATA_DIR}/pts-list-installed-tests.txt
 rm -rf ${LOG_DIR}/*
 cp -r /var/log/cloud-init*.log /var/log/phoronix-test-suite-*.log /var/lib/cloud/ /root/userdata.sh ${LOG_DIR}
 tar czfP ${DATA_DIR}-all.tar.gz ${DATA_DIR}
+aws s3 ls | awk '{print $3}' | grep ec2-core-benchmark | head -1
 aws s3 cp ${DATA_DIR}-all.tar.gz s3://${aws_s3_bucket_name}/result_pts/ && \
 echo "[INFO] Step3: Result files have been uploaded to s3 bucket. BYE BYE."
 
