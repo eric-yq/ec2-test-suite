@@ -180,7 +180,17 @@ wget ${DOWNLOAD_URL}/${DOWNLOAD_FILE}.tar.xz
 tar xf ${DOWNLOAD_FILE}.tar.xz
 cp ${DOWNLOAD_FILE}/bin/ffmpeg /usr/local/bin/ && rm -rf ${DOWNLOAD_FILE}*
 
-
+# 安装 sysbench
+cd /root/
+rpm -Uvh https://repo.mysql.com//mysql80-community-release-el9.rpm
+yum install -y mysql-devel --nogpgcheck
+wget https://github.com/akopytov/sysbench/archive/refs/tags/1.0.20.tar.gz
+tar zxf 1.0.20.tar.gz && rm -rf 1.0.20.tar.gz && cd sysbench-1.0.20
+./autogen.sh
+./configure --with-mysql
+make -j
+make install
+sysbench --version
 
 ## 执行基准测试(标准)
 echo "[INFO] Step1: Start to perform PTS tests ..."
@@ -190,7 +200,7 @@ tests="gmpbench primesieve stream cachebench ramspeed compress-zstd compress-lz4
   graphics-magick smallpt draco renaissance dacapobench java-scimark2 scimark2 \
   redis memtier-benchmark valkey keydb dragonflydb pogocache tidb sonicjson simdjson \
   cassandra scylladb mariadb rocksdb influxdb clickhouse duckdb leveldb cockroach couchdb \
-  stockfish mt-dgemm perf-bench mlpack mnn whisper-cpp whisperfile opencv \
+  c-ray lczero arrayfire stockfish mt-dgemm perf-bench mlpack mnn whisper-cpp whisperfile opencv \
   "
 for testname in ${tests} 
 do
@@ -211,7 +221,7 @@ do
 done
 
 ## 执行时间太长的，设置为只执行 1 次的tests:
-tests1="openssl pyperformance cpp-perf-bench c-ray lczero arrayfire hpcg quantlib"
+tests1="openssl hpcg quantlib"
 for testname in ${tests1} 
 do
     # 启动一个监控
@@ -226,6 +236,67 @@ do
     grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
     # 停止监控
     kill -9 ${DOOL_PID}
+
+    sleep 5
+done
+
+## 需要使用 GCC 低版本的测试项目，OS 中已经安装有 GCC（11） 和 GCC14
+tests1="keydb cpp-perf-bench"
+for testname in ${tests1} 
+do
+    # 启动一个监控
+    DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
+    dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
+    DOOL_PID=$!
+    # 执行基准测试
+    FORCE_TIMES_TO_RUN=1 CC=gcc CXX=g++ \
+      phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
+    # 保存结果 URL
+    echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
+    phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
+    grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
+    # 停止监控
+    kill -9 ${DOOL_PID}
+
+    sleep 5
+done
+
+## pyperformance 需要使用 python 3.10 以上
+tests1="pyperformance"
+for testname in ${tests1} 
+do
+    yum install -yq python3.14*
+    python3.14 -m venv ~/venv-py314
+
+    # 进入 python 3.14 虚拟环境
+    source ~/venv-py314/bin/activate
+    phoronix-test-suite download-test-files pyperformance
+    cd /var/lib/phoronix-test-suite/test-profiles/pts/pyperformance-1.2.0
+    sed -i.bak "s/--user//g" install.sh
+    phoronix-test-suite install pyperformance
+    cd /var/lib/phoronix-test-suite/installed-tests/pts/pyperformance-1.2.0/
+    mkdir -p .local/bin/
+    cp /root/venv-py314/bin/pyperformance .local/bin/
+    
+    cd ~
+    
+    # 启动一个监控
+    DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
+    dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
+    DOOL_PID=$!
+    phoronix-test-suite install ${testname}
+    cd
+    
+    # 执行基准测试
+    FORCE_TIMES_TO_RUN=1 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
+    # 保存结果 URL
+    echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
+    phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
+    grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
+    # 停止监控
+    kill -9 ${DOOL_PID}
+    # 退出python 3.14 虚拟环境
+    deactivate
 
     sleep 5
 done
