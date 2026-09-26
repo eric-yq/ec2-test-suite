@@ -200,7 +200,7 @@ echo "结果文件参数: $result_file"
 
 # 将对应的结果集从 OpenBenchmarking 克隆到本地
 echo "正在克隆结果集 ${result_id} ..."
-if phoronix-test-suite is-result-file-saved "$result_id" 2>/dev/null; then
+if phoronix-test-suite list-saved-results 2>/dev/null | grep -q "$result_id"; then
     echo "结果集 ${result_id} 本地已存在，跳过克隆。"
 else
     phoronix-test-suite clone-result "$result_id" || {
