@@ -176,7 +176,7 @@ else
     echo "结果集 ${result_id} 克隆完成。"
 fi
  
-tests="smallpt"
+tests="byte"
 for testname in ${tests} 
 do
     # 启动一个监控
@@ -184,7 +184,7 @@ do
     dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 30 > ${DOOL_FILE} 2>&1 &
     DOOL_PID=$!
     # 执行基准测试
-    FORCE_TIMES_TO_RUN=3 phoronix-test-suite batch-benchmark ${testname} ${result_file} > ${PTS_RESULT_DIR}/${testname}.txt
+    FORCE_TIMES_TO_RUN=1 phoronix-test-suite batch-benchmark ${testname} ${result_file} > ${PTS_RESULT_DIR}/${testname}.txt
     # 保存结果 URL
     echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
     phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
