@@ -175,24 +175,41 @@ cp ${DOWNLOAD_FILE}/bin/ffmpeg /usr/local/bin/ && rm -rf ${DOWNLOAD_FILE}*
 ###############################################################################
 # 向指定结果集中添加测试项
 case "$PN" in
-    r6a.4xlarge) result_file="--result-file=2609255-NE-R6A4XLARG94" ;;
-    r6g.4xlarge) result_file="--result-file=2609251-NE-R6G4XLARG33" ;;
-    r6i.4xlarge) result_file="--result-file=2609230-NE-R6I4XLARG56" ;;
-    r7a.4xlarge) result_file="--result-file=2609234-NE-R7A4XLARG63" ;;
-    r7g.4xlarge) result_file="--result-file=2609257-NE-R7G4XLARG63" ;;
-    r7i.4xlarge) result_file="--result-file=2609256-NE-R7I4XLARG59" ;;
-    r8a.4xlarge) result_file="--result-file=2609245-NE-R8A4XLARG78" ;;
-    r8g.4xlarge) result_file="--result-file=2609254-NE-R8G4XLARG67" ;;
-    r8i.4xlarge) result_file="--result-file=2609243-NE-R8I4XLARG23" ;;
-    r9g.4xlarge) result_file="--result-file=2609233-NE-R9G4XLARG44" ;;
+    r6a.4xlarge) result_id="2609255-NE-R6A4XLARG94" ;;
+    r6g.4xlarge) result_id="2609251-NE-R6G4XLARG33" ;;
+    r6i.4xlarge) result_id="2609230-NE-R6I4XLARG56" ;;
+    r7a.4xlarge) result_id="2609234-NE-R7A4XLARG63" ;;
+    r7g.4xlarge) result_id="2609257-NE-R7G4XLARG63" ;;
+    r7i.4xlarge) result_id="2609256-NE-R7I4XLARG59" ;;
+    r8a.4xlarge) result_id="2609245-NE-R8A4XLARG78" ;;
+    r8g.4xlarge) result_id="2609254-NE-R8G4XLARG67" ;;
+    r8i.4xlarge) result_id="2609243-NE-R8I4XLARG23" ;;
+    r9g.4xlarge) result_id="2609233-NE-R9G4XLARG44" ;;
     *)
         echo "错误：未知的实例类型 '$PN'，没有对应的 result-file 配置" >&2
-        exit 1 
+        exit 1
         ;;
 esac
+
+# 拼出 --result-file 参数
+result_file="--result-file=${result_id}"
+
 echo "实例类型: $PN"
+echo "结果集 ID: $result_id"
 echo "结果文件参数: $result_file"
 
+# 将对应的结果集从 OpenBenchmarking 克隆到本地
+echo "正在克隆结果集 ${result_id} ..."
+if phoronix-test-suite is-result-file-saved "$result_id" 2>/dev/null; then
+    echo "结果集 ${result_id} 本地已存在，跳过克隆。"
+else
+    phoronix-test-suite clone-result "$result_id" || {
+        echo "错误：克隆结果集 ${result_id} 失败" >&2
+        exit 1
+    }
+    echo "结果集 ${result_id} 克隆完成。"
+fi
+ 
 tests="smallpt"
 for testname in ${tests} 
 do
