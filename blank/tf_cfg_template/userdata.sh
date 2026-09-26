@@ -179,7 +179,7 @@ case "$PN" in
     r6g.4xlarge) result_file="--result-file=2609251-NE-R6G4XLARG33" ;;
     r6i.4xlarge) result_file="--result-file=2609230-NE-R6I4XLARG56" ;;
     r7a.4xlarge) result_file="--result-file=2609234-NE-R7A4XLARG63" ;;
-    r7g.4xlarge) result_file="--result-file=2609257-NE-R7G4XLARG96" ;;
+    r7g.4xlarge) result_file="--result-file=2609257-NE-R7G4XLARG63" ;;
     r7i.4xlarge) result_file="--result-file=2609256-NE-R7I4XLARG59" ;;
     r8a.4xlarge) result_file="--result-file=2609245-NE-R8A4XLARG78" ;;
     r8g.4xlarge) result_file="--result-file=2609254-NE-R8G4XLARG67" ;;
