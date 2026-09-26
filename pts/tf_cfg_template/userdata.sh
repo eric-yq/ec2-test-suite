@@ -278,7 +278,7 @@ do
     mkdir -p .local/bin/
     cp /root/venv-py314/bin/pyperformance .local/bin/
     
-    cd ~
+    cd /root/
     
     # 启动一个监控
     DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
