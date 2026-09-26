@@ -6,40 +6,6 @@
 ## 暂时关闭补丁更新流程
 sudo systemctl stop amazon-ssm-agent
 sudo systemctl disable amazon-ssm-agent
-
-# 实例启动成功之后的首次启动 OS， /root/userdata.sh 不存在，创建该 userdata.sh 文件并设置开启自动执行该脚本。
-if [ ! -f "/root/userdata.sh" ]; then
-    echo "首次启动 OS, 未找到 /root/userdata.sh，准备创建..."
-    # 复制文件
-    cp /var/lib/cloud/instance/scripts/part-001 /root/userdata.sh
-    chmod +x /root/userdata.sh
-    # 创建 systemd 服务单元
-    cat > /etc/systemd/system/userdata.service << EOF
-[Unit]
-Description=Execute userdata script at boot
-After=network.target
-
-[Service]
-Type=oneshot
-User=root
-ExecStart=/root/userdata.sh
-RemainAfterExit=yes
-
-[Install]
-WantedBy=multi-user.target
-EOF
-    # 启用服务
-    systemctl daemon-reload
-    systemctl enable userdata.service
-    
-    echo "已创建并启用 systemd 服务 userdata.service"
-
-    ### 等待 60 秒再执行 userdata 脚本
-    sleep 60
-    systemctl start userdata.service
-    exit 0
-fi
-
 ################################################################################################################ 
 
 SUT_NAME="SUT_XXX"
@@ -175,24 +141,41 @@ cp ${DOWNLOAD_FILE}/bin/ffmpeg /usr/local/bin/ && rm -rf ${DOWNLOAD_FILE}*
 ###############################################################################
 # 向指定结果集中添加测试项
 case "$PN" in
-    r6a.4xlarge) result_file="--result-file=2609255-NE-R6A4XLARG94" ;;
-    r6g.4xlarge) result_file="--result-file=2609251-NE-R6G4XLARG33" ;;
-    r6i.4xlarge) result_file="--result-file=2609230-NE-R6I4XLARG56" ;;
-    r7a.4xlarge) result_file="--result-file=2609234-NE-R7A4XLARG63" ;;
-    r7g.4xlarge) result_file="--result-file=2609257-NE-R7G4XLARG96" ;;
-    r7i.4xlarge) result_file="--result-file=2609256-NE-R7I4XLARG59" ;;
-    r8a.4xlarge) result_file="--result-file=2609245-NE-R8A4XLARG78" ;;
-    r8g.4xlarge) result_file="--result-file=2609254-NE-R8G4XLARG67" ;;
-    r8i.4xlarge) result_file="--result-file=2609243-NE-R8I4XLARG23" ;;
-    r9g.4xlarge) result_file="--result-file=2609233-NE-R9G4XLARG44" ;;
+    r6a.4xlarge) result_id="2609255-NE-R6A4XLARG94" ;;
+    r6g.4xlarge) result_id="2609251-NE-R6G4XLARG33" ;;
+    r6i.4xlarge) result_id="2609230-NE-R6I4XLARG56" ;;
+    r7a.4xlarge) result_id="2609234-NE-R7A4XLARG63" ;;
+    r7g.4xlarge) result_id="2609257-NE-R7G4XLARG63" ;;
+    r7i.4xlarge) result_id="2609256-NE-R7I4XLARG59" ;;
+    r8a.4xlarge) result_id="2609245-NE-R8A4XLARG78" ;;
+    r8g.4xlarge) result_id="2609254-NE-R8G4XLARG67" ;;
+    r8i.4xlarge) result_id="2609243-NE-R8I4XLARG23" ;;
+    r9g.4xlarge) result_id="2609233-NE-R9G4XLARG44" ;;
     *)
         echo "错误：未知的实例类型 '$PN'，没有对应的 result-file 配置" >&2
         exit 1
         ;;
 esac
+
+# 拼出 --result-file 参数
+result_file="--result-file=${result_id}"
+
 echo "实例类型: $PN"
+echo "结果集 ID: $result_id"
 echo "结果文件参数: $result_file"
 
+# 将对应的结果集从 OpenBenchmarking 克隆到本地
+echo "正在克隆结果集 ${result_id} ..."
+if phoronix-test-suite list-saved-results 2>/dev/null | grep -q "$result_id"; then
+    echo "结果集 ${result_id} 本地已存在，跳过克隆。"
+else
+    phoronix-test-suite clone-result "$result_id" || {
+        echo "错误：克隆结果集 ${result_id} 失败" >&2
+        exit 1
+    }
+    echo "结果集 ${result_id} 克隆完成。"
+fi
+ 
 tests="smallpt"
 for testname in ${tests} 
 do
@@ -287,7 +270,7 @@ echo "[INFO] Step3: Result files have been uploaded to s3 bucket. BYE BYE."
 
 
 ## Disable 服务，这样 reboot 后不会再次执行
-systemctl disable userdata.service
+# systemctl disable userdata.service
 
 ## 停止实例
 INSTANCE_ID=$(ec2-metadata --quiet --instance-id)
