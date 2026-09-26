@@ -187,7 +187,7 @@ case "$PN" in
     r9g.4xlarge) result_file="--result-file=2609233-NE-R9G4XLARG44" ;;
     *)
         echo "错误：未知的实例类型 '$PN'，没有对应的 result-file 配置" >&2
-        exit 1
+        exit 1 
         ;;
 esac
 echo "实例类型: $PN"
