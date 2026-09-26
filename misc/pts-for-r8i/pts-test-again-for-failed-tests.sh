@@ -2,9 +2,6 @@
 
 ######################################################################
 ## 使用场景：已经完整过执行了一次PTS多项目测试，但是有一些 test 失败了，重新执行。
-## 并将某个testname的结果追加到某个已知的结果集。
-## 例如：2609235-NE-R6A4XLARG84
-## results="$1"
 ######################################################################
 
 ## 查询 pts-result 目录下已经执行完成的日志文件中的错误信息，
@@ -18,7 +15,7 @@ echo "yuanquan: TEST_RESULTS_IDENTIFIER=${PN}, TEST_RESULTS_DESCRIPTION=${PN}, T
 ## 执行基准测试(标准)
 echo "[INFO] Step1: Start to perform PTS tests ..."
 
-tests="ffmpeg"
+tests="smallpt"
 for testname in ${tests} 
 do
     # 启动一个监控
