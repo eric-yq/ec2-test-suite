@@ -49,7 +49,7 @@ curl "https://awscli.amazonaws.com/awscli-exe-linux-${ARCH}.zip" -o "awscliv2.zi
 unzip -q awscliv2.zip
 ./aws/install
 cp -rf /usr/local/bin/aws /usr/bin/aws
-aws --version
+aws --version 
 
 aws_ak_value="akxxx"
 aws_sk_value="skxxx"
