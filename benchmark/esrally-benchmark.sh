@@ -14,20 +14,18 @@ OPTS=()
 [ "$OFFLINE" = "true" ] && OPTS+=(--offline)
 
 # ============ 定制测试场景 ============
-declare -a FULL_TESTS=(
-    "geonames:append-no-conflicts:冒烟测试-地理空间"
-    "nyc_taxis:aggs:聚合查询(CPU/分支预测/L2缓存)"
-)
-
 # declare -a FULL_TESTS=(
 #     "geonames:append-no-conflicts:冒烟测试-地理空间"
-#     "nyc_taxis:aggs:聚合查询(CPU/分支预测/L2缓存)"
-#     "nyc_taxis:esql:ESQL新查询引擎"
-#     "wikipedia:index-and-search:全文检索综合"
-#     "so_vector:index-and-search:向量检索(SIMD)"
-#     "http_logs:append-no-conflicts:日志场景"
-#     "big5:big5:五大主要场景"
 # )
+
+declare -a FULL_TESTS=(
+    "nyc_taxis:aggs:聚合查询(CPU/分支预测/L2缓存)"
+    "nyc_taxis:esql:ESQL新查询引擎"
+    "wikipedia:index-and-search:全文检索综合"
+    "so_vector:index-and-search:向量检索(SIMD)"
+    "http_logs:append-no-conflicts:日志场景"
+    "big5:big5:五大主要场景"
+)
 # ============ 定制测试场景 - END ============
 
 RESULT_PATH="/root/ec2-test-suite/benchmark-result-files"
@@ -61,7 +59,7 @@ for combo in "${FULL_TESTS[@]}"; do
         --pipeline="${PIPELINE}" \
         --race-id="${RACE_ID}" \
         --on-error=continue --kill-running-processes "${OPTS[@]}" \
-        > ${RESULT_FILE}
+        1>${RESULT_FILE} 2>&1
 
     # 跑完一个 track 后看实际占用
     curl -s "http://${IPADDR}:9200/_cat/indices?v&h=index,docs.count,store.size&s=store.size:desc" >> ${RACE_ID}.log
