@@ -2,7 +2,7 @@
 
 set -uo pipefail
 
-SUT_NAME="elasticsearch_ssd"
+SUT_NAME="es_ssd"
 source /tmp/temp-setting
 
 # ============ 配置区（按需修改）============
@@ -42,12 +42,12 @@ for combo in "${FULL_TESTS[@]}"; do
     echo "-------------------------------------------------------------------"
 
     ttt=$(date +%Y%m%d%H%M%S)
-    RACE_ID=${SUT_NAME}_${INSTANCE_TYPE}_${IPADDR}_-${track}-${challenge}
+    RACE_ID=${SUT_NAME}_${INSTANCE_TYPE}_${IPADDR}_${track}-${challenge}
     RESULT_FILE="${RESULT_PATH}/${RACE_ID}.txt"
 
     ## 启动一个后台进程，执行dool命令，获取系统性能信息
     DOOL_FILE="${RESULT_PATH}/${RACE_ID}_dool-sut.txt"
-    ssh -o StrictHostKeyChecking=no -i ~/.aws/${KEY_NAME}.pem ec2-user@${SUT_IP_ADDR} \
+    ssh -o StrictHostKeyChecking=no -i ~/.aws/${KEY_NAME}.pem ec2-user@${IPADDR} \
       "dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60" \
       1>> ${DOOL_FILE} 2>&1 &
     DOOL_FILE_LOADGEN="${RESULT_PATH}/${RACE_ID}_dool-loadgen.txt"
@@ -55,14 +55,12 @@ for combo in "${FULL_TESTS[@]}"; do
       1>> ${DOOL_FILE_LOADGEN} 2>&1 &
 
     esrally race \
-        --track="$track" \
-        --challenge="$challenge" \
+        --track="${track}" \
+        --challenge="${challenge}" \
         --target-hosts=http://${IPADDR}:9200 \
         --pipeline="${PIPELINE}" \
         --race-id="${RACE_ID}" \
-        --on-error=continue \
-        --kill-running-processes \
-        "${OPTS[@]}" \
+        --on-error=continue --kill-running-processes "${OPTS[@]}" \
         > ${RACE_ID}.log
 
     # 跑完一个 track 后看实际占用
