@@ -9,7 +9,7 @@ source /tmp/temp-setting
 IPADDR="${IPADDR:-127.0.0.1}" # ES 集群地址
 INSTANCE_TYPE="${INSTANCE_TYPE:-unknown}" # EC2 实例类型
 PIPELINE="${PIPELINE:-benchmark-only}"  # benchmark-only=连外部ES；from-distribution=Rally自建
-OFFLINE="${OFFLINE:false}"          # 离线模式
+OFFLINE="${OFFLINE:-false}"          # 离线模式
 OPTS=()
 [ "$OFFLINE" = "true" ] && OPTS+=(--offline)
 
