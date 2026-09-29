@@ -60,16 +60,18 @@ pip3.13 install esrally # --ignore-installed requests
 mkdir -p /root/.rally/benchmarks/tracks 
 cd /root/.rally/benchmarks/tracks 
 git clone https://github.com/elastic/rally-tracks.git
-cp -r rally-tracks/big5 default/
+rm -rf default
+cp -r rally-tracks/ default/
 
 ## 下载数据集
 curl -LsSf https://astral.sh/uv/install.sh | sh
+mkdir -p /root/.rally/benchmarks/data/
 cd /root/.rally/benchmarks/data/
 datasets="geonames nyc_taxis wikipedia so_vector http_logs big5"
 for i in ${datasets}
 do
     echo "[Info] Download Data Set: $i ... "
-    uv run --python 3.13 /root/.rally/benchmarks/tracks/rally-tracks/download.py $i 
+    uv run --python 3.13 /root/.rally/benchmarks/tracks/default/download.py $i 
     sleep 5
 done
 # 解压缩数据集
