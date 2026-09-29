@@ -61,7 +61,7 @@ for combo in "${FULL_TESTS[@]}"; do
         --pipeline="${PIPELINE}" \
         --race-id="${RACE_ID}" \
         --on-error=continue --kill-running-processes "${OPTS[@]}" \
-        > ${RACE_ID}.log
+        > ${RESULT_FILE}
 
     # 跑完一个 track 后看实际占用
     curl -s "http://${IPADDR}:9200/_cat/indices?v&h=index,docs.count,store.size&s=store.size:desc" >> ${RACE_ID}.log
