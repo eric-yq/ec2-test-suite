@@ -21,7 +21,7 @@ cd /root/
 yum install -yq git python3-pip
 pip3 install dool
 # git clone https://github.com/eric-yq/ec2-test-suite.git
-bash ec2-test-suite/tools/setup_nvme_instance_store.sh
+bash /root/ec2-test-suite/tools/setup_nvme_instance_store.sh
 # 如果有本地盘，脚本执行后挂载到 /data；如果没有本地盘，则脚本退出。
 
 # ---------- 4. 装 ES ----------
