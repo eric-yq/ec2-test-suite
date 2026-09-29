@@ -17,12 +17,12 @@ grep -H . /sys/kernel/mm/transparent_hugepage/{enabled,defrag}
 
 # ---------- 3. 本地 NVMe 先挂好,再装包 ----------
 # 设置磁盘lvm stripe
-# cd /root/
-# yum install -yq git python3-pip
-# pip3 install dool
+cd /root/
+yum install -yq git python3-pip
+pip3 install dool
 # git clone https://github.com/eric-yq/ec2-test-suite.git
-# bash ec2-test-suite/tools/setup_nvme_instance_store.sh
-# # 如果有本地盘，脚本执行后挂载到 /data；如果没有本地盘，则脚本退出。
+bash ec2-test-suite/tools/setup_nvme_instance_store.sh
+# 如果有本地盘，脚本执行后挂载到 /data；如果没有本地盘，则脚本退出。
 
 # ---------- 4. 装 ES ----------
 # ElasticSearch 安装信息
