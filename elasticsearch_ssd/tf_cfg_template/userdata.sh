@@ -31,8 +31,8 @@ EOF
     
     echo "已创建并启用 systemd 服务 userdata.service"
 
-    ### 等待 180 秒再执行 userdata 脚本
-    sleep 180
+    ### 等待 60 秒再执行 userdata 脚本
+    sleep 60
     systemctl start userdata.service
     exit 0
 fi
