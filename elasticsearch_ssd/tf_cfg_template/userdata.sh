@@ -39,26 +39,21 @@ fi
 
 ################################################################################################################ 
 
-SUT_NAME="SUT_PTS_SSD"
+SUT_NAME="SUT_ELASTICSEARCH_SSD"
 
-# 配置 AWSCLI
-cd /root/
-yum remove -y awscli
-ARCH=$(arch)
-curl "https://awscli.amazonaws.com/awscli-exe-linux-${ARCH}.zip" -o "awscliv2.zip"
-unzip -q awscliv2.zip
-./aws/install
-cp -rf /usr/local/bin/aws /usr/bin/aws
-aws --version 
+# ---------- 1. sysctl(覆盖 RPM 自带的 262144) ----------
+cat > /etc/sysctl.d/99-elasticsearch-bench.conf <<'EOF'
+vm.max_map_count = 1048576
+vm.swappiness = 1
+net.core.somaxconn = 4096
+EOF
+sysctl --system
 
-aws_ak_value="akxxx"
-aws_sk_value="skxxx"
-aws_region_name=$(ec2-metadata --quiet --region)
-aws configure set aws_access_key_id ${aws_ak_value}
-aws configure set aws_secret_access_key ${aws_sk_value}
-aws configure set default.region ${aws_region_name}
-aws_s3_bucket_name=$(aws s3 ls | awk '{print $3}' | grep ec2-core-benchmark | head -1)
+# ---------- 2. THP:开大页,不碰 defrag ----------
+echo always > /sys/kernel/mm/transparent_hugepage/enabled
+grep -H . /sys/kernel/mm/transparent_hugepage/{enabled,defrag}
 
+# ---------- 3. 本地 NVMe 先挂好,再装包 ----------
 # 设置磁盘lvm stripe
 cd /root/
 yum install -yq git
@@ -66,36 +61,19 @@ git clone https://github.com/eric-yq/ec2-test-suite.git
 bash ec2-test-suite/tools/setup_nvme_instance_store.sh
 # 如果有本地盘，脚本执行后挂载到 /data；如果没有本地盘，则脚本退出。
 
-
-## 设置一些系统参数
-echo "* soft nofile 65536" >> /etc/security/limits.conf
-echo "* hard nofile 131072" >> /etc/security/limits.conf
-echo "* soft nproc 4096" >> /etc/security/limits.conf
-echo "* hard nproc 4096" >> /etc/security/limits.conf
-echo "vm.max_map_count=262145" >> /etc/sysctl.conf
-sysctl -p 
-echo always > /sys/kernel/mm/transparent_hugepage/enabled
-echo always > /sys/kernel/mm/transparent_hugepage/defrag
-
+# ---------- 4. 装 ES ----------
 # ElasticSearch 安装信息
 VERSION="8.19.22"
-esuser="ec2-user"
+esuser="elasticsearch"
 IPADDR="$(hostname -i)"
 NODENAME=node-$RANDOM
-ESROOTDISK="/data"  
+ESROOTDISK="/data" 
 
 # 安装目录
-cd /root/
-ARCH=$(arch)
-wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${VERSION}-linux-${ARCH}.tar.gz
-tar zxf elasticsearch-${VERSION}-linux-${ARCH}.tar.gz
-mv elasticsearch-${VERSION} $ESROOTDISK/elasticsearch
-mkdir -p $ESROOTDISK/elasticsearch/data
-mkdir -p $ESROOTDISK/elasticsearch/logs
-chown -R $esuser:$esuser $ESROOTDISK/elasticsearch
+mkdir -p /etc/elasticsearch/
 
 ## 生成 ES 配置文件
-cat << EOF > $ESROOTDISK/elasticsearch/config/elasticsearch.yml
+cat > /etc/elasticsearch/elasticsearch.yml << EOF
 # ==========================================================
 # Elasticsearch 8.19.x — 单机 benchmark 配置
 # ==========================================================
@@ -151,21 +129,41 @@ cluster.routing.allocation.disk.watermark.high: 95%
 cluster.routing.allocation.disk.watermark.flood_stage: 97%
 EOF
 
-# 启动 
-su ${esuser} -c "$ESROOTDISK/elasticsearch/bin/elasticsearch -d -p pid"
+# 生成 jvm 选项
+mkdir -p /etc/elasticsearch/jvm.options.d/
+cat > /etc/elasticsearch/jvm.options.d/bench.options << EOF
+-Xms26g
+-Xmx26g
+-XX:+AlwaysPreTouch
+-Xlog:gc*:file=$ESROOTDISK/elasticsearch/logs/gc.log:utctime,pid,tags:filecount=8,filesize=64m
+EOF
+
+# 安装 ES
+rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
+cat > /etc/yum.repos.d/elasticsearch.repo <<'EOF'
+[elasticsearch]
+name=Elasticsearch repository for 8.x packages
+baseurl=https://artifacts.elastic.co/packages/8.x/yum
+gpgcheck=1
+gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
+enabled=0
+autorefresh=1
+type=rpm-md
+EOF
+dnf install -y --enablerepo=elasticsearch "elasticsearch-${VERSION}"
+ 
+mkdir -p $ESROOTDISK/elasticsearch/data
+mkdir -p $ESROOTDISK/elasticsearch/logs
+chown -R $esuser:$esuser $ESROOTDISK/elasticsearch
+chown root:elasticsearch /etc/elasticsearch/elasticsearch.yml /etc/elasticsearch/jvm.options.d/bench.options
+chmod 660 /etc/elasticsearch/elasticsearch.yml /etc/elasticsearch/jvm.options.d/bench.options
+
+# ---------- 6. 启动 ----------
+systemctl daemon-reload
+systemctl enable --now elasticsearch
 echo "[$(date)] Wait for ElasticSearch start successfully."
 sleep 10
 curl -XGET http://$IPADDR:9200/_cat/health?v
-
-
-
-## 停止并清理数据：先停止其他节点，最后停止 master节点
-# kill -9 $(cat /home/${esuser}/elasticsearch/pid)
-# rm -rf /home/${esuser}/elasticsearch/data
-
-# IPADDR=$(ifconfig | grep "inet " | grep -v "127.0.0.1" | awk -F " " '{print $2}')
-# IPADDR=$(hostname -i)
-
 
 ## Disable 服务，这样 reboot 后不会再次执行
 systemctl disable userdata.service
