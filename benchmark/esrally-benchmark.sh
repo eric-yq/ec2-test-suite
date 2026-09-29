@@ -42,6 +42,7 @@ for combo in "${FULL_TESTS[@]}"; do
     ttt=$(date +%Y%m%d%H%M%S)
     RACE_ID=${SUT_NAME}_${INSTANCE_TYPE}_${IPADDR}_${track}-${challenge}
     RESULT_FILE="${RESULT_PATH}/${RACE_ID}.txt"
+    REPORT_FILE="${RESULT_PATH}/${RACE_ID}_report.txt"
 
     ## 启动一个后台进程，执行dool命令，获取系统性能信息
     DOOL_FILE="${RESULT_PATH}/${RACE_ID}_dool-sut.txt"
@@ -59,6 +60,7 @@ for combo in "${FULL_TESTS[@]}"; do
         --pipeline="${PIPELINE}" \
         --race-id="${RACE_ID}" \
         --on-error=continue --kill-running-processes "${OPTS[@]}" \
+        --report-format=csv --report-file=${REPORT_FILE}
         1>${RESULT_FILE} 2>&1
 
     # 跑完一个 track 后看实际占用
