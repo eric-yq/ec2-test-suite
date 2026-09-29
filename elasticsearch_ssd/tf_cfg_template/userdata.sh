@@ -96,33 +96,59 @@ chown -R $esuser:$esuser $ESROOTDISK/elasticsearch
 
 ## 生成 ES 配置文件
 cat << EOF > $ESROOTDISK/elasticsearch/config/elasticsearch.yml
-bootstrap.memory_lock: false
-bootstrap.system_call_filter: true
-cluster.name: es-cluster
-cluster.initial_master_nodes: ["${IPADDR}"]
-cluster.routing.allocation.same_shard.host: true 
-discovery.seed_hosts: ["${IPADDR}"]
-discovery.zen.ping_timeout: 90s
-discovery.zen.fd.ping_interval: 10s
-discovery.zen.fd.ping_timeout: 120s 
-discovery.zen.fd.ping_retries: 12
+# ==========================================================
+# Elasticsearch 8.19.x — 单机 benchmark 配置
+# ==========================================================
+
+# ---------- 集群与节点 ----------
+cluster.name: es-bench
+node.name: node-26723
+
+# 只保留必要角色: 去掉 ml / transform 减少后台开销;
+# 保留 ingest —— 部分 Rally track 会用 ingest pipeline, 缺这个角色会失败
+node.roles: [ master, data, ingest ]
+
+# ---------- 单机发现 ----------
+# 用 single-node 直接跳过选主流程, 不要再配 initial_master_nodes / seed_hosts
+discovery.type: single-node
+
+# ---------- 网络 ----------
 network.host: ${IPADDR}
-network.bind_host: ${IPADDR}
-network.publish_host: ${IPADDR}
-node.name: ${NODENAME}
-node.master: true
-node.data: true
 http.port: 9200
+
+# ---------- 路径 ----------
+# 确认这是本地 NVMe 挂载点, 不是 EBS 根卷
 path.data: $ESROOTDISK/elasticsearch/data
 path.logs: $ESROOTDISK/elasticsearch/logs
-indices.query.bool.max_clause_count : 2048 
-indices.memory.index_buffer_size: 30% 
-indices.fielddata.cache.size: 40%
-indices.breaker.fielddata.limit: 70%
-indices.recovery.max_bytes_per_sec: 20mb 
+
+# ---------- 安全: 关闭, 让 Rally 走明文 HTTP ----------
+xpack.security.enabled: false
+
+# ---------- 关掉 benchmark 不需要的后台组件, 降低噪声 ----------
+xpack.ml.enabled: false
+xpack.watcher.enabled: false
+xpack.monitoring.collection.enabled: false
+
+# ---------- 内存 ----------
+bootstrap.memory_lock: false
+
+# ---------- 索引写入 ----------
+indices.memory.index_buffer_size: 30%
+
+# ---------- 熔断器: 避免压测中被误触发中断测试 ----------
 indices.breaker.total.use_real_memory: false
-thread_pool.write.queue_size: 1000
-action.auto_create_index: .monitoring*,.watches,.triggered_watches,.watcher-history*,.ml*
+indices.breaker.fielddata.limit: 70%
+indices.fielddata.cache.size: 40%
+
+# ---------- 查询 ----------
+indices.query.bool.max_clause_count: 2048
+
+# ---------- 磁盘水位: 大数据集 track 必调 ----------
+# 默认 flood_stage 95% 触发后索引变只读, benchmark 会直接失败
+cluster.routing.allocation.disk.threshold_enabled: true
+cluster.routing.allocation.disk.watermark.low: 90%
+cluster.routing.allocation.disk.watermark.high: 95%
+cluster.routing.allocation.disk.watermark.flood_stage: 97%
 EOF
 
 # 启动 
