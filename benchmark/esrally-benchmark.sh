@@ -66,13 +66,14 @@ for combo in "${FULL_TESTS[@]}"; do
       1>> ${DOOL_FILE_LOADGEN} 2>&1 &
 
     esrally race \
-        --track="${track}" \
-        --challenge="${challenge}" \
+        --race-id="${RACE_ID}" \
         --target-hosts=http://${IPADDR}:9200 \
         --pipeline="${PIPELINE}" \
-        --race-id="${RACE_ID}" \
+        --track="${track}" \
+        --track-params="number_of_replicas:0" \
+        --challenge="${challenge}" \
         --on-error=continue --kill-running-processes "${OPTS[@]}" \
-        --report-format=csv --report-file=${REPORT_FILE}
+        --report-format=csv --report-file=${REPORT_FILE} \
         1>${RESULT_FILE} 2>&1
 
     # 跑完一个 track 后看实际占用
