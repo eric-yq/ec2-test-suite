@@ -19,12 +19,13 @@ OPTS=()
 # )
 
 declare -a FULL_TESTS=(
+    "big5:big5:五大主要场景"
     "nyc_taxis:aggs:聚合查询(CPU/分支预测/L2缓存)"
     "nyc_taxis:esql:ESQL新查询引擎"
     "wikipedia:index-and-search:全文检索综合"
     "so_vector:index-and-search:向量检索(SIMD)"
     "http_logs:append-no-conflicts:日志场景"
-    "big5:big5:五大主要场景"
+    
 )
 # ============ 定制测试场景 - END ============
 
@@ -71,6 +72,7 @@ for combo in "${FULL_TESTS[@]}"; do
     # curl -sX DELETE "http://${IPADDR}:9200/${track}" && echo "已删除: $track" >> ${RESULT_FILE}
     # 等待段文件真正释放
     sleep 10 && curl -s "http://${IPADDR}:9200/_cat/allocation?v" >> ${RESULT_FILE}
+    echo "[Info]: Complete benchmark for $track ." >> ${RESULT_FILE}
     
     # 关闭dool 日志文件
     killall ssh dool
