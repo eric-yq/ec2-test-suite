@@ -64,12 +64,15 @@ for combo in "${FULL_TESTS[@]}"; do
         1>${RESULT_FILE} 2>&1
 
     # 跑完一个 track 后看实际占用
-    curl -s "http://${IPADDR}:9200/_cat/indices?v&h=index,docs.count,store.size&s=store.size:desc" >> ${RACE_ID}.log
-    curl -s "http://${IPADDR}:9200/_cat/allocation?v&h=node,disk.used,disk.avail,disk.percent" >> ${RACE_ID}.log
+    curl -s "http://${IPADDR}:9200/_cat/indices?v&h=index,docs.count,store.size&s=store.size:desc" >> ${RESULT_FILE}
+    curl -s "http://${IPADDR}:9200/_cat/allocation?v&h=node,disk.used,disk.avail,disk.percent" >> ${RESULT_FILE}
 
     # 删除 track 在 ES 中的数据
-    curl -sX DELETE "http://${IPADDR}:9200/${track}" && echo "已删除: $track" >> ${RACE_ID}.log
+    # curl -sX DELETE "http://${IPADDR}:9200/${track}" && echo "已删除: $track" >> ${RESULT_FILE}
     # 等待段文件真正释放
-    sleep 10 && curl -s "http://${IPADDR}:9200/_cat/allocation?v" >> ${RACE_ID}.log
+    sleep 10 && curl -s "http://${IPADDR}:9200/_cat/allocation?v" >> ${RESULT_FILE}
+    
+    # 关闭dool 日志文件
+    killall ssh dool
 
 done
