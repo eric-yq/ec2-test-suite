@@ -67,7 +67,8 @@ cp -r rally-tracks/ default/
 curl -LsSf https://astral.sh/uv/install.sh | sh
 mkdir -p /root/.rally/benchmarks/data/
 cd /root/.rally/benchmarks/data/
-datasets="geonames nyc_taxis wikipedia so_vector http_logs big5"
+datasets="nyc_taxis http_logs wikipedia so_vector wiki_en_cohere_vector_int8 \
+          msmarco-passage-ranking k8s_metrics sql joins"
 for i in ${datasets}
 do
     echo "[Info] Download Data Set: $i ... "
