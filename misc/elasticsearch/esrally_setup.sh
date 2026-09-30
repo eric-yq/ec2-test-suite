@@ -63,7 +63,7 @@ git clone https://github.com/elastic/rally-tracks.git
 rm -rf default
 cp -r rally-tracks/ default/
 
-## 下载数据集
+## 首次下载数据集
 curl -LsSf https://astral.sh/uv/install.sh | sh
 mkdir -p /root/.rally/benchmarks/data/
 cd /root/.rally/benchmarks/data/
@@ -83,3 +83,10 @@ do
     lbzip2 -dk -n $(nproc) *.bz2 && rm -rf *.bz2
     cd ..
 done
+
+### 实例停止后，再启动后数据丢失
+cd /root
+bash ec2-test-suite/tools/setup_nvme_instance_store.sh
+mkdir -p $ESROOTDISK/esrally_benchmark /root/.rally 
+cd /data/esrally_benchmark
+s5cmd cp s3://ec2-core-benchmark-ericyq/esrally_benchmark/ .
