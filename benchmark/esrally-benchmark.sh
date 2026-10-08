@@ -22,8 +22,6 @@ declare -a FULL_TESTS=(
     "nyc_taxis:append-no-conflicts-index-only:HIGH:写入吞吐(内存带宽+SSD写)"
     "nyc_taxis:aggs:LOW:聚合查询(CPU/分支预测/L2缓存)"
     "nyc_taxis:esql:LOW:ESQL新查询引擎"
-    "http_logs:append-no-conflicts:HIGH:日志写入+查询混合"
-    "http_logs:append-no-conflicts-index-only:HIGH:日志纯写入(SSD写)"
     "wikipedia:index-and-search:MED:全文检索综合"
     "so_vector:index-and-search:MED:StackOverflow向量检索(SIMD)"
     "wiki_en_cohere_vector_int8:index-and-search:MED:int8量化向量检索"
@@ -36,6 +34,8 @@ declare -a FULL_TESTS=(
 )
 # 其他track
 # "big5:big5:五大主要场景"  ### 数据量太大，1TB 左右，build index 时长过长。
+# "http_logs:append-no-conflicts:HIGH:日志写入+查询混合"
+# "http_logs:append-no-conflicts-index-only:HIGH:日志纯写入(SSD写)"
 
 
 # ============ 定制测试场景 - END ============

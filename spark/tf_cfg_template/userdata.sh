@@ -403,8 +403,8 @@ cd $HOME/hive-testbench/spark-queries-tpcds
 LIST=$(ls *.sql)
 # LIST="q1.sql q2.sql q3.sql"
 for i in $LIST; do
-    RESULT_LOG="$RESULT_PATH/$i.log"
-    RESULT_OUT="$RESULT_PATH/$i.out"
+    RESULT_LOG="$RESULT_PATH/$i.log.txt"
+    RESULT_OUT="$RESULT_PATH/$i.out.txt"
     spark-sql --driver-memory 4G --database tpcds_bin_partitioned_orc_$SF -f $i \ 1>$RESULT_OUT 2>$RESULT_LOG
     execution_time=$(grep "Time taken" $RESULT_LOG)
     echo "[$(date +%Y%m%d-%H%M%S)] $i : $execution_time " >> $RESULT_SUMMARY
