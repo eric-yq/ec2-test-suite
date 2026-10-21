@@ -53,9 +53,10 @@ set -x
 
 SUT_NAME="SUT_XXX"
 
+apt install -y unzip amazon-ec2-utils
+
 # 配置 AWSCLI
 cd /root/
-yum remove -y awscli
 ARCH=$(arch)
 curl "https://awscli.amazonaws.com/awscli-exe-linux-${ARCH}.zip" -o "awscliv2.zip"
 unzip -q awscliv2.zip
@@ -65,19 +66,21 @@ aws --version
 
 aws_ak_value="akxxx"
 aws_sk_value="skxxx"
-aws_region_name=$(ec2-metadata --quiet --region)
+# Ubuntu下 ec2-metadata 没有 --region 参数
+# aws_region_name=$(ec2-metadata --quiet --region)
+# Ubuntu 下还是用 cloud-init , 
+aws_region_name=$(cloud-init query region)
 aws configure set aws_access_key_id ${aws_ak_value}
 aws configure set aws_secret_access_key ${aws_sk_value}
 aws configure set default.region ${aws_region_name}
 aws_s3_bucket_name=$(aws s3 ls | awk '{print $3}' | grep ec2-core-benchmark | head -1)
 
-
 ## 获取代码
 cd /root/
 git clone https://github.com/eric-yq/ec2-test-suite.git
 
-cd ec2-test-suite/${SUT_NAME}
-bash install-sut.sh ${SUT_NAME}
+# 执行
+bash ec2-test-suite/${SUT_NAME}/install-sut.sh
 
 ## Disable 服务，这样 reboot 后不会再次执行
 systemctl disable userdata.service
