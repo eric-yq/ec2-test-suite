@@ -98,8 +98,9 @@ if [ "$PM" = apt ]; then
   # 先等 cloud-init 收尾,再给 apt 一个锁等待超时,双重保险。
   log "    等待 cloud-init 结束"
   sudo cloud-init status --wait >>"$LOG" 2>&1 || true
-  APT_OPTS=(-y -qq -o DPkg::Lock::Timeout=600)
-  sudo apt-get update -qq -o DPkg::Lock::Timeout=600 >>"$LOG" 2>&1
+  #APT_OPTS=(-y -qq -o DPkg::Lock::Timeout=600)
+  APT_OPTS=(-y -qq)
+  sudo apt-get update -qq >>"$LOG" 2>&1
   sudo apt-get "${APT_OPTS[@]}" install \
     git curl ca-certificates \
     libnss3 libdbus-1-3 libatk1.0-0t64 libasound2t64 libxrandr2 \
