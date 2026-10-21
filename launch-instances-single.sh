@@ -7,7 +7,7 @@ while getopts 's:t:o:e:' OPT; do
     case $OPT in
         s) SUT_NAME="$OPTARG";;
         t) INSTANCE_TYPE="$OPTARG";;
-        o) OS_TYPE="$OPTARG";;  ## al2, al2023, ubuntu2004, ubuntu2204
+        o) OS_TYPE="$OPTARG";;  ## al2023, ubuntu2204/ubuntu2404/ubuntu2604
     esac
 done
 

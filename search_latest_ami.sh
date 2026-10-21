@@ -6,7 +6,7 @@
 
 source /tmp/temp-setting
 
-## 查询实例类型的 CPU 架构 arm64, x86_64，根据CPU 架构查询最新的 Amazon Linux 2 的 AMI
+## 查询实例类型的 CPU 架构 arm64, x86_64，根据CPU 架构查询最新的 AMI
 CPU_ARCH=$(aws ec2 describe-instance-types \
   --region ${REGION_NAME}  \
   --instance-types ${INSTANCE_TYPE} \
@@ -26,28 +26,37 @@ INSTANCE_MEM_SIZE=$(aws ec2 describe-instance-types \
   --query InstanceTypes[0].MemoryInfo.SizeInMiB \
   --output text)
 
-AMI_OWNERS="--owners amazon"
-
-### Amazon Linux 2: al2 
+### Amazon Linux 2023
 if   [[ "${OS_TYPE}" == "al2023" ]]; then
-	
+	  AMI_OWNERS="--owners amazon"
     AMI_NAME="al2023-ami-2023.*-kernel-6.18-${CPU_ARCH}"
     
-### Ubuntu: ubuntu2004, ubuntu2204
-elif [[ "${CPU_ARCH}" == "arm64" ]] && [[ "${OS_TYPE}" == "ubuntu2004" ]]; then
+### Ubuntu
+### ubuntu2604
+elif [[ "${CPU_ARCH}" == "arm64" ]] && [[ "${OS_TYPE}" == "ubuntu2604" ]]; then
+    AMI_OWNERS="--owners 099720109477"
+    AMI_NAME="ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-arm64-server-*"
+    
+elif [[ "${CPU_ARCH}" == "x86_64" ]] && [[ "${OS_TYPE}" == "ubuntu2604" ]]; then
+    AMI_OWNERS="--owners 099720109477"
+    AMI_NAME="ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"
 
-    AMI_NAME="ubuntu/images/hvm-ssd/ubuntu-focal-20.04-arm64-server-*"
+### ubuntu2404
+elif [[ "${CPU_ARCH}" == "arm64" ]] && [[ "${OS_TYPE}" == "ubuntu2404" ]]; then
+    AMI_OWNERS="--owners 099720109477"
+    AMI_NAME="ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-arm64-server-*"
+    
+elif [[ "${CPU_ARCH}" == "x86_64" ]] && [[ "${OS_TYPE}" == "ubuntu2404" ]]; then
+    AMI_OWNERS="--owners 099720109477"
+    AMI_NAME="ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"
 
+### ubuntu2204
 elif [[ "${CPU_ARCH}" == "arm64" ]] && [[ "${OS_TYPE}" == "ubuntu2204" ]]; then
-
+    AMI_OWNERS="--owners 099720109477"
     AMI_NAME="ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-arm64-server-*"
     
-elif [[ "${CPU_ARCH}" == "x86_64" ]] && [[ "${OS_TYPE}" == "ubuntu2004" ]]; then
-
-    AMI_NAME="ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"
-    
 elif [[ "${CPU_ARCH}" == "x86_64" ]] && [[ "${OS_TYPE}" == "ubuntu2204" ]]; then
-    
+    AMI_OWNERS="--owners 099720109477"
     AMI_NAME="ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"
     
 ### Others 
