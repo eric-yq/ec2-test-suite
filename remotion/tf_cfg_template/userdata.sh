@@ -72,3 +72,4 @@ bash ec2-test-suite/${SUT_NAME}/install-sut.sh
 
 ## Disable 服务，这样 reboot 后不会再次执行
 systemctl disable userdata.service
+

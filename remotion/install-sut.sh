@@ -581,3 +581,20 @@ log "=== 完成 ==="
 log "单条成片耗时 : ${MEAN}s (σ ${SD:-?})"
 log "吞吐         : ${THRU} 条/小时"
 cat "$RESULT_JSON"
+
+###########################################################3
+## 汇总结果并打包
+cd /root/
+instance_type=$(ec2-metadata --quiet --instance-type)
+timestamp=$(date +%Y%m%d-%H%M%S)
+archive="remotion_result_${instance_type}_${timestamp}"
+mkdir -p ${archive}
+cp t3-benchmark-raw.txt t3-run.log t3-result.json ${archive}
+tar czf ${archive}.tar.gz ${archive}/
+aws_s3_bucket_name=$(aws s3 ls | awk '{print $3}' | grep ec2-core-benchmark | head -1)
+aws s3 cp ${archive}.tar.gz s3://${aws_s3_bucket_name}/result_remotion/
+
+# 停止实例
+INSTANCE_ID=$(ec2-metadata --quiet --instance-id)
+REGION_ID=$(cloud-init query region)
+aws ec2 stop-instances --instance-ids "${INSTANCE_ID}" --region "${REGION_ID}"
