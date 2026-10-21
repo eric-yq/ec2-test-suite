@@ -102,13 +102,13 @@ if [ "$PM" = apt ]; then
   APT_OPTS=(-y -qq)
   sudo apt-get update -qq >>"$LOG" 2>&1
   sudo apt-get "${APT_OPTS[@]}" install \
-    git curl ca-certificates \
+    git curl ca-certificates python3-pip \
     libnss3 libdbus-1-3 libatk1.0-0t64 libasound2t64 libxrandr2 \
     libxkbcommon0 libxfixes3 libxcomposite1 libxdamage1 libgbm1 \
     libcups2t64 libcairo2 libpango-1.0-0 libatk-bridge2.0-0t64 \
     fontconfig >>"$LOG" 2>&1 \
   || sudo apt-get "${APT_OPTS[@]}" install \
-    git curl ca-certificates \
+    git curl ca-certificates python3-pip \
     libnss3 libdbus-1-3 libatk1.0-0 libasound2 libxrandr2 \
     libxkbcommon0 libxfixes3 libxcomposite1 libxdamage1 libgbm1 \
     libcups2 libcairo2 libpango-1.0-0 libatk-bridge2.0-0 \
@@ -597,4 +597,4 @@ aws s3 cp ${archive}.tar.gz s3://${aws_s3_bucket_name}/result_remotion/
 # 停止实例
 INSTANCE_ID=$(ec2-metadata --quiet --instance-id)
 REGION_ID=$(cloud-init query region)
-aws ec2 stop-instances --instance-ids "${INSTANCE_ID}" --region "${REGION_ID}"
+aws ec2 terminate-instances --instance-ids "${INSTANCE_ID}" --region "${REGION_ID}"
