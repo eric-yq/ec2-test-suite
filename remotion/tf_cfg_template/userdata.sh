@@ -1,22 +1,20 @@
 #!/bin/bash
-# 统一日志去处:两条调用路径(cloud-init 首次 / systemd 重启后)都写同一个文件
 
-exec >> /var/log/userdata.log 2>&1
-echo "=== userdata start $(date -Is) boot=$(cat /proc/sys/kernel/random/boot_id | head -c8) ==="
+## 暂时关闭补丁更新流程
+sudo systemctl stop amazon-ssm-agent
+sudo systemctl disable amazon-ssm-agent
 
-SENTINEL=/root/.userdata-done
-
-# ---------- 首次启动:自我注册成开机服务,然后给重启一个机会 ----------
+# 实例启动成功之后的首次启动 OS， /root/userdata.sh 不存在，创建该 userdata.sh 文件并设置开启自动执行该脚本。
 if [ ! -f "/root/userdata.sh" ]; then
-    echo "首次启动,安装 userdata.service"
-    cp "$0" /root/userdata.sh        # 用 $0,不写死 part-001
+    echo "首次启动 OS, 未找到 /root/userdata.sh，准备创建..."
+    # 复制文件
+    cp /var/lib/cloud/instance/scripts/part-001 /root/userdata.sh
     chmod +x /root/userdata.sh
-
-    cat > /etc/systemd/system/userdata.service <<'EOF'
+    # 创建 systemd 服务单元
+    cat > /etc/systemd/system/userdata.service << EOF
 [Unit]
 Description=Execute userdata script at boot
-After=network-online.target
-Wants=network-online.target
+After=network.target
 
 [Service]
 Type=oneshot
@@ -27,29 +25,19 @@ RemainAfterExit=yes
 [Install]
 WantedBy=multi-user.target
 EOF
-
+    # 启用服务
     systemctl daemon-reload
     systemctl enable userdata.service
+    
+    echo "已创建并启用 systemd 服务 userdata.service"
 
-    # 给自动更新的重启留 10 分钟:
-    #   重启了   -> 本进程随机器消失,服务在新 boot 自动跑(这才是主路径)
-    #   没重启   -> 说明大概率是 AL2023,自己触发
-    echo "等待 600s,给自动重启留出窗口"
+    ### 等待 600 秒再执行 userdata 脚本
     sleep 600
-    echo "600s 内未重启,主动触发 userdata.service"
     systemctl start userdata.service
     exit 0
 fi
 
-# ---------- 真实工作:只跑一次 ----------
-if [ -f "$SENTINEL" ]; then
-    echo "已执行过($(cat "$SENTINEL")),跳过"
-    exit 0
-fi
-
-set -x
-
-#=========================================================
+################################################################################################################ 
 
 SUT_NAME="SUT_XXX"
 
@@ -84,9 +72,3 @@ bash ec2-test-suite/${SUT_NAME}/install-sut.sh
 
 ## Disable 服务，这样 reboot 后不会再次执行
 systemctl disable userdata.service
-
-# ... 其余工作 ...
-
-# 完成标记:既防跨 boot 重跑,也给编排侧一个明确信号
-date -Is > "$SENTINEL"
-echo "=== userdata done $(date -Is) ==="
