@@ -35,17 +35,17 @@ if   [[ "${OS_TYPE}" == "al2023" ]]; then
 ### ubuntu2604
 elif [[ "${CPU_ARCH}" == "arm64" ]] && [[ "${OS_TYPE}" == "ubuntu2604" ]]; then
     AMI_OWNERS="--owners 099720109477"
-    AMI_NAME="ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-arm64-server-*"
+    AMI_NAME="ubuntu/images/hvm-ssd-gp3/ubuntu-resolute-26.04-arm64-server-*"
     
 elif [[ "${CPU_ARCH}" == "x86_64" ]] && [[ "${OS_TYPE}" == "ubuntu2604" ]]; then
     AMI_OWNERS="--owners 099720109477"
-    AMI_NAME="ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"
+    AMI_NAME="ubuntu/images/hvm-ssd-gp3/ubuntu-resolute-26.04-arm64-server-*"
 
 ### ubuntu2404
 elif [[ "${CPU_ARCH}" == "arm64" ]] && [[ "${OS_TYPE}" == "ubuntu2404" ]]; then
     AMI_OWNERS="--owners 099720109477"
     AMI_NAME="ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-arm64-server-*"
-    
+
 elif [[ "${CPU_ARCH}" == "x86_64" ]] && [[ "${OS_TYPE}" == "ubuntu2404" ]]; then
     AMI_OWNERS="--owners 099720109477"
     AMI_NAME="ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"
