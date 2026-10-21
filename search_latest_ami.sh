@@ -39,7 +39,7 @@ elif [[ "${CPU_ARCH}" == "arm64" ]] && [[ "${OS_TYPE}" == "ubuntu2604" ]]; then
     
 elif [[ "${CPU_ARCH}" == "x86_64" ]] && [[ "${OS_TYPE}" == "ubuntu2604" ]]; then
     AMI_OWNERS="--owners 099720109477"
-    AMI_NAME="ubuntu/images/hvm-ssd-gp3/ubuntu-resolute-26.04-arm64-server-*"
+    AMI_NAME="ubuntu/images/hvm-ssd-gp3/ubuntu-resolute-26.04-amd64-server-*"
 
 ### ubuntu2404
 elif [[ "${CPU_ARCH}" == "arm64" ]] && [[ "${OS_TYPE}" == "ubuntu2404" ]]; then
