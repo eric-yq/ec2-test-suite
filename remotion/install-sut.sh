@@ -48,7 +48,7 @@ if command -v apt-get >/dev/null 2>&1; then PM=apt
 elif command -v dnf >/dev/null 2>&1; then PM=dnf
 else PM=unknown; fi
 # 在最外层声明,避免 set -u 下在 dnf 分支里引用到未定义数组
-APT_OPTS=(-y -qq -o DPkg::Lock::Timeout=600)
+APT_OPTS=(-y -qq)
 
 log "=== T3 成片基准 ==="
 log "OS=${PRETTY_NAME:-?}  arch=$ARCH  vCPU=$VCPU  glibc=$GLIBC  pkg=$PM"
@@ -96,8 +96,8 @@ if [ "$PM" = apt ]; then
   # Ubuntu 云镜像刚启动时,cloud-init / unattended-upgrades 会持有 dpkg 锁,
   # 直接 apt 会在几秒内失败("Could not get lock ... held by process N (python3)")。
   # 先等 cloud-init 收尾,再给 apt 一个锁等待超时,双重保险。
-  log "    等待 cloud-init 结束"
-  sudo cloud-init status --wait >>"$LOG" 2>&1 || true
+  # log "    等待 cloud-init 结束"
+  # sudo cloud-init status --wait >>"$LOG" 2>&1 || true
   #APT_OPTS=(-y -qq -o DPkg::Lock::Timeout=600)
   APT_OPTS=(-y -qq)
   sudo apt-get update -qq >>"$LOG" 2>&1
