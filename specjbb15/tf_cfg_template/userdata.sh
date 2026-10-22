@@ -191,12 +191,13 @@ echo "THREADS_PROBE=${THREADS_PROBE}" >> ${RESULT_SUMMARY_FILE}
 # nohup dstat -cmndryt 60 > $DSTAT_LOGFILE 2>&1 & echo $! > pid_file.txt
 # # kill -9 $(cat pid_file.txt)
 EXTRA_OPTS="-XX:MaxGCPauseMillis=500 \
-  -XX:+TieredCompilation \
-  -XX:ReservedCodeCacheSize=256m \
-  -XX:InitialCodeCacheSize=256m \
+  -XX:-TieredCompilation \
+  -XX:ReservedCodeCacheSize=64m \
+  -XX:InitialCodeCacheSize=64m \
+  -XX:CICompilerCount=2 \
+  -XX:CompilationMode=high-only \
   -XX:MaxInlineSize=256 \
   -XX:FreqInlineSize=512 \
-  -XX:+UseCompressedOops \
   -XX:+UseCompressedClassPointers"
 
 java -showversion -server \
