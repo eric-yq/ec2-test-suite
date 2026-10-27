@@ -19,15 +19,15 @@ uv run main.py build
 sleep 5
 
 # 启动镜像
-uv run main.py warm --each 1
+uv run main.py warm --each 2
 sleep 5
 
 # 预热一轮
-uv run main.py throughput --ncpu $(nproc) --each 1 --duration 60
+uv run main.py throughput --ncpu $(nproc) --each 2 --duration 60
 sleep 10
 
 # 并发跑 30 分钟
-uv run main.py throughput --ncpu $(nproc) --each 1 --duration 300
+uv run main.py throughput --ncpu $(nproc) --each 2 --duration 300
 sleep 10
 
 # 跑一轮串行
@@ -40,7 +40,7 @@ instance_type=$(ec2-metadata --quiet --instance-type)
 timestamp=$(date +%Y%m%d-%H%M%S)
 archive="agentless_result_${instance_type}_${timestamp}"
 mkdir -p ${archive}
-cp /root/agentless-agent-bench/results/* ${archive}
+cp /root/agentless-agent-bench-for-ec2/results/* ${archive}
 tar czf ${archive}.tar.gz ${archive}/
 aws_s3_bucket_name=$(aws s3 ls | awk '{print $3}' | grep ec2-core-benchmark | head -1)
 aws s3 cp ${archive}.tar.gz s3://${aws_s3_bucket_name}/result_agentless/
