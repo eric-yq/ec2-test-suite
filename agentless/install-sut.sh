@@ -19,6 +19,7 @@ uv run main.py build
 sleep 5
 
 # 启动镜像
+# 24xlarge使用 --each 2
 uv run main.py warm --each 2
 sleep 5
 
@@ -31,7 +32,8 @@ uv run main.py throughput --ncpu $(nproc) --each 2 --duration 1800
 sleep 10
 
 # 跑一轮串行
-# uv run main.py serial
+uv run main.py serial
+sleep 5
 
 ###########################################################3
 ## 汇总结果并打包
@@ -48,4 +50,4 @@ aws s3 cp ${archive}.tar.gz s3://${aws_s3_bucket_name}/result_agentless/
 # 停止实例
 INSTANCE_ID=$(ec2-metadata --quiet --instance-id)
 REGION_ID=$(cloud-init query region)
-aws ec2 stop-instances --instance-ids "${INSTANCE_ID}" --region "${REGION_ID}"
+aws ec2 terminate-instances --instance-ids "${INSTANCE_ID}" --region "${REGION_ID}"
