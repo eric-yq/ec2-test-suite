@@ -1,6 +1,6 @@
 INSTANCE_FAMILY="r8g"
 
-
+###################################################################################################
 # 创建集群
 cd /root/ec2-test-suite/misc/tidb/test-suite/${INSTANCE_FAMILY}/eks
 eksctl create cluster -f tidb-cluster.yaml 
@@ -26,11 +26,12 @@ kubectl apply -f default-gp3-storageclass.yaml
 kubectl get storageclass gp3-tikv gp3-tiflash gp3-default
 kubectl get sc
 
+###################################################################################################
 # 部署 TiDB Operator
 ## 安装 TiDB Operator CRDs
 kubectl create -f https://raw.githubusercontent.com/pingcap/tidb-operator/v1.6.3/manifests/crd.yaml
 ## 添加 PingCAP 仓库。
-helm repo add pingcap https://charts.pingcap.org/
+helm repo add pingcap https://charts.pingcap.com/
 ## 为 TiDB Operator 创建一个命名空间。
 kubectl create namespace tidb-admin
 ## 安装 TiDB Operator
@@ -38,12 +39,12 @@ helm install --namespace tidb-admin tidb-operator pingcap/tidb-operator --versio
 ## 查看 TiDB Operator Pod 状态
 kubectl get pods --namespace tidb-admin -l app.kubernetes.io/instance=tidb-operator
 
+###################################################################################################
 # 部署 TiDB 集群
 ## 创建 TiDB 集群命名空间
 kubectl create namespace tidb-cluster-${INSTANCE_FAMILY}
 ## 下载 TidbCluster 和 TidbMonitor CR 的配置文件。
-mkdir -p tidb-deployment
-cd tidb-deployment
+cd ../tidb-deployment
 # curl -O https://raw.githubusercontent.com/pingcap/tidb-operator/v1.6.3/examples/aws/tidb-cluster.yaml
 # curl -O https://raw.githubusercontent.com/pingcap/tidb-operator/v1.6.3/examples/aws/tidb-monitor.yaml
 # curl -O https://raw.githubusercontent.com/pingcap/tidb-operator/v1.6.3/examples/aws/tidb-dashboard.yaml
@@ -57,7 +58,7 @@ kubectl get pods -n tidb-cluster-${INSTANCE_FAMILY} -o wide
 
 # 查询 TiDB 访问地址
 kubectl get svc basic-tidb -n tidb-cluster-${INSTANCE_FAMILY} -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
-tidb_host="a033bd2d92e374af59654dfce7507303-a8cc69cb6f5ecd0b.elb.us-east-2.amazonaws.com"
+tidb_host="acbb9153ddd0b4915b8ec30ee2c46f47-0e3f4c123ad209df.elb.us-east-2.amazonaws.com"
 
 
 ## 附加：删除 TiDB 集群
@@ -67,10 +68,11 @@ tidb_host="a033bd2d92e374af59654dfce7507303-a8cc69cb6f5ecd0b.elb.us-east-2.amazo
 #################################################################################################################
 # TiDB TPC-H 测试脚本 , 在一台 tidb-client 实例上执行.
 # 该实例和 tidb-node 在同一个 subnet 和 安全组，同时加入 default 安全组
-# vpc-0832099b319700874
-# subnet-0b6c2c938832955f7
-# sg-01f1405e679e0d309
-# sg-0a6ed671324b1cb3a
+# vpc-00dff4c509ba673b8
+# subnet-0691c2ea78520c3f7
+# sg-0cb2fd382e1534e25
+# sg-0a5a40cef0d729653
+# 这个实例在启动之后，没有公网 IP 地址，通过控制台连接。
 #################################################################################################################
 # 安装基础软件包
 yum update -yq
@@ -80,13 +82,12 @@ rpm -Uvh https://repo.mysql.com/mysql80-community-release-el9.rpm
 yum install -yq mysql
 
 # 测试 mysql 客户端远程访问
-# 测试 mysql 客户端远程访问
 cat >> ~/.bash_profile << EOF
 alias ccc="clear"
 alias ddd="dool 1 10"
 alias sttt="screen -r ttt"
 alias tailf="tail ~/screenlog.0"
-export tidb_host="a033bd2d92e374af59654dfce7507303-a8cc69cb6f5ecd0b.elb.us-east-2.amazonaws.com"
+export tidb_host="acbb9153ddd0b4915b8ec30ee2c46f47-0e3f4c123ad209df.elb.us-east-2.amazonaws.com"
 export sf=300
 export wares=1000
 EOF
@@ -101,11 +102,11 @@ tiup install playground
 tiup install bench
 
 #################################################################################################################
-# 准备数据：下面内容可以保存为 prepare-tpch300.sh , 然后执行。
+# TPCH 准备数据：下面内容可以保存为 prepare-tpch300.sh , 然后执行。
 # screen -R ttt -L
 #!/bin/bash
 sf=300
-tidb_host="a033bd2d92e374af59654dfce7507303-a8cc69cb6f5ecd0b.elb.us-east-2.amazonaws.com"
+tidb_host="acbb9153ddd0b4915b8ec30ee2c46f47-0e3f4c123ad209df.elb.us-east-2.amazonaws.com"
 tiup bench tpch prepare \
   --sf $sf --dropdata --threads 16 \
   --host ${tidb_host} --port 4000 --db tpch${sf} \
@@ -128,6 +129,8 @@ mysql -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.region;"
 mysql -h ${tidb_host} -P 4000 -u root -e "ANALYZE TABLE tpch${sf}.supplier;"
 
 echo "[Info] Complete to prepare and analyze tpch${sf}, you can start to run benchmark."
+#################################################################################################################
+bash prepare-tpch300.sh
 
 #################################################################################################################
 ## 常用操作 eks-and-tidb-commands.sh
@@ -138,7 +141,7 @@ echo "[Info] Complete to prepare and analyze tpch${sf}, you can start to run ben
 # 执行测试: q4 查询有点问题，先不执行
 # screen -R ttt -L
 sf=300
-tidb_host="a033bd2d92e374af59654dfce7507303-a8cc69cb6f5ecd0b.elb.us-east-2.amazonaws.com"
+tidb_host="acbb9153ddd0b4915b8ec30ee2c46f47-0e3f4c123ad209df.elb.us-east-2.amazonaws.com"
 LIST="q1 q2 q3 q5 q6 q7 q8 q9 q10 q11 q12 q13 q14 q15 q16 q17 q18 q19 q20 q21 q22"
 for i in $LIST; do
   tiup bench tpch run \
@@ -161,12 +164,12 @@ echo "[Info] Complete to run tpch${sf} tests."
 grep Summary result_tpch${sf}.txt > result_summary_tpch${sf}_${INSTANCE_FAMILY}.txt
 
 #################################################################################################################
-# 准备数据：下面内容可以保存为 prepare-tpcc1000.sh , 然后执行。
+# TPCC 准备数据：下面内容可以保存为 prepare-tpcc1000.sh , 然后执行。
 # screen -R ttt -L
 #!/bin/bash
 source .bash_profile
 wares=1000
-tidb_host="a033bd2d92e374af59654dfce7507303-a8cc69cb6f5ecd0b.elb.us-east-2.amazonaws.com"
+tidb_host="acbb9153ddd0b4915b8ec30ee2c46f47-0e3f4c123ad209df.elb.us-east-2.amazonaws.com"
 tiup bench tpcc prepare \
   --host ${tidb_host} --port 4000 \
   --db tpcc${wares} --warehouses ${wares} --dropdata \
@@ -214,6 +217,7 @@ mysql -h ${tidb_host} -P 4000 -u root -e "SELECT COUNT(*) FROM tpcc${wares}.ware
 echo "[Info] Complete to prepare and analyze tpcc${wares}, you can start to run benchmark."
 sleep 60
 
+###################################################################################################
 # 执行 TPCC 测试
 wares=1000
 LIST="10 30 50 70 100"

@@ -22,7 +22,7 @@ nodeGroups:
     desiredCapacity: 2
     privateNetworking: true
     availabilityZones: ["us-east-2c"]
-    instanceType: c8g.2xlarge
+    instanceType: c8g.4xlarge
     labels:
       dedicated: tidb
     taints:
@@ -48,7 +48,7 @@ nodeGroups:
     desiredCapacity: 3
     privateNetworking: true
     availabilityZones: ["us-east-2c"]
-    instanceType: r8g.2xlarge
+    instanceType: r8g.4xlarge
     labels:
       dedicated: tikv
     taints:
@@ -61,7 +61,7 @@ nodeGroups:
     desiredCapacity: 3
     privateNetworking: true
     availabilityZones: ["us-east-2c"]
-    instanceType: r8g.2xlarge
+    instanceType: r8g.4xlarge
     labels:
       dedicated: tiflash
     taints:
@@ -69,5 +69,3 @@ nodeGroups:
     iam:
       withAddonPolicies:
         ebs: true
-
-
