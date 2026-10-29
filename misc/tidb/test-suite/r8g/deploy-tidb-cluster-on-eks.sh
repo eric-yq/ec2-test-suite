@@ -1,8 +1,17 @@
-INSTANCE_FAMILY="r8g"
+# 本次要测试的实例家族类型 
+INSTANCE_FAMILY="r9g"
+GENERATION=${INSTANCE_FAMILY: -2}
+echo $GENERATION
+
+# 准备配置文件
+cd /root/ec2-test-suite/misc/tidb/test-suite
+cp -r r8g ${INSTANCE_FAMILY}
+cd /root/ec2-test-suite/misc/tidb/test-suite/${INSTANCE_FAMILY}
+sed "s/8g/${GENERATION}/g" eks/tidb-cluster.yaml
 
 ###################################################################################################
 # 创建集群
-cd /root/ec2-test-suite/misc/tidb/test-suite/${INSTANCE_FAMILY}/eks
+cd eks
 eksctl create cluster -f tidb-cluster.yaml 
 
 # 创建 IAM
