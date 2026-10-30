@@ -53,7 +53,7 @@ aws eks update-kubeconfig --region "$REGION" --name "$CLUSTER_NAME" \
 
 # 1.3 用这个集群的 context 获取 TiDB 的 LB 地址，地址未分配时等待重试
 until tidb_host=$(kubectl --context "$CLUSTER_NAME" get svc basic-tidb \
-        -n "tidb-${INSTANCE_FAMILY}" \
+        -n "$CLUSTER_NAME" \
         -o jsonpath='{.status.loadBalancer.ingress[0].hostname}') \
       && [ -n "$tidb_host" ]; do
   echo "等待 LB 地址..."; sleep 10
