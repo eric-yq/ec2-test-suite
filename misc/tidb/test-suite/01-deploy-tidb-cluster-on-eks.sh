@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 本次要测试的实例家族类型，通过脚本执行时的环境变量带入
-# INSTANCE_FAMILY="r9g" bash deploy-tidb-cluster-on-eks.sh  带入
+# INSTANCE_FAMILY=r8g bash deploy-tidb-cluster-on-eks.sh  带入
 
 # 准备配置文件
 cp -r template ${INSTANCE_FAMILY}
@@ -45,6 +45,8 @@ helm repo add pingcap https://charts.pingcap.com/
 kubectl create namespace tidb-admin
 ## 安装 TiDB Operator
 helm install --namespace tidb-admin tidb-operator pingcap/tidb-operator --version v1.6.3
+sleep 300
+
 ## 查看 TiDB Operator Pod 状态
 kubectl get pods --namespace tidb-admin -l app.kubernetes.io/instance=tidb-operator
 
@@ -55,6 +57,8 @@ echo "[Info] Deploy TiDB cluster ..."
 kubectl create namespace tidb-${INSTANCE_FAMILY}
 ## 执行部署 TiDB 集群
 kubectl apply -f tidb/tidb-cluster.yaml -n tidb-${INSTANCE_FAMILY}
+sleep 300
+
 ## 查看 TiDB 集群 Pod 状态
 kubectl get pvc  -n tidb-${INSTANCE_FAMILY} -o wide
 kubectl get pods -n tidb-${INSTANCE_FAMILY} -o wide
