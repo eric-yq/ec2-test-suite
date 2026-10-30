@@ -5,7 +5,7 @@
 
 # 准备配置文件
 # cd ec2-test-suite/misc/tidb/test-suite
-cp -r r8g ${INSTANCE_FAMILY}
+cp -r template ${INSTANCE_FAMILY}
 cd ${INSTANCE_FAMILY}
 sed -i "s/8g/${INSTANCE_FAMILY: -2}/g" eks/tidb-cluster.yaml
 
