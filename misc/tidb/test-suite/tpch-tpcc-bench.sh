@@ -1,46 +1,9 @@
 
 #################################################################################################################
-# TiDB TPC-H 测试脚本 , 在一台 tidb-client 实例上执行.
-# 该实例和 tidb-node 在同一个 subnet 和 安全组，同时加入 default 安全组
-# vpc-00dff4c509ba673b8
-# subnet-0691c2ea78520c3f7
-# sg-0cb2fd382e1534e25
-# sg-0a5a40cef0d729653
-# 这个实例在启动之后，没有公网 IP 地址，通过控制台连接。
-#################################################################################################################
-# 安装基础软件包
-yum update -yq
-yum install -yq python3-pip htop
-pip3 install dool
-rpm -Uvh https://repo.mysql.com/mysql80-community-release-el9.rpm
-yum install -yq mysql
-
-# 测试 mysql 客户端远程访问
-cat >> ~/.bash_profile << EOF
-alias ccc="clear"
-alias ddd="dool 1 10"
-alias sttt="screen -r ttt"
-alias tailf="tail ~/screenlog.0"
-export tidb_host="acbb9153ddd0b4915b8ec30ee2c46f47-0e3f4c123ad209df.elb.us-east-2.amazonaws.com"
-export sf=300
-export wares=1000
-EOF
-source ~/.bash_profile
-mysql -h ${tidb_host} -P 4000 -u root -e "show databases;"
-
-# 安装 TiUP
-cd /root/
-curl --proto '=https' --tlsv1.2 -sSf https://tiup-mirrors.pingcap.com/install.sh | sh
-source /root/.bash_profile
-tiup install playground
-tiup install bench
-
-#################################################################################################################
 # TPCH 准备数据：下面内容可以保存为 prepare-tpch300.sh , 然后执行。
 # screen -R ttt -L
 #!/bin/bash
 sf=300
-tidb_host="acbb9153ddd0b4915b8ec30ee2c46f47-0e3f4c123ad209df.elb.us-east-2.amazonaws.com"
 tiup bench tpch prepare \
   --sf $sf --dropdata --threads 16 \
   --host ${tidb_host} --port 4000 --db tpch${sf} \
@@ -75,7 +38,6 @@ bash prepare-tpch300.sh
 # 执行测试: q4 查询有点问题，先不执行
 # screen -R ttt -L
 sf=300
-tidb_host="acbb9153ddd0b4915b8ec30ee2c46f47-0e3f4c123ad209df.elb.us-east-2.amazonaws.com"
 LIST="q1 q2 q3 q5 q6 q7 q8 q9 q10 q11 q12 q13 q14 q15 q16 q17 q18 q19 q20 q21 q22"
 for i in $LIST; do
   tiup bench tpch run \
@@ -103,7 +65,6 @@ grep Summary result_tpch${sf}.txt > result_summary_tpch${sf}_${INSTANCE_FAMILY}.
 #!/bin/bash
 source .bash_profile
 wares=1000
-tidb_host="acbb9153ddd0b4915b8ec30ee2c46f47-0e3f4c123ad209df.elb.us-east-2.amazonaws.com"
 tiup bench tpcc prepare \
   --host ${tidb_host} --port 4000 \
   --db tpcc${wares} --warehouses ${wares} --dropdata \
