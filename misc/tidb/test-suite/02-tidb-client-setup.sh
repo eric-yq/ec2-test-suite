@@ -118,7 +118,6 @@ NEW_ID=$(aws ec2 run-instances --region "$REGION" \
   --instance-type c8i.4xlarge \
   --subnet-id "$SUBNET_ID" \
   --security-group-ids $SG_IDS \
-  --key-name "$KEY_NAME" \
   --user-data "file://$USERDATA_FILE" \
   --block-device-mappings '[{"DeviceName":"/dev/xvda","Ebs":{"VolumeSize":40,"VolumeType":"gp3","DeleteOnTermination":true}}]' \
   --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=tidb-client}]' \
