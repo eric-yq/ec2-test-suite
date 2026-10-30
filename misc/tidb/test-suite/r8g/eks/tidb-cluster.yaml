@@ -1,7 +1,7 @@
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
-  name: tidb-cluster-r8g
+  name: tidb-r8g
   region: us-east-2
 addons:
   - name: aws-ebs-csi-driver
