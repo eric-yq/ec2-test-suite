@@ -189,6 +189,19 @@ make -j
 make install
 sysbench --version
 
+### 20261102: 一些新用例可能用到的
+yum install -yq boost-devel
+yum install -yq openmpi openmpi-devel
+yum install -yq libevent-devel openssl-devel pkgconf-pkg-config
+yum install -yq openblas-devel lapack-devel blas-devel
+yum install -yq fftw-devel fftw-libs-double
+yum install -yq libxml2-devel
+echo "export OMPI_CC=gcc14-gcc OMPI_CXX=gcc14-g++ " >> /root/.bashrc
+echo "export HDF5_ROOT=/opt/hdf5" >> /root/.bashrc
+echo "export PATH=/usr/lib64/openmpi/bin:$PATH" >> /root/.bashrc
+source .bashrc
+
+################################################################################################
 ## 执行基准测试(标准)
 echo "[INFO] Step1: Start to perform PTS tests ..."
 
