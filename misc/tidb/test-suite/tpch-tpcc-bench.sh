@@ -110,7 +110,8 @@ mysql -h ${tidb_host} -P 4000 -u root -e "SELECT COUNT(*) FROM tpcc${wares}.stoc
 mysql -h ${tidb_host} -P 4000 -u root -e "SELECT COUNT(*) FROM tpcc${wares}.warehouse;"
 
 echo "[Info] Complete to prepare and analyze tpcc${wares}, you can start to run benchmark."
-sleep 60
+#################################################################################################################
+bash prepare-tpcc1000.sh
 
 ###################################################################################################
 # 执行 TPCC 测试
