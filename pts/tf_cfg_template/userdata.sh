@@ -209,8 +209,8 @@ source .bashrc
 echo "[INFO] Step1: Start to perform PTS tests ..."
 
 tests="gmpbench primesieve stream cachebench ramspeed compress-zstd compress-lz4 blosc \
-  botan john-the-ripper cython-bench ffmpeg x264 x265 tjbench vvenc blogbench nginx \
-  graphics-magick smallpt draco renaissance dacapobench java-scimark2 scimark2 \
+  botan john-the-ripper cython-bench ffmpeg x264 x265 tjbench vvenc svt-av1 blogbench nginx \
+  graphics-magick smallpt draco renaissance dacapobench java-scimark2 scimark2 libxsmm faiss \
   redis memtier-benchmark valkey keydb dragonflydb pogocache tidb sonicjson simdjson \
   cassandra scylladb mariadb rocksdb influxdb clickhouse duckdb leveldb cockroach couchdb \
   c-ray lczero arrayfire stockfish mt-dgemm perf-bench mlpack mnn whisper-cpp whisperfile opencv \
@@ -315,24 +315,24 @@ do
 done
 
 ## 特殊任务：执行2次的tests。
-tests2="scikit-learn"
-for testname in ${tests2} 
-do
-    # 启动一个监控
-    DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
-    dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
-    DOOL_PID=$!
-    # 执行基准测试
-    FORCE_TIMES_TO_RUN=2 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
-    # 保存结果 URL
-    echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
-    phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
-    grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
-    # 停止监控
-    kill -9 ${DOOL_PID}
+# tests2="scikit-learn"
+# for testname in ${tests2} 
+# do
+#     # 启动一个监控
+#     DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
+#     dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
+#     DOOL_PID=$!
+#     # 执行基准测试
+#     FORCE_TIMES_TO_RUN=2 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
+#     # 保存结果 URL
+#     echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
+#     phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
+#     grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
+#     # 停止监控
+#     kill -9 ${DOOL_PID}
 
-    sleep 5
-done
+#     sleep 5
+# done
 
 echo "[INFO] Step: Complete ALL PTS TESTS."
 
