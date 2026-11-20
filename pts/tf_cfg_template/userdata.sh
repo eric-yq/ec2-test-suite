@@ -208,7 +208,7 @@ source .bashrc
 ## 执行基准测试(标准)
 echo "[INFO] Step1: Start to perform PTS tests ..."
 
-tests="gmpbench primesieve stream cachebench ramspeed compress-zstd compress-lz4 blosc \
+tests="stream cachebench ramspeed compress-zstd compress-lz4 blosc \
   botan john-the-ripper cython-bench ffmpeg x264 x265 tjbench vvenc svt-av1 blogbench nginx \
   graphics-magick smallpt draco renaissance dacapobench java-scimark2 scimark2 libxsmm faiss \
   redis memtier-benchmark valkey keydb dragonflydb pogocache tidb sonicjson simdjson \
