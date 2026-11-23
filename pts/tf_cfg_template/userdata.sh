@@ -322,7 +322,7 @@ DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
 dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 30 > ${DOOL_FILE} 2>&1 &
 DOOL_PID=$!
 # 执行基准测试
-yes | PRESET_OPTIONS_VALUES="${testname}.scale=500" FORCE_TIMES_TO_RUN=1 \
+yes | PRESET_OPTIONS_VALUES="${testname}.scale=500" FORCE_TIMES_TO_RUN=1 CC=gcc CXX=g++ \
   phoronix-test-suite benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
 # 保存结果 URL
 echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
