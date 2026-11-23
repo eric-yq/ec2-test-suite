@@ -60,7 +60,7 @@ fi
 ################################################################################################################       
 # Amazon Linux 2023, 使用 ec2-user 账号登录.
 
-SUT_NAME="spark-tpcds-instancestore"
+sc
 
 ## 配置 AWSCLI
 aws_ak_value="akxxx"
