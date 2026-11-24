@@ -85,9 +85,9 @@ aws configure set default.region ${aws_region_name}
 aws_s3_bucket_name=$(aws s3 ls | awk '{print $3}' | grep ec2-core-benchmark | head -1)
 
 # 主要流程
-OS_NAME=$(egrep ^NAME /etc/os-release | awk -F "\"" '{print $2}')
-OS_VERSION=$(egrep ^VERSION_ID /etc/os-release | awk -F "\"" '{print $2}')
-ARCH=$(arch)
+# OS_NAME=$(egrep ^NAME /etc/os-release | awk -F "\"" '{print $2}')
+# OS_VERSION=$(egrep ^VERSION_ID /etc/os-release | awk -F "\"" '{print $2}')
+# ARCH=$(arch)
 
 install_al2023_dependencies
 
@@ -107,6 +107,7 @@ CFG_DIR=${DATA_DIR}/system-infomation
 PTS_RESULT_DIR=${DATA_DIR}/pts-result
 LOG_DIR=${DATA_DIR}/logs
 mkdir -p ${DATA_DIR}  ${CFG_DIR} ${PTS_RESULT_DIR} ${LOG_DIR} 
+mkdir -p /data
 
 echo "export DATA_DIR=${DATA_DIR}" >> /root/.bashrc
 echo "export CFG_DIR=${CFG_DIR}" >> /root/.bashrc
@@ -118,6 +119,9 @@ echo "export TEST_RESULTS_DESCRIPTION=${PN}" >> /root/.bashrc
 echo "export TEST_RESULTS_NAME=${PN}" >> /root/.bashrc
 ## 设置测试项执行结束后，删除测试项以节省空间
 echo "export REMOVE_TESTS_ON_COMPLETION=TRUE" >> /root/.bashrc
+## 设置测试项安装在 /data/ 目录下（可以是 EBS 或者 本地 SSD 盘)
+echo "export PTS_DOWNLOAD_CACHE=/data/" >> /root/.bashrc
+echo "export PTS_TEST_INSTALL_ROOT_PATH=/data/" >> /root/.bashrc
 ## 关闭 checksum
 echo "export NO_FILE_HASH_CHECKS=1" >> /root/.bashrc
 ## 设置 GCC14
@@ -321,7 +325,7 @@ testname="spark-tpcds"
 DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
 dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 30 > ${DOOL_FILE} 2>&1 &
 DOOL_PID=$!
-# 执行基准测试
+# 执行基准测试: spark-tpcds 需要使用 gcc11.
 yes | PRESET_OPTIONS_VALUES="${testname}.scale=500" FORCE_TIMES_TO_RUN=1 CC=gcc CXX=g++ \
   phoronix-test-suite benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
 # 保存结果 URL
@@ -340,7 +344,7 @@ DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
 dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 30 > ${DOOL_FILE} 2>&1 &
 DOOL_PID=$!
 # 执行基准测试
-yes | PRESET_OPTIONS_VALUES="${testname}.scale=10,100" FORCE_TIMES_TO_RUN=3 \
+yes | PRESET_OPTIONS_VALUES="${testname}.scale=10,100,500" FORCE_TIMES_TO_RUN=3 \
   phoronix-test-suite benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
 # 保存结果 URL
 echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
