@@ -273,43 +273,7 @@ done
 
 ## pyperformance 需要使用 python 3.10 以上
 tests1="pyperformance"
-for testname in ${tests1} 
-do
-    yum install -yq python3.14*
-    python3.14 -m venv ~/venv-py314
-
-    # 进入 python 3.14 虚拟环境
-    source ~/venv-py314/bin/activate
-    phoronix-test-suite download-test-files pyperformance
-    cd /var/lib/phoronix-test-suite/test-profiles/pts/pyperformance-1.2.0
-    sed -i.bak "s/--user//g" install.sh
-    phoronix-test-suite install pyperformance
-    cd /var/lib/phoronix-test-suite/installed-tests/pts/pyperformance-1.2.0/
-    mkdir -p .local/bin/
-    cp /root/venv-py314/bin/pyperformance .local/bin/
-    
-    cd ~
-    
-    # 启动一个监控
-    DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
-    dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
-    DOOL_PID=$!
-    phoronix-test-suite install ${testname}
-    cd
-    
-    # 执行基准测试
-    FORCE_TIMES_TO_RUN=1 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
-    # 保存结果 URL
-    echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
-    phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
-    grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
-    # 停止监控
-    kill -9 ${DOOL_PID}
-    # 退出python 3.14 虚拟环境
-    deactivate
-
-    sleep 5
-done
+## ..........
 
 ################################################################################################
 # spark-tpcds: 只测试 PRESET_OPTIONS_VALUES='spark-tpcds.scale=500'

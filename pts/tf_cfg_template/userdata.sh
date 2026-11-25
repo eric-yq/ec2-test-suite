@@ -190,10 +190,7 @@ rpm -Uvh https://repo.mysql.com//mysql80-community-release-el9.rpm
 yum install -y mysql-devel --nogpgcheck
 wget https://github.com/akopytov/sysbench/archive/refs/tags/1.0.20.tar.gz
 tar zxf 1.0.20.tar.gz && rm -rf 1.0.20.tar.gz && cd sysbench-1.0.20
-./autogen.sh
-./configure --with-mysql
-make -j
-make install
+./autogen.sh && ./configure --with-mysql && make -j && make install
 sysbench --version
 
 ### 20261102: 一些新用例可能用到的
@@ -282,18 +279,18 @@ done
 tests1="pyperformance"
 for testname in ${tests1} 
 do
-    yum install -yq python3.14*
-    python3.14 -m venv ~/venv-py314
+    yum install -yq python3.11*
+    python3.11 -m venv ~/venv-py311
 
-    # 进入 python 3.14 虚拟环境
-    source ~/venv-py314/bin/activate
+    # 进入 python 3.11虚拟环境
+    source ~/venv-py311/bin/activate
     phoronix-test-suite download-test-files pyperformance
     cd /var/lib/phoronix-test-suite/test-profiles/pts/pyperformance-1.2.0
     sed -i.bak "s/--user//g" install.sh
     phoronix-test-suite install pyperformance
     cd /var/lib/phoronix-test-suite/installed-tests/pts/pyperformance-1.2.0/
     mkdir -p .local/bin/
-    cp /root/venv-py314/bin/pyperformance .local/bin/
+    cp pyperformance .local/bin/
     
     cd /root/
     
@@ -312,7 +309,7 @@ do
     grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
     # 停止监控
     kill -9 ${DOOL_PID}
-    # 退出python 3.14 虚拟环境
+    # 退出python 3.11 虚拟环境
     deactivate
 
     sleep 5

@@ -146,9 +146,10 @@ maxmemory ${XXX}gb
 maxmemory-policy allkeys-lru
 EOF
 
+    chmod 644 /root/valkey-6379.conf
     docker run -d --name valkey-6379 --restart=always \
 	  -p 6379:6379 \
-	  -v /root/valkey-6379.conf:/etc/valkey/valkey.conf \
+	  -v /root/valkey-6379.conf:/etc/valkey/valkey.conf:Z \
 	  valkey/valkey:8.1.0 \
 	  valkey-server /etc/valkey/valkey.conf
 
@@ -174,9 +175,10 @@ io-threads-do-reads yes
 io-threads $i
 EOF
 	    # 启动 valkey
+        chmod 644 /root/valkey-$PORT.conf
         docker run -d --name valkey-$PORT --restart=always \
 	      -p $PORT:6379 \
-	      -v /root/valkey-$PORT.conf:/etc/valkey/valkey.conf \
+	      -v /root/valkey-$PORT.conf:/etc/valkey/valkey.conf:Z \
 	      valkey/valkey:8.1.0 \
 	      valkey-server /etc/valkey/valkey.conf
     done
