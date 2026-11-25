@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# 补充测试 pyperformance, cpp-perf-bench, keydb, smallpt
-
-
 ## 暂时关闭补丁更新流程
 sudo systemctl stop amazon-ssm-agent
 sudo systemctl disable amazon-ssm-agent
@@ -87,12 +84,7 @@ aws configure set aws_secret_access_key ${aws_sk_value}
 aws configure set default.region ${aws_region_name}
 aws_s3_bucket_name="s3://ec2-core-benchmark-ericyq"
 
-
 # 主要流程
-OS_NAME=$(egrep ^NAME /etc/os-release | awk -F "\"" '{print $2}')
-OS_VERSION=$(egrep ^VERSION_ID /etc/os-release | awk -F "\"" '{print $2}')
-ARCH=$(arch)
-
 install_al2023_dependencies
 
 ## 更新 cmake
@@ -146,7 +138,6 @@ lstopo --of png > ${CFG_DIR}/cfg_lstopo-all.png
 numactl -H > ${CFG_DIR}/cfg_numactl-H.txt
 uname -a > ${CFG_DIR}/cfg_uname-a.txt
 
-
 ##############################################################################################
 ## PTS（Phoronix-Test-Suite）基准测试
 ## 安装依赖包,master 分支的代码需要修改才能正常运行，使用 10.8.4 的稳定版本。
@@ -175,3 +166,20 @@ wget ${DOWNLOAD_URL}/${DOWNLOAD_FILE}.tar.xz
 tar xf ${DOWNLOAD_FILE}.tar.xz
 cp ${DOWNLOAD_FILE}/bin/ffmpeg /usr/local/bin/ && rm -rf ${DOWNLOAD_FILE}*
 
+# 安装 sysbench
+cd /root/
+rpm -Uvh https://repo.mysql.com//mysql80-community-release-el9.rpm
+yum install -y mysql-devel --nogpgcheck
+wget https://github.com/akopytov/sysbench/archive/refs/tags/1.0.20.tar.gz
+tar zxf 1.0.20.tar.gz && rm -rf 1.0.20.tar.gz && cd sysbench-1.0.20
+./autogen.sh && ./configure --with-mysql && make -j && make install
+sysbench --version
+
+# 创建 python3.11 的 venv 环境
+yum install -yq python3.11*
+VENV=/root/venv-py311
+[ -d "$VENV" ] || python3.11 -m venv "$VENV"
+
+####################################################################################################
+echo "[Info] Complete to prepare PTS env."
+systemctl start userdata.service

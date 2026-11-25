@@ -193,17 +193,10 @@ tar zxf 1.0.20.tar.gz && rm -rf 1.0.20.tar.gz && cd sysbench-1.0.20
 ./autogen.sh && ./configure --with-mysql && make -j && make install
 sysbench --version
 
-### 20261102: 一些新用例可能用到的
-# yum install -yq boost-devel
-# yum install -yq openmpi openmpi-devel
-# yum install -yq libevent-devel openssl-devel pkgconf-pkg-config
-# yum install -yq openblas-devel lapack-devel blas-devel
-# yum install -yq fftw-devel fftw-libs-double
-# yum install -yq libxml2-devel
-# echo "export OMPI_CC=gcc14-gcc OMPI_CXX=gcc14-g++ " >> /root/.bashrc
-# echo "export HDF5_ROOT=/opt/hdf5" >> /root/.bashrc
-# echo "export PATH=/usr/lib64/openmpi/bin:$PATH" >> /root/.bashrc
-# source .bashrc
+# 创建 python3.11 的 venv 环境
+yum install -yq python3.11*
+VENV=/root/venv-py311
+[ -d "$VENV" ] || python3.11 -m venv "$VENV"
 
 ########################################################################################################
 ## 执行基准测试(标准)
@@ -276,42 +269,6 @@ do
 done
 
 ################################################################################################
-## pyperformance 需要使用 python 3.10 以上
-testname="pyperformance"
-yum install -yq python3.11*
-python3.11 -m venv ~/venv-py311
-# 进入 python 3.11虚拟环境
-source ~/venv-py311/bin/activate
-pip install -U pip setuptools wheel
-
-phoronix-test-suite download-test-files pyperformance
-cd /var/lib/phoronix-test-suite/test-profiles/pts/pyperformance-1.2.0
-sed -i.bak "s/--user//g" install.sh
-phoronix-test-suite install pyperformance
-cd /var/lib/phoronix-test-suite/installed-tests/pts/pyperformance-1.2.0/
-mkdir -p .local/bin/
-cp pyperformance .local/bin/
-
-cd /root/
-
-# 启动一个监控
-DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
-dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
-DOOL_PID=$!
-
-# 执行基准测试
-FORCE_TIMES_TO_RUN=1 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
-# 保存结果 URL
-echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
-phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
-grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
-# 停止监控
-kill -9 ${DOOL_PID}
-# 退出python 3.11 虚拟环境
-deactivate
-sleep 5
-
-################################################################################################
 # spark-tpcds: 只测试 PRESET_OPTIONS_VALUES='spark-tpcds.scale=500'
 testname="spark-tpcds"
 # 启动一个监控
@@ -348,12 +305,44 @@ kill -9 ${DOOL_PID}
 sleep 5
 
 ################################################################################################
+## pyperformance 需要使用 python 3.10 以上
+testname="pyperformance"
+# 进入 python 3.11虚拟环境
+source "$VENV/bin/activate"
+pip install -U pip setuptools wheel
+
+phoronix-test-suite download-test-files pyperformance
+cd /var/lib/phoronix-test-suite/test-profiles/pts/pyperformance-1.2.0
+sed -i.bak "s/--user//g" install.sh
+phoronix-test-suite install pyperformance
+cd /var/lib/phoronix-test-suite/installed-tests/pts/pyperformance-1.2.0/
+mkdir -p .local/bin/
+cp pyperformance .local/bin/
+
+cd /root/
+
+# 启动一个监控
+DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
+dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
+DOOL_PID=$!
+
+# 执行基准测试
+FORCE_TIMES_TO_RUN=1 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
+# 保存结果 URL
+echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
+phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
+grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
+# 停止监控
+kill -9 ${DOOL_PID}
+# 退出python 3.11 虚拟环境
+deactivate
+sleep 5
+
+################################################################################################
 ## qdrant 需要使用 python 3.10 以上
 testname="qdrant"
-# yum install -yq python3.11*
-# python3.11 -m venv ~/venv-py311
 # 进入 python 3.11虚拟环境
-source ~/venv-py311/bin/activate
+source "$VENV/bin/activate"
 phoronix-test-suite info pts/qdrant-1.0.0
 
 # 修改安装脚本
@@ -370,6 +359,49 @@ diff install.sh.orig install.sh || true
 
 # 安装
 phoronix-test-suite force-install pts/qdrant-1.0.0
+
+# 启动一个监控
+DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
+dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
+DOOL_PID=$!
+
+# 执行基准测试
+phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
+# 保存结果 URL
+echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
+phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
+grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
+# 停止监控
+kill -9 ${DOOL_PID}
+# 退出python 3.11 虚拟环境
+deactivate
+sleep 5
+
+################################################################################################
+## pgvector 需要使用 python 3.10 以上
+testname="pgvector"
+# 进入 python 3.11虚拟环境
+source "$VENV/bin/activate"
+phoronix-test-suite info pts/pgvector-1.0.0 
+
+# 修改安装脚本
+PROFILE_DIR=/var/lib/phoronix-test-suite/test-profiles/pts/pgvector-1.0.0
+INSTALL_DIR=/data/pts/pgvector-1.0.0
+cd "$PROFILE_DIR"
+[ -f install.sh.orig ] || cp install.sh install.sh.orig
+sed -i -E '/pip/ s/ --user( |$)/\1/g' install.sh
+diff install.sh.orig install.sh || true    # 应该只有 pip 那一行有变化
+
+# 安装
+phoronix-test-suite force-install pts/pgvector-1.0.0
+mkdir -p /data/pts/pgvector-1.0.0/.local/bin/
+cp $VENV/bin/vectordbbench /data/pts/pgvector-1.0.0/.local/bin/
+# 修改运行脚本：createdb/createuser 已存在时跳过
+cd "$INSTALL_DIR"
+cp -n pgvector pgvector.orig
+sed -i -e 's|^pg_/bin/createdb vectordbbench.*|pg_/bin/createdb vectordbbench 2>/dev/null \|\| true|' \
+       -e 's|^pg_/bin/createuser postgresuser.*|pg_/bin/createuser postgresuser -d -s --no-password 2>/dev/null \|\| true|' pgvector
+grep -n -E "createdb|createuser" pgvector    # 两行末尾都应有 || true
 
 # 启动一个监控
 DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
