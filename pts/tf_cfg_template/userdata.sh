@@ -85,10 +85,6 @@ aws configure set default.region ${aws_region_name}
 aws_s3_bucket_name=$(aws s3 ls | awk '{print $3}' | grep ec2-core-benchmark | head -1)
 
 # 主要流程
-# OS_NAME=$(egrep ^NAME /etc/os-release | awk -F "\"" '{print $2}')
-# OS_VERSION=$(egrep ^VERSION_ID /etc/os-release | awk -F "\"" '{print $2}')
-# ARCH=$(arch)
-
 install_al2023_dependencies
 
 ## 更新 cmake
@@ -106,7 +102,7 @@ DATA_DIR=~/${PN}_hwinfo_${KERNEL_RELEASE}
 CFG_DIR=${DATA_DIR}/system-infomation
 PTS_RESULT_DIR=${DATA_DIR}/pts-result
 LOG_DIR=${DATA_DIR}/logs
-mkdir -p ${DATA_DIR}  ${CFG_DIR} ${PTS_RESULT_DIR} ${LOG_DIR} 
+mkdir -p ${DATA_DIR} ${CFG_DIR} ${PTS_RESULT_DIR} ${LOG_DIR} 
 mkdir -p /data
 
 echo "export DATA_DIR=${DATA_DIR}" >> /root/.bashrc
@@ -180,8 +176,7 @@ yum install -yq lz4-devel lzo-devel libcurl-devel bzip2-devel
 python3 -m pip install sklearn scons
 DOWNLOAD_FILE="ffmpeg-master-latest-linux$([ "$(uname -m)" = "aarch64" ] && echo "arm" || echo "")64-gpl"
 DOWNLOAD_URL="https://github.com/BtbN/FFmpeg-Builds/releases/download/latest"
-wget ${DOWNLOAD_URL}/${DOWNLOAD_FILE}.tar.xz
-tar xf ${DOWNLOAD_FILE}.tar.xz
+wget ${DOWNLOAD_URL}/${DOWNLOAD_FILE}.tar.xz && tar xf ${DOWNLOAD_FILE}.tar.xz
 cp ${DOWNLOAD_FILE}/bin/ffmpeg /usr/local/bin/ && rm -rf ${DOWNLOAD_FILE}*
 
 # 安装 sysbench
@@ -190,13 +185,14 @@ rpm -Uvh https://repo.mysql.com//mysql80-community-release-el9.rpm
 yum install -y mysql-devel --nogpgcheck
 wget https://github.com/akopytov/sysbench/archive/refs/tags/1.0.20.tar.gz
 tar zxf 1.0.20.tar.gz && rm -rf 1.0.20.tar.gz && cd sysbench-1.0.20
-./autogen.sh && ./configure --with-mysql && make -j && make install
-sysbench --version
+./autogen.sh && ./configure --with-mysql && make -j && make install && sysbench --version
 
 # 创建 python3.11 的 venv 环境
 yum install -yq python3.11*
 VENV=/root/venv-py311
 [ -d "$VENV" ] || python3.11 -m venv "$VENV"
+echo "export VENV=/root/venv-py311" >> /root/.bashrc
+source /root/.bashrc
 
 ########################################################################################################
 ## 执行基准测试(标准)
@@ -247,6 +243,7 @@ do
     sleep 5
 done
 
+################################################################################################
 ## 需要使用 GCC 低版本的测试项目，OS 中已经安装有 GCC（11） 和 GCC14
 tests1="keydb cpp-perf-bench"
 for testname in ${tests1} 
@@ -311,11 +308,14 @@ testname="pyperformance"
 source "$VENV/bin/activate"
 pip install -U pip setuptools wheel
 
+PROFILE_DIR=/var/lib/phoronix-test-suite/test-profiles/pts/pyperformance-1.2.0
+INSTALL_DIR=/data/pts/pyperformance-1.2.0
+
 phoronix-test-suite download-test-files pyperformance
-cd /var/lib/phoronix-test-suite/test-profiles/pts/pyperformance-1.2.0
+cd "$PROFILE_DIR"
 sed -i.bak "s/--user//g" install.sh
 phoronix-test-suite install pyperformance
-cd /var/lib/phoronix-test-suite/installed-tests/pts/pyperformance-1.2.0/
+cd "$INSTALL_DIR"
 mkdir -p .local/bin/
 cp pyperformance .local/bin/
 
@@ -382,6 +382,7 @@ sleep 5
 testname="pgvector"
 # 进入 python 3.11虚拟环境
 source "$VENV/bin/activate"
+pip install "psycopg[binary]"
 phoronix-test-suite info pts/pgvector-1.0.0 
 
 # 修改安装脚本
@@ -393,9 +394,9 @@ sed -i -E '/pip/ s/ --user( |$)/\1/g' install.sh
 diff install.sh.orig install.sh || true    # 应该只有 pip 那一行有变化
 
 # 安装
-phoronix-test-suite force-install pts/pgvector-1.0.0
-mkdir -p /data/pts/pgvector-1.0.0/.local/bin/
-cp $VENV/bin/vectordbbench /data/pts/pgvector-1.0.0/.local/bin/
+phoronix-test-suite install pts/pgvector-1.0.0
+mkdir -p $INSTALL_DIR/.local/bin/
+cp $VENV/bin/vectordbbench $INSTALL_DIR/.local/bin/
 # 修改运行脚本：createdb/createuser 已存在时跳过
 cd "$INSTALL_DIR"
 cp -n pgvector pgvector.orig

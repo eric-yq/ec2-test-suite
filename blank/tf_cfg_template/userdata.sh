@@ -78,11 +78,11 @@ aws --version
 
 aws_ak_value="akxxx"
 aws_sk_value="skxxx"
-aws_region_name=$(cloud-init query region)
+aws_region_name=$(ec2-metadata --quiet --region)
 aws configure set aws_access_key_id ${aws_ak_value}
 aws configure set aws_secret_access_key ${aws_sk_value}
 aws configure set default.region ${aws_region_name}
-aws_s3_bucket_name="s3://ec2-core-benchmark-ericyq"
+aws_s3_bucket_name=$(aws s3 ls | awk '{print $3}' | grep ec2-core-benchmark | head -1)
 
 # 主要流程
 install_al2023_dependencies
@@ -102,7 +102,7 @@ DATA_DIR=~/${PN}_hwinfo_${KERNEL_RELEASE}
 CFG_DIR=${DATA_DIR}/system-infomation
 PTS_RESULT_DIR=${DATA_DIR}/pts-result
 LOG_DIR=${DATA_DIR}/logs
-mkdir -p ${DATA_DIR}  ${CFG_DIR} ${PTS_RESULT_DIR} ${LOG_DIR} 
+mkdir -p ${DATA_DIR} ${CFG_DIR} ${PTS_RESULT_DIR} ${LOG_DIR} 
 mkdir -p /data
 
 echo "export DATA_DIR=${DATA_DIR}" >> /root/.bashrc
@@ -162,8 +162,7 @@ yum install -yq lz4-devel lzo-devel libcurl-devel bzip2-devel
 python3 -m pip install sklearn scons
 DOWNLOAD_FILE="ffmpeg-master-latest-linux$([ "$(uname -m)" = "aarch64" ] && echo "arm" || echo "")64-gpl"
 DOWNLOAD_URL="https://github.com/BtbN/FFmpeg-Builds/releases/download/latest"
-wget ${DOWNLOAD_URL}/${DOWNLOAD_FILE}.tar.xz
-tar xf ${DOWNLOAD_FILE}.tar.xz
+wget ${DOWNLOAD_URL}/${DOWNLOAD_FILE}.tar.xz && tar xf ${DOWNLOAD_FILE}.tar.xz
 cp ${DOWNLOAD_FILE}/bin/ffmpeg /usr/local/bin/ && rm -rf ${DOWNLOAD_FILE}*
 
 # 安装 sysbench
@@ -172,14 +171,135 @@ rpm -Uvh https://repo.mysql.com//mysql80-community-release-el9.rpm
 yum install -y mysql-devel --nogpgcheck
 wget https://github.com/akopytov/sysbench/archive/refs/tags/1.0.20.tar.gz
 tar zxf 1.0.20.tar.gz && rm -rf 1.0.20.tar.gz && cd sysbench-1.0.20
-./autogen.sh && ./configure --with-mysql && make -j && make install
-sysbench --version
+./autogen.sh && ./configure --with-mysql && make -j && make install && sysbench --version
 
 # 创建 python3.11 的 venv 环境
 yum install -yq python3.11*
 VENV=/root/venv-py311
 [ -d "$VENV" ] || python3.11 -m venv "$VENV"
+echo "export VENV=/root/venv-py311" >> /root/.bashrc
+source /root/.bashrc
 
 ####################################################################################################
 echo "[Info] Complete to prepare PTS env."
-systemctl start userdata.service
+####################################################################################################
+# 临时测试项目
+## pyperformance 需要使用 python 3.10 以上
+testname="pyperformance"
+# 进入 python 3.11虚拟环境
+source "$VENV/bin/activate"
+pip install -U pip setuptools wheel
+
+PROFILE_DIR=/var/lib/phoronix-test-suite/test-profiles/pts/pyperformance-1.2.0
+INSTALL_DIR=/data/pts/pyperformance-1.2.0
+
+phoronix-test-suite download-test-files pyperformance
+cd "$PROFILE_DIR"
+sed -i.bak "s/--user//g" install.sh
+phoronix-test-suite install pyperformance
+cd "$INSTALL_DIR"
+mkdir -p .local/bin/
+cp pyperformance .local/bin/
+
+cd /root/
+
+# 启动一个监控
+DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
+dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
+DOOL_PID=$!
+
+# 执行基准测试
+FORCE_TIMES_TO_RUN=1 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
+# 保存结果 URL
+echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
+phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
+grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
+# 停止监控
+kill -9 ${DOOL_PID}
+# 退出python 3.11 虚拟环境
+deactivate
+sleep 5
+
+################################################################################################
+## qdrant 需要使用 python 3.10 以上
+testname="qdrant"
+# 进入 python 3.11虚拟环境
+source "$VENV/bin/activate"
+phoronix-test-suite info pts/qdrant-1.0.0
+
+# 修改安装脚本
+PROFILE_DIR=/var/lib/phoronix-test-suite/test-profiles/pts/qdrant-1.0.0
+cd "$PROFILE_DIR"
+[ -f install.sh.orig ] || cp install.sh install.sh.orig       # 只在第一次备份原始脚本
+sed -i -e 's/ --user//g' \
+       -e 's#/usr/bin/python3#python3#g' \
+       -e 's#/usr/bin/pip3#pip3#g' \
+       -e 's#\$HOME/\.local/bin/##g' \
+       -e 's#~/\.local/bin/##g' install.sh
+echo "---- 修改内容 ----"
+diff install.sh.orig install.sh || true
+
+# 安装
+phoronix-test-suite force-install pts/qdrant-1.0.0
+
+# 启动一个监控
+DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
+dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
+DOOL_PID=$!
+
+# 执行基准测试
+phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
+# 保存结果 URL
+echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
+phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
+grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
+# 停止监控
+kill -9 ${DOOL_PID}
+# 退出python 3.11 虚拟环境
+deactivate
+sleep 5
+
+################################################################################################
+## pgvector 需要使用 python 3.10 以上
+testname="pgvector"
+# 进入 python 3.11虚拟环境
+source "$VENV/bin/activate"
+pip install "psycopg[binary]"
+phoronix-test-suite info pts/pgvector-1.0.0 
+
+# 修改安装脚本
+PROFILE_DIR=/var/lib/phoronix-test-suite/test-profiles/pts/pgvector-1.0.0
+INSTALL_DIR=/data/pts/pgvector-1.0.0
+cd "$PROFILE_DIR"
+[ -f install.sh.orig ] || cp install.sh install.sh.orig
+sed -i -E '/pip/ s/ --user( |$)/\1/g' install.sh
+diff install.sh.orig install.sh || true    # 应该只有 pip 那一行有变化
+
+# 安装
+phoronix-test-suite install pts/pgvector-1.0.0
+mkdir -p $INSTALL_DIR/.local/bin/
+cp $VENV/bin/vectordbbench $INSTALL_DIR/.local/bin/
+# 修改运行脚本：createdb/createuser 已存在时跳过
+cd "$INSTALL_DIR"
+cp -n pgvector pgvector.orig
+sed -i -e 's|^pg_/bin/createdb vectordbbench.*|pg_/bin/createdb vectordbbench 2>/dev/null \|\| true|' \
+       -e 's|^pg_/bin/createuser postgresuser.*|pg_/bin/createuser postgresuser -d -s --no-password 2>/dev/null \|\| true|' pgvector
+grep -n -E "createdb|createuser" pgvector    # 两行末尾都应有 || true
+
+# 启动一个监控
+DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
+dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
+DOOL_PID=$!
+
+# 执行基准测试
+phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
+# 保存结果 URL
+echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
+phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
+grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
+# 停止监控
+kill -9 ${DOOL_PID}
+# 退出python 3.11 虚拟环境
+deactivate
+
+systemctl disable userdata.service
