@@ -275,45 +275,41 @@ do
     sleep 5
 done
 
+################################################################################################
 ## pyperformance 需要使用 python 3.10 以上
-tests1="pyperformance"
-for testname in ${tests1} 
-do
-    yum install -yq python3.11*
-    python3.11 -m venv ~/venv-py311
+testname="pyperformance"
+yum install -yq python3.11*
+python3.11 -m venv ~/venv-py311
+# 进入 python 3.11虚拟环境
+source ~/venv-py311/bin/activate
+pip install -U pip setuptools wheel
 
-    # 进入 python 3.11虚拟环境
-    source ~/venv-py311/bin/activate
-    phoronix-test-suite download-test-files pyperformance
-    cd /var/lib/phoronix-test-suite/test-profiles/pts/pyperformance-1.2.0
-    sed -i.bak "s/--user//g" install.sh
-    phoronix-test-suite install pyperformance
-    cd /var/lib/phoronix-test-suite/installed-tests/pts/pyperformance-1.2.0/
-    mkdir -p .local/bin/
-    cp pyperformance .local/bin/
-    
-    cd /root/
-    
-    # 启动一个监控
-    DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
-    dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
-    DOOL_PID=$!
-    phoronix-test-suite install ${testname}
-    cd
-    
-    # 执行基准测试
-    FORCE_TIMES_TO_RUN=1 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
-    # 保存结果 URL
-    echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
-    phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
-    grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
-    # 停止监控
-    kill -9 ${DOOL_PID}
-    # 退出python 3.11 虚拟环境
-    deactivate
+phoronix-test-suite download-test-files pyperformance
+cd /var/lib/phoronix-test-suite/test-profiles/pts/pyperformance-1.2.0
+sed -i.bak "s/--user//g" install.sh
+phoronix-test-suite install pyperformance
+cd /var/lib/phoronix-test-suite/installed-tests/pts/pyperformance-1.2.0/
+mkdir -p .local/bin/
+cp pyperformance .local/bin/
 
-    sleep 5
-done
+cd /root/
+
+# 启动一个监控
+DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
+dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
+DOOL_PID=$!
+
+# 执行基准测试
+FORCE_TIMES_TO_RUN=1 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
+# 保存结果 URL
+echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
+phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
+grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
+# 停止监控
+kill -9 ${DOOL_PID}
+# 退出python 3.11 虚拟环境
+deactivate
+sleep 5
 
 ################################################################################################
 # spark-tpcds: 只测试 PRESET_OPTIONS_VALUES='spark-tpcds.scale=500'
@@ -351,6 +347,48 @@ grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test
 kill -9 ${DOOL_PID}
 sleep 5
 
+################################################################################################
+## qdrant 需要使用 python 3.10 以上
+testname="qdrant"
+# yum install -yq python3.11*
+# python3.11 -m venv ~/venv-py311
+# 进入 python 3.11虚拟环境
+source ~/venv-py311/bin/activate
+phoronix-test-suite info pts/qdrant-1.0.0
+
+# 修改安装脚本
+PROFILE_DIR=/var/lib/phoronix-test-suite/test-profiles/pts/qdrant-1.0.0
+cd "$PROFILE_DIR"
+[ -f install.sh.orig ] || cp install.sh install.sh.orig       # 只在第一次备份原始脚本
+sed -i -e 's/ --user//g' \
+       -e 's#/usr/bin/python3#python3#g' \
+       -e 's#/usr/bin/pip3#pip3#g' \
+       -e 's#\$HOME/\.local/bin/##g' \
+       -e 's#~/\.local/bin/##g' install.sh
+echo "---- 修改内容 ----"
+diff install.sh.orig install.sh || true
+
+# 安装
+phoronix-test-suite force-install pts/qdrant-1.0.0
+
+# 启动一个监控
+DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
+dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
+DOOL_PID=$!
+
+# 执行基准测试
+phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
+# 保存结果 URL
+echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
+phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
+grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
+# 停止监控
+kill -9 ${DOOL_PID}
+# 退出python 3.11 虚拟环境
+deactivate
+sleep 5
+
+################################################################################################
 ## 特殊任务：执行2次的tests。
 # tests2="scikit-learn"
 # for testname in ${tests2} 

@@ -111,6 +111,7 @@ CFG_DIR=${DATA_DIR}/system-infomation
 PTS_RESULT_DIR=${DATA_DIR}/pts-result
 LOG_DIR=${DATA_DIR}/logs
 mkdir -p ${DATA_DIR}  ${CFG_DIR} ${PTS_RESULT_DIR} ${LOG_DIR} 
+mkdir -p /data
 
 echo "export DATA_DIR=${DATA_DIR}" >> /root/.bashrc
 echo "export CFG_DIR=${CFG_DIR}" >> /root/.bashrc
@@ -122,6 +123,9 @@ echo "export TEST_RESULTS_DESCRIPTION=${PN}" >> /root/.bashrc
 echo "export TEST_RESULTS_NAME=${PN}" >> /root/.bashrc
 ## 设置测试项执行结束后，删除测试项以节省空间
 echo "export REMOVE_TESTS_ON_COMPLETION=TRUE" >> /root/.bashrc
+## 设置测试项安装在 /data/ 目录下（可以是 EBS 或者 本地 SSD 盘)
+echo "export PTS_DOWNLOAD_CACHE=/data/" >> /root/.bashrc
+echo "export PTS_TEST_INSTALL_ROOT_PATH=/data/" >> /root/.bashrc
 ## 关闭 checksum
 echo "export NO_FILE_HASH_CHECKS=1" >> /root/.bashrc
 ## 设置 GCC14
