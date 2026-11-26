@@ -193,7 +193,7 @@ pip install -U pip setuptools wheel
 PROFILE_DIR=/var/lib/phoronix-test-suite/test-profiles/pts/pyperformance-1.2.0
 INSTALL_DIR=/data/pts/pyperformance-1.2.0
 
-phoronix-test-suite download-test-files pyperformance
+phoronix-test-suite info pyperformance
 cd "$PROFILE_DIR"
 sed -i.bak "s/--user//g" install.sh
 phoronix-test-suite install pyperformance
