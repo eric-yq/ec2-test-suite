@@ -184,42 +184,6 @@ source /root/.bashrc
 echo "[Info] Complete to prepare PTS env."
 ####################################################################################################
 # 临时测试项目
-## pyperformance 需要使用 python 3.10 以上
-testname="pyperformance"
-# 进入 python 3.11虚拟环境
-source "$VENV/bin/activate"
-pip install -U pip setuptools wheel
-
-PROFILE_DIR=/var/lib/phoronix-test-suite/test-profiles/pts/pyperformance-1.2.0
-INSTALL_DIR=/data/pts/pyperformance-1.2.0
-
-phoronix-test-suite info pyperformance
-cd "$PROFILE_DIR"
-sed -i.bak "s/--user//g" install.sh
-phoronix-test-suite install pyperformance
-cd "$INSTALL_DIR"
-mkdir -p .local/bin/
-cp pyperformance .local/bin/
-
-cd /root/
-
-# 启动一个监控
-DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
-dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
-DOOL_PID=$!
-
-# 执行基准测试
-FORCE_TIMES_TO_RUN=1 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
-# 保存结果 URL
-echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
-phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
-grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
-# 停止监控
-kill -9 ${DOOL_PID}
-# 退出python 3.11 虚拟环境
-deactivate
-sleep 5
-
 ################################################################################################
 ## qdrant 需要使用 python 3.10 以上
 testname="qdrant"
