@@ -204,7 +204,7 @@ echo "---- 修改内容 ----"
 diff install.sh.orig install.sh || true
 
 # 安装
-phoronix-test-suite force-install pts/qdrant-1.0.0
+phoronix-test-suite install pts/qdrant-1.0.0
 
 # 启动一个监控
 DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
