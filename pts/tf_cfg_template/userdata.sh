@@ -144,24 +144,8 @@ lstopo --of png > ${CFG_DIR}/cfg_lstopo-all.png
 numactl -H > ${CFG_DIR}/cfg_numactl-H.txt
 uname -a > ${CFG_DIR}/cfg_uname-a.txt
 
-## core-to-core-latency 测试 ===========================================================
-cargo install core-to-core-latency
-python3 -m pip install cython numpy pandas matplotlib
-curl -o ~/heatmap.py https://raw.githubusercontent.com/eric-yq/ec2-test-suite/refs/heads/main/tools/heatmap.py
-## 测试 core-to-core-latency，并通过 heatmap.py 生成热力图，执行3次。
-cpu_model=$(dmidecode -t Processor | grep -i Version | awk -F':'  '{print $2}' | sed s"/^ //g")
-NPROCS=$(nproc)
-for i in {1..3} 
-do
-	~/.cargo/bin/core-to-core-latency 5000 --csv > ${CFG_DIR}/perf-core-to-core-latency-${i}.csv
-	python3 ~/heatmap.py -f "${CFG_DIR}/perf-core-to-core-latency-${i}.csv" -o "${CFG_DIR}/perf-core-to-core-latency-heatmap-${i}.png" -c "${cpu_model}" -n ${NPROCS}
-	sleep 5
-done
-
 ##############################################################################################
-## PTS（Phoronix-Test-Suite）基准测试
-## 安装依赖包,master 分支的代码需要修改才能正常运行，使用 10.8.4 的稳定版本。
-# git clone https://github.com/phoronix-test-suite/phoronix-test-suite.git ~/phoronix-test-suite
+## 安装 Phoronix
 wget https://github.com/phoronix-test-suite/phoronix-test-suite/releases/download/v10.8.4/phoronix-test-suite-10.8.4.tar.gz
 tar zxf phoronix-test-suite-10.8.4.tar.gz
 cd ~/phoronix-test-suite/pts-core/commands/
@@ -417,64 +401,7 @@ kill -9 ${DOOL_PID}
 deactivate
 sleep 5
 
-################################################################################################
-## 特殊任务：执行2次的tests。
-# tests2="scikit-learn"
-# for testname in ${tests2} 
-# do
-#     # 启动一个监控
-#     DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
-#     dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
-#     DOOL_PID=$!
-#     # 执行基准测试
-#     FORCE_TIMES_TO_RUN=2 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
-#     # 保存结果 URL
-#     echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
-#     phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
-#     grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
-#     # 停止监控
-#     kill -9 ${DOOL_PID}
-
-#     sleep 5
-# done
-
-################################################################################################
-## pyperformance 需要使用 python 3.10 以上:OOM!! 
-# testname="pyperformance"
-# # 进入 python 3.11虚拟环境
-# source "$VENV/bin/activate"
-# pip install -U pip setuptools wheel
-
-# PROFILE_DIR=/var/lib/phoronix-test-suite/test-profiles/pts/pyperformance-1.2.0
-# INSTALL_DIR=/data/pts/pyperformance-1.2.0
-
-# phoronix-test-suite download-test-files pyperformance
-# cd "$PROFILE_DIR"
-# sed -i.bak "s/--user//g" install.sh
-# phoronix-test-suite install pyperformance
-# cd "$INSTALL_DIR"
-# mkdir -p .local/bin/
-# cp pyperformance .local/bin/
-
-# cd /root/
-
-# # 启动一个监控
-# DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
-# dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
-# DOOL_PID=$!
-
-# # 执行基准测试
-# FORCE_TIMES_TO_RUN=1 phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
-# # 保存结果 URL
-# echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
-# phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
-# grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
-# # 停止监控
-# kill -9 ${DOOL_PID}
-# # 退出python 3.11 虚拟环境
-# deactivate
-# sleep 5
-
+##############################################################################################################
 echo "[INFO] Step: Complete ALL PTS TESTS."
 
 # 所有结果打包并上传到 S3 bucket
