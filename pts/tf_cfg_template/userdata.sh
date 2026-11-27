@@ -87,6 +87,13 @@ aws_s3_bucket_name=$(aws s3 ls | awk '{print $3}' | grep ec2-core-benchmark | he
 # 主要流程
 install_al2023_dependencies
 
+# 如果有本地 SSD 盘，则设置磁盘lvm stripe，会自动挂载在 /data 目录。
+cd /root/
+git clone https://github.com/eric-yq/ec2-test-suite.git
+bash ec2-test-suite/tools/setup_nvme_instance_store.sh
+# 创建一个 /data 目录，如果没有本地 SSD 盘，上一步不会创建 /data 目录。
+mkdir -p /data
+
 ## 更新 cmake
 ARCH=$(arch) 
 VER=3.29.6
@@ -103,7 +110,6 @@ CFG_DIR=${DATA_DIR}/system-infomation
 PTS_RESULT_DIR=${DATA_DIR}/pts-result
 LOG_DIR=${DATA_DIR}/logs
 mkdir -p ${DATA_DIR} ${CFG_DIR} ${PTS_RESULT_DIR} ${LOG_DIR} 
-mkdir -p /data
 
 echo "export DATA_DIR=${DATA_DIR}" >> /root/.bashrc
 echo "export CFG_DIR=${CFG_DIR}" >> /root/.bashrc
@@ -301,7 +307,6 @@ grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test
 kill -9 ${DOOL_PID}
 sleep 5
 
-################################################################################################
 ## qdrant 需要使用 python 3.10 以上
 testname="qdrant"
 # 进入 python 3.11虚拟环境
@@ -321,7 +326,35 @@ echo "---- 修改内容 ----"
 diff install.sh.orig install.sh || true
 
 # 安装
-phoronix-test-suite force-install pts/qdrant-1.0.0
+phoronix-test-suite install pts/qdrant-1.0.0
+# 修改测试脚本
+INSTALL_DIR=/data/pts/qdrant-1.0.0
+cd "$INSTALL_DIR"
+cp -n qdrant qdrant.orig
+head -1 qdrant.orig > qdrant
+cat >> qdrant << 'EOF'
+# 清掉上一轮残留的进程和数据
+pkill -f qdrant-bin 2>/dev/null
+while pgrep -f qdrant-bin >/dev/null; do sleep 1; done
+rm -rf ./storage ./snapshots
+
+./qdrant-bin --disable-telemetry &
+QDRANT_PID=$!
+# 等 Qdrant 就绪，最多 120 秒
+for i in $(seq 1 120); do
+  curl -sf http://localhost:6333/readyz >/dev/null && break
+  sleep 1
+done
+
+vectordbbench qdrantlocal --load-concurrency 1 $@ > $LOG_FILE
+
+# 停止并等进程真正退出
+kill $QDRANT_PID
+wait $QDRANT_PID 2>/dev/null
+rm -rf ./storage ./snapshots
+EOF
+chmod +x qdrant
+# cat qdrant
 
 # 启动一个监控
 DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
