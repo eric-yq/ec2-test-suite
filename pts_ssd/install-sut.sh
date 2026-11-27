@@ -1,0 +1,1 @@
+../pts/install-sut.sh
