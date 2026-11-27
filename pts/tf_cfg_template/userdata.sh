@@ -40,7 +40,7 @@ fi
 SUT_NAME="SUT_XXX"
 
 ## 获取代码
-cd /root/
+cd /root/ && yum install -y git
 git clone https://github.com/eric-yq/ec2-test-suite.git
 
 # 安装 SUT
