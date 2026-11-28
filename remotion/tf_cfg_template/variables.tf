@@ -55,3 +55,7 @@ variable "number_of_instances" {
 	description = "number of instances to be created"
 	default = 1
 }
+
+variable "iam_instance_profile" {
+	default = "SSMDefaultRoleForPVREReporting"
+}

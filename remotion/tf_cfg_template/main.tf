@@ -33,4 +33,6 @@ resource "aws_instance" "sut_server" {
   tags = {
     Name = "${var.instance_name}"
   }
+  
+  iam_instance_profile = var.iam_instance_profile
 }
