@@ -190,7 +190,32 @@ source /root/.bashrc
 echo "[Info] Complete to prepare PTS env."
 ####################################################################################################
 # 临时测试项目
-################################################################################################
+####################################################################################################
+## faiss 需要使用 python 3.10 以上
+testname="faiss"
+# 进入 python 3.11虚拟环境
+source "$VENV/bin/activate"
+dnf install -y python3.11-devel swig openblas-devel
+pip install numpy faiss-cpu
+
+# 启动一个监控
+DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
+dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
+DOOL_PID=$!
+
+# 执行基准测试
+phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
+# 保存结果 URL
+echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
+phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
+grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
+# 停止监控
+kill -9 ${DOOL_PID}
+# 退出python 3.11 虚拟环境
+deactivate
+sleep 5
+
+####################################################################################################
 ## qdrant 需要使用 python 3.10 以上
 testname="qdrant"
 # 进入 python 3.11虚拟环境

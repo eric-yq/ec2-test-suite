@@ -149,7 +149,7 @@ echo "[INFO] Step1: Start to perform PTS tests ..."
 
 tests="stream cachebench ramspeed compress-zstd compress-lz4 blosc \
   botan john-the-ripper cython-bench ffmpeg x264 x265 tjbench vvenc svt-av1 blogbench nginx \
-  graphics-magick smallpt draco renaissance dacapobench java-scimark2 scimark2 libxsmm faiss \
+  graphics-magick smallpt draco renaissance dacapobench java-scimark2 scimark2 libxsmm \
   redis memtier-benchmark valkey dragonflydb pogocache tidb sonicjson simdjson \
   cassandra scylladb mariadb rocksdb influxdb clickhouse duckdb leveldb cockroach couchdb spark \
   c-ray lczero arrayfire stockfish mt-dgemm perf-bench mlpack mnn whisper-cpp whisperfile opencv \
@@ -250,6 +250,32 @@ grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test
 kill -9 ${DOOL_PID}
 sleep 5
 
+################################################################################################
+## faiss 需要使用 python 3.10 以上
+testname="faiss"
+# 进入 python 3.11虚拟环境
+source "$VENV/bin/activate"
+dnf install -y python3.11-devel swig openblas-devel
+pip install numpy faiss-cpu
+
+# 启动一个监控
+DOOL_FILE="${PTS_RESULT_DIR}/${testname}-dool.txt"
+dool --cpu --sys --mem --net --net-packets --disk --io --proc-count --time --bits 60 > ${DOOL_FILE} 2>&1 &
+DOOL_PID=$!
+
+# 执行基准测试
+phoronix-test-suite batch-benchmark ${testname} > ${PTS_RESULT_DIR}/${testname}.txt
+# 保存结果 URL
+echo "${testname}:" >> ${DATA_DIR}/test-report-url-summary.txt
+phoronix-test-suite info ${testname} | grep "Description: "  >> ${DATA_DIR}/test-report-url-summary.txt
+grep "Results Uploaded To" ${PTS_RESULT_DIR}/${testname}.txt >> ${DATA_DIR}/test-report-url-summary.txt
+# 停止监控
+kill -9 ${DOOL_PID}
+# 退出python 3.11 虚拟环境
+deactivate
+sleep 5
+
+################################################################################################
 ## qdrant 需要使用 python 3.10 以上
 testname="qdrant"
 # 进入 python 3.11虚拟环境
@@ -315,6 +341,7 @@ kill -9 ${DOOL_PID}
 # 退出python 3.11 虚拟环境
 deactivate
 sleep 5
+
 
 ################################################################################################
 ## pgvector 需要使用 python 3.10 以上
