@@ -35,13 +35,13 @@ unzip -q awscliv2.zip
 cp -rf /usr/local/bin/aws /usr/bin/aws
 aws --version
 
-aws_ak_value="akxxx"
-aws_sk_value="skxxx"
-aws_region_name=$(ec2-metadata --quiet --region)
-aws configure set aws_access_key_id ${aws_ak_value}
-aws configure set aws_secret_access_key ${aws_sk_value}
-aws configure set default.region ${aws_region_name}
-aws_s3_bucket_name=$(aws s3 ls | awk '{print $3}' | grep ec2-core-benchmark | head -1)
+# aws_ak_value="akxxx"
+# aws_sk_value="skxxx"
+# aws_region_name=$(ec2-metadata --quiet --region)
+# aws configure set aws_access_key_id ${aws_ak_value}
+# aws configure set aws_secret_access_key ${aws_sk_value}
+# aws configure set default.region ${aws_region_name}
+# aws_s3_bucket_name=$(aws s3 ls | awk '{print $3}' | grep ec2-core-benchmark | head -1)
 
 # 主要流程
 install_al2023_dependencies

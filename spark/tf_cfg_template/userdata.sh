@@ -49,12 +49,12 @@ fi
 SUT_NAME="SUT_XXX"
 
 ## 配置 AWSCLI
-aws_ak_value="akxxx"
-aws_sk_value="skxxx"
-aws_region_name=$(ec2-metadata --quiet --region)
-aws configure set aws_access_key_id ${aws_ak_value}
-aws configure set aws_secret_access_key ${aws_sk_value}
-aws configure set default.region ${aws_region_name}
+# aws_ak_value="akxxx"
+# aws_sk_value="skxxx"
+# aws_region_name=$(ec2-metadata --quiet --region)
+# aws configure set aws_access_key_id ${aws_ak_value}
+# aws configure set aws_secret_access_key ${aws_sk_value}
+# aws configure set default.region ${aws_region_name}
 aws_s3_bucket_name=$(aws s3 ls | awk '{print $3}' | grep ec2-core-benchmark | head -1)
 
 # 设置软件栈版本：
@@ -421,6 +421,7 @@ timestamp=$(date +%Y%m%d-%H%M%S)
 archive="${DATA_DIR}_${timestamp}"
 cp ${DOOL_FILE} ${DATA_DIR}/
 tar czf ${archive}.tar.gz ${DATA_DIR}/
+aws_s3_bucket_name=$(aws s3 ls | awk '{print $3}' | grep ec2-core-benchmark | head -1)
 aws s3 cp ${archive}.tar.gz s3://${aws_s3_bucket_name}/result_spark/
 
 ## Disable 服务，这样 reboot 后不会再次执行

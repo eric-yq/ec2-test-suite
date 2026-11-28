@@ -85,11 +85,11 @@ sed -i "s/USERDATA_FILE_XXX/userdata.sh/g" variables.tf
 sed -i "s/KEY_NAME_XXX/${KEY_NAME_XXX}/g" variables.tf
 
 ## 修改 userdata.sh: 设置 AWC CLI 的 AK/SK
-sed -i "s/SUT_XXX/${SUT_NAME}/g" userdata.sh
-if grep -q "akxxx" userdata.sh && grep -q "skxxx" userdata.sh; then
-    sed -i "s/akxxx/$(aws configure get aws_access_key_id)/g" userdata.sh
-    sed -i "s/skxxx/$(aws configure get aws_secret_access_key)/g" userdata.sh
-fi
+# sed -i "s/SUT_XXX/${SUT_NAME}/g" userdata.sh
+# if grep -q "akxxx" userdata.sh && grep -q "skxxx" userdata.sh; then
+#     sed -i "s/akxxx/$(aws configure get aws_access_key_id)/g" userdata.sh
+#     sed -i "s/skxxx/$(aws configure get aws_secret_access_key)/g" userdata.sh
+# fi
 
 ## USE_CPG 通过 调用脚本 launch-instances-single.sh 时传递过来 USE_cpg=1 表示使用 CPG， 否则不使用。
 if [ "$USE_CPG" = "1" ] && [ -n "$PG_NAME_XXX" ]; then

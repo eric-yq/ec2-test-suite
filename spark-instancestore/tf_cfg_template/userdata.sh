@@ -4,23 +4,12 @@
 sudo systemctl stop amazon-ssm-agent
 sudo systemctl disable amazon-ssm-agent
 
-## (optional) mount nvme disk
-disks="nvme1n1" 
-for disk in $disks
-do
-    echo "[INFO] Start to create partition on $disk..."
-    echo -e "g\nn\n1\n\n\nw" | fdisk /dev/$disk
-
-    echo "[INFO] Start to create filesystem on $device..."
-    partition=${disk}p1 && mkdir -p /data/$partition
-    device="/dev/$partition" && mkfs -t xfs -f $device
-
-    echo "[INFO] Start to modify /etc/fstab..."
-    uuid=$(blkid | grep $partition | awk -F "\"" '{print $2}')
-    echo "UUID=$uuid /data/$partition xfs  defaults,nofail  0  2" >> /etc/fstab
-done
-mount -a && df -h && sleep 5
-chmod 777 /data/*
+# 如果有本地 SSD 盘，则设置磁盘lvm stripe，会自动挂载在 /data 目录。
+cd /root/
+git clone https://github.com/eric-yq/ec2-test-suite.git
+bash ec2-test-suite/tools/setup_nvme_instance_store.sh
+# 创建一个 /data 目录，如果没有本地 SSD 盘，上一步不会创建 /data 目录。
+mkdir -p /data
 
 # 实例启动成功之后的首次启动 OS， /home/ec2-user/userdata.sh 不存在，创建该 userdata.sh 文件并设置开启自动执行该脚本。
 # !!! Spark 比较特殊，需要使用 ec2-user 执行。
@@ -63,12 +52,12 @@ fi
 sc
 
 ## 配置 AWSCLI
-aws_ak_value="akxxx"
-aws_sk_value="skxxx"
-aws_region_name=$(ec2-metadata --quiet --region)
-aws configure set aws_access_key_id ${aws_ak_value}
-aws configure set aws_secret_access_key ${aws_sk_value}
-aws configure set default.region ${aws_region_name}
+# aws_ak_value="akxxx"
+# aws_sk_value="skxxx"
+# aws_region_name=$(ec2-metadata --quiet --region)
+# aws configure set aws_access_key_id ${aws_ak_value}
+# aws configure set aws_secret_access_key ${aws_sk_value}
+# aws configure set default.region ${aws_region_name}
 aws_s3_bucket_name=$(aws s3 ls | awk '{print $3}' | grep ec2-core-benchmark | head -1)
 
 # 设置软件栈版本：
@@ -174,7 +163,7 @@ source  ~/.bashrc
 mkdir $HADOOP_HOME/tmp
 # mkdir $HADOOP_HOME/hdfs
 # for instance store - begin
-sudo ln -s /data/nvme1n1p1 $HADOOP_HOME/hdfs
+sudo ln -s /data/ $HADOOP_HOME/hdfs
 # for instance store - end
 mkdir $HADOOP_HOME/hdfs/name
 mkdir $HADOOP_HOME/hdfs/data
@@ -336,7 +325,7 @@ spark-submit --class org.apache.spark.examples.SparkPi \
 
 ################################################################################################
 # 安装和配置 TPC-DS 测试工具
-TEST_TOOL_FOLDER=/data/nvme1n1p1
+TEST_TOOL_FOLDER=/data/
 cd $TEST_TOOL_FOLDER
 git clone https://github.com/hortonworks/hive-testbench.git
 
